@@ -838,7 +838,7 @@ setup_special_roles(struct gr_arg *grarg)
 			    (entry.rolename, entry.salt, entry.sum)) {
 				fprintf(stderr,
 					"No password exists for special "
-					"role %s.\n  Run gradm -P %s to set up a password "
+					"role %s.\nRun gradm -P %s to set up a password "
 					"for the role.\n", rtmp->rolename,
 					rtmp->rolename);
 				exit(EXIT_FAILURE);
