@@ -123,8 +123,17 @@ void * gr_dyn_alloc(unsigned long len);
 void * gr_stat_alloc(unsigned long len);
 void * gr_dyn_realloc(void *addr, unsigned long len);
 void gr_dyn_free(void *addr);
+void gr_stat_free(void *addr);
 
 void insert_acl_object(struct proc_acl *subject, struct file_acl *object);
 void insert_acl_subject(struct role_acl *role, struct proc_acl *subject);
 
 void insert_nested_acl_subject(struct proc_acl *subject);
+
+char *gr_get_user_name(uid_t uid);
+char *gr_get_group_name(gid_t gid);
+
+void output_role_info(struct gr_learn_group_node *group, struct gr_learn_user_node *user, FILE *stream);
+void output_learn_header(FILE *stream);
+
+int display_leaf(struct gr_learn_file_node *node, struct gr_learn_file_node *unused1, FILE *stream);

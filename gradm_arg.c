@@ -281,8 +281,10 @@ parse_args(int argc, char *argv[])
 		check_acl_status(entry.mode);
 		if (gr_fulllearn)
 			add_fulllearn_acl();
-		if (gr_learn)
+		if (gr_learn) {
 			start_grlearn(learn_log);
+			free(learn_log);
+		}
 		grarg = conv_user_to_kernel(&entry);
 		read_saltandpass(entry.rolename, grarg->arg->salt,
 				 grarg->arg->sum);
@@ -310,6 +312,8 @@ parse_args(int argc, char *argv[])
 		else
 			handle_learn_logs(learn_log, stream);
 
+		free(learn_log);
+		free(output_log);
 	}
 	return;
 }

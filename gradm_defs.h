@@ -401,3 +401,7 @@ __u32 num_roles;
 __u32 num_objects;
 __u32 num_pointers;
 __u32 num_domain_children;
+
+char *current_learn_rolename;
+char *current_learn_subject;
+__u16 current_learn_rolemode;

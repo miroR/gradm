@@ -91,6 +91,7 @@ void fulllearn_pass2(FILE *stream)
 	fulllearn_pass2parse();
 	printf("done.\n");
 	fflush(stdout);
+
 	traverse_roles(role_list, &full_reduce_subjects, NULL);
 	traverse_roles(role_list, &full_reduce_allowed_ips, NULL);
 
@@ -124,6 +125,7 @@ int full_reduce_object_node(struct gr_learn_file_node *subject,
 	enforce_high_protected_paths(subject);
 
 	third_stage_reduce_tree(subject->object_list);
+
 	printf("done.\n");
 	fflush(stdout);
 	return 0;
@@ -178,18 +180,161 @@ int full_reduce_ips(struct gr_learn_group_node *group,
 	return 0;
 }
 
-void fulllearn_pass3(FILE *stream)
+void free_ip_ports(struct gr_learn_ip_node *node)
 {
-	fulllearn_pass3in = stream;
-	printf("Beginning full learning 3rd pass...");
-	fflush(stdout);
-	fulllearn_pass3parse();
-	printf("done.\n");
-	fflush(stdout);
-	traverse_roles(role_list, &full_reduce_objects, NULL);
-	traverse_roles(role_list, &full_reduce_ips, NULL);
+	struct gr_learn_ip_node **tmp;
+	__u16 **tmp2;
+
+	if (node == NULL)
+		return;
+
+	tmp = node->leaves;
+
+	while (tmp && *tmp) {
+		free_ip_ports(*tmp);
+		tmp++;
+	}
+	
+	if (node->leaves) {
+		gr_dyn_free(node->leaves);
+		node->leaves = NULL;
+	}
+
+	tmp2 = node->ports;
+	while (tmp2 && *tmp2) {
+		gr_stat_free(*tmp2);
+		tmp2++;
+	}
+
+	if (node->ports)
+		gr_dyn_free(node->ports);
+	gr_stat_free(node);
+	node = NULL;
 
 	return;
+}
+
+void free_subject_objects(struct gr_learn_file_node *node)
+{
+	struct gr_learn_file_node **tmp;
+
+	if (node == NULL)
+		return;
+
+	tmp = node->leaves;
+
+	while (tmp && *tmp) {
+		free_subject_objects(*tmp);
+		tmp++;
+	}
+
+	if (node->leaves) {
+		gr_dyn_free(node->leaves);
+		node->leaves = NULL;
+	}
+
+	free_ip_ports(node->connect_list);
+	free_ip_ports(node->bind_list);
+
+	if (node->subject) {
+		free(node->subject);
+		node->subject = NULL;
+	}
+	free(node->filename);
+	gr_stat_free(node);
+	node = NULL;
+	
+
+	return;
+}
+
+void free_subject_full(struct gr_learn_file_node *subject)
+{
+	struct gr_learn_file_tmp_node **tmptable;
+	unsigned long table_size, i;
+
+	if (subject->hash) {
+		tmptable = (struct gr_learn_file_tmp_node **)subject->hash->table;
+		table_size = subject->hash->table_size;
+		for (i = 0; i < table_size; i++) {
+			if (tmptable[i] == NULL)
+				continue;
+			free(tmptable[i]->filename);
+			free(tmptable[i]);
+		}
+		free(tmptable);
+		free(subject->hash);
+	}
+
+	free_subject_objects(subject->object_list);
+
+	return;
+}
+
+void free_role_user_full(struct gr_learn_user_node *user)
+{
+	struct gr_learn_file_tmp_node **tmptable;
+	unsigned long table_size, i;
+
+	if (user->hash) {
+		tmptable = (struct gr_learn_file_tmp_node **)user->hash->table;
+		table_size = user->hash->table_size;
+		for (i = 0; i < table_size; i++) {
+			if (tmptable[i] == NULL)
+				continue;
+			free(tmptable[i]->filename);
+			free(tmptable[i]);
+		}
+		free(tmptable);
+		free(user->hash);
+	}
+
+	free_subject_objects(user->subject_list);
+	free_ip_ports(user->allowed_ips);
+
+	return;
+}
+
+void free_role_group_full(struct gr_learn_group_node *group)
+{
+	struct gr_learn_file_tmp_node **tmptable;
+	unsigned long table_size, i;
+
+	if (group->hash) {
+		tmptable = (struct gr_learn_file_tmp_node **)group->hash->table;
+		table_size = group->hash->table_size;
+		for (i = 0; i < table_size; i++) {
+			if (tmptable[i] == NULL)
+				continue;
+			free(tmptable[i]->filename);
+			free(tmptable[i]);
+		}
+		free(tmptable);
+		free(group->hash);
+	}
+
+	free_subject_objects(group->subject_list);
+	free_ip_ports(group->allowed_ips);
+	
+	return;
+}
+
+int fulllearn_pass3(struct gr_learn_file_node *subject, struct gr_learn_file_node *unused, FILE *stream)
+{
+	fseek(fulllearn_pass3in, 0, SEEK_SET);
+	current_learn_subject = subject->filename;
+
+	fflush(stdout);
+	fulllearn_pass3parse();
+	fflush(stdout);
+
+	full_reduce_object_node(subject, NULL, NULL);
+	full_reduce_ip_node(subject, NULL, NULL);
+
+	display_leaf(subject, NULL, stream);
+	free_subject_full(subject);
+
+	return 0;
 }
 
 void enforce_hidden_file(struct gr_learn_file_node *subject, char *filename)
@@ -201,7 +346,7 @@ void enforce_hidden_file(struct gr_learn_file_node *subject, char *filename)
 	if (retobj->mode & GR_FIND && !strcmp(retobj->filename, filename))
 		retobj->mode = 0;
 	else if (retobj->mode & GR_FIND)
-		insert_file(&(subject->object_list), strdup(filename), 0, 0);
+		insert_file(&(subject->object_list), filename, 0, 0);
 
 	return;
 }
@@ -240,18 +385,42 @@ int ensure_role_security(struct gr_learn_group_node *group,
 	return 0;
 }
 
-void fulllearn_finalpass(void)
+void output_learn_header(FILE *stream)
 {
-	printf("Beginning full learning final pass...");
-	fflush(stdout);
-	traverse_roles(role_list, &ensure_role_security, NULL);
-	printf("done.\n");
-	fflush(stdout);
+	fprintf(stream, "role default\n");
+	fprintf(stream, "subject / {\n");
+	fprintf(stream, "\t/\t\t\t\th\n");
+	fprintf(stream, "\t-CAP_ALL\n");
+	fprintf(stream, "\tconnect\tdisabled\n");
+	fprintf(stream, "\tbind\tdisabled\n");
+	fprintf(stream, "}\n\n");
+	fflush(stream);
+
+	return;
+}
+
+void output_role_info(struct gr_learn_group_node *group, struct gr_learn_user_node *user, FILE *stream)
+{
+	struct gr_learn_ip_node *allowed_ips = NULL;
+
+	if (user) {
+		fprintf(stream, "role %s u%s\n", user->rolename, strcmp(user->rolename, "root") ? "" : "G");
+		allowed_ips = user->allowed_ips;
+	} else {
+		fprintf(stream, "role %s g\n", group->rolename);
+		allowed_ips = group->allowed_ips;
+	}
+
+	if (allowed_ips)
+		traverse_ip_tree(allowed_ips, NULL, &display_only_ip, 0, stream);
+
 	return;
 }
 
 void generate_full_learned_acls(char *learn_log, FILE *stream)
 {
+	struct gr_learn_group_node **group;
+	struct gr_learn_user_node **user;
 	FILE *learnlog;
 
 	learnlog = fopen(learn_log, "r");
@@ -260,16 +429,41 @@ void generate_full_learned_acls(char *learn_log, FILE *stream)
 				"Error: %s\n", learn_log, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+
+	output_learn_header(stream);
+
 	fulllearn_pass1(learnlog);
 	fseek(learnlog, 0, SEEK_SET);
 	fulllearn_pass2(learnlog);
-	fseek(learnlog, 0, SEEK_SET);
-	fulllearn_pass3(learnlog);
+	
+	fulllearn_pass3in = learnlog;
+	group = role_list;
+
+	if (!group)
+		goto out;
+
+	while (*group) {
+		user = (*group)->users;
+		if (!user) {
+			current_learn_rolename = (*group)->rolename;
+			current_learn_rolemode = GR_ROLE_GROUP;
+			output_role_info((*group), NULL, stream);
+			traverse_file_tree((*group)->subject_list, &fulllearn_pass3, NULL, stream);
+		} else {	
+			while (*user) {
+				current_learn_rolename = (*user)->rolename;
+				current_learn_rolemode = GR_ROLE_USER;
+				output_role_info(NULL, (*user), stream);
+				traverse_file_tree((*user)->subject_list, &fulllearn_pass3, NULL, stream);
+				free_role_user_full(*user);
+				user++;
+			}
+		}
+		free_role_group_full(*group);
+		group++;
+	}
+out:
+	fprintf(stdout, "Full learning complete.\n");
 	fclose(learnlog);
-
-	fulllearn_finalpass();
-
-	display_roles(role_list, stream);
-
 	return;
 }

@@ -1,147 +1,49 @@
 #include "gradm.h"
 
-/* anticipatory memory allocator */
-
-/* gr_stat_alloc(): for groups of allocations that need to be done quickly
-		    allocate several more of larger size, fit for use as
-		    filenames (4k), then hand out one at a time until 
-		    there are none left.
-   gr_dyn_alloc() : addresses that need constant resizing
-		    here we allocate 16 times the amount requested,
-		    once this is full, we redirect to the real realloc,
-		    and then update our internal structures.
-*/
-
-struct mem_entry {
-	void *data;
-	void *current;
-};
-
-struct resize_entry {
-	unsigned long max;
-};
-
-#define MAX_MEM_SIZE	512
-#define MAX_RESIZE_SIZE	16
-
-static struct mem_entry **stat_alloc = NULL;
-static unsigned long stat_alloc_num = 0;
-static unsigned long stat_alloc_start = 0;
-
-void gr_stat_free_all(void)
-{
-	unsigned long i;
-
-	for (i = 0; i < stat_alloc_num; i++)
-		free(stat_alloc[i]->data);
-	if (stat_alloc != NULL)
-		free(stat_alloc);
-	stat_alloc_num = 0;
-	stat_alloc = NULL;
-}
-
 void * gr_stat_alloc(unsigned long len)
 {
-	unsigned long i, j;
-	void *ret = NULL;
+	void *ptr;
 
-	if (stat_alloc == NULL) {
-		stat_alloc_num = MAX_MEM_SIZE;
-		stat_alloc = calloc(stat_alloc_num, sizeof(struct mem_entry *));
-		if (stat_alloc == NULL)
-			failure("calloc");
-
-		/* allocate new mem_entries */
-		for (j = 0; j < stat_alloc_num; j++) {
-			stat_alloc[j] = calloc(1, sizeof(struct mem_entry));
-			if (stat_alloc[j] == NULL)
-				failure("calloc");
-		}
-	}
-
-	for (i = stat_alloc_start; i < stat_alloc_num; i++) {
-		if (stat_alloc[i]->data != NULL) {
-			if ((stat_alloc[i]->current - stat_alloc[i]->data + len) < (PATH_MAX * MAX_MEM_SIZE)) {
-				ret = stat_alloc[i]->current;
-				stat_alloc[i]->current = stat_alloc[i]->current + len;
-				return ret;
-			}
-		} else
-			break;
-	}
-
-	if (i == stat_alloc_num) {
-		/* out of space, need to resize allocation list */
-		stat_alloc = realloc(stat_alloc, (stat_alloc_num + MAX_MEM_SIZE) * sizeof(struct mem_entry *));
-		if (stat_alloc == NULL)
-			failure("realloc");
-		memset(stat_alloc + stat_alloc_num, 0, MAX_MEM_SIZE * sizeof(struct mem_entry *));
-
-		/* allocate new mem_entries */
-		for (j = 0; j < MAX_MEM_SIZE; j++) {
-			stat_alloc[stat_alloc_num + j] = calloc(1, sizeof(struct mem_entry));
-			if (stat_alloc[stat_alloc_num + j] == NULL)
-				failure("calloc");
-		}
-		stat_alloc_num = stat_alloc_num + MAX_MEM_SIZE;
-	}
-
-	/* ->data was null, let's allocate it */
-	stat_alloc[i]->data = calloc(MAX_MEM_SIZE, PATH_MAX);
-	if (stat_alloc[i]->data == NULL)
+	ptr = calloc(1, len);
+	if (ptr == NULL)
 		failure("calloc");
-	stat_alloc[i]->current = stat_alloc[i]->data + len;
-	stat_alloc_start = i;
-	ret = stat_alloc[i]->data;
 
-	return ret;
+	return ptr;
 }
 
 void * gr_dyn_alloc(unsigned long len)
 {
-	void *ret;
-	struct resize_entry *resent;
+	void *ptr;
 
-	/* store usage information before the actual allocation. */
-	ret = calloc(1, (MAX_RESIZE_SIZE * len) + sizeof(struct resize_entry));
-	if (ret == NULL)
+	ptr = calloc(1, len);
+	if (ptr == NULL)
 		failure("calloc");
-	resent = ret;
-	resent->max = MAX_RESIZE_SIZE * len;
-	ret = ret + sizeof(struct resize_entry);
 
-	return ret;
+	return ptr;
 }
 
 void * gr_dyn_realloc(void *addr, unsigned long len)
 {
-	void *ret = NULL;
-	struct resize_entry *resent;
+	void *ptr;
 
-	if (addr == NULL)
-		return gr_dyn_alloc(len);
+	ptr = realloc(addr, len);
+	if (ptr == NULL)
+		failure("realloc");
 
-	resent = addr - sizeof(struct resize_entry);
-	if (len < resent->max)
-		return addr;
-	else {
-		ret = realloc(resent, (MAX_RESIZE_SIZE * len) + sizeof(struct resize_entry));
-		if (ret == NULL)
-			failure("realloc");
-		resent = ret;
-		resent->max = MAX_RESIZE_SIZE * len;
-		ret = ret + sizeof(struct resize_entry);
-	}
-
-	return ret;		
+	return ptr;
 }
 
 void gr_dyn_free(void *addr)
 {
-	void *ptr;
+	free(addr);
 
-	ptr = addr - sizeof(struct resize_entry);
-	free(ptr);
+	return;
+}
+
+
+void gr_stat_free(void *addr)
+{
+	free(addr);
 
 	return;
 }
@@ -197,46 +99,50 @@ void insert_name_entry(struct gr_hash_struct *hash, void *entry);
 void resize_hash_table(struct gr_hash_struct *hash)
 {
 	unsigned long i;
-	struct gr_hash_struct newhash;
+	struct gr_hash_struct *newhash;
+
+	newhash = calloc(1, sizeof(struct gr_hash_struct));
+	if (newhash == NULL)
+		failure("calloc");
 
 	for (i = 0; i < sizeof(table_sizes)/sizeof(table_sizes[0]); i++) {
 		if (table_sizes[i] > hash->table_size) {
-			newhash.table_size = table_sizes[i];
+			newhash->table_size = table_sizes[i];
 			break;
 		}
 	}
 
-	if (newhash.table_size == 0) {
+	if (newhash->table_size == 0) {
 		fprintf(stderr, "Out of memory.\n");
 		exit(EXIT_FAILURE);
 	}
 
-	newhash.table = calloc(newhash.table_size, sizeof(void *));
-	if (newhash.table == NULL)
+	newhash->table = calloc(newhash->table_size, sizeof(void *));
+	if (newhash->table == NULL)
 		failure("calloc");
 
-	newhash.nametable = NULL;
+	newhash->nametable = NULL;
 	if (hash->type != GR_HASH_FILENAME) {
-		newhash.nametable = calloc(newhash.table_size, sizeof(void *));
-		if (newhash.nametable == NULL)
+		newhash->nametable = calloc(newhash->table_size, sizeof(void *));
+		if (newhash->nametable == NULL)
 			failure("calloc");
 	}
 
-	newhash.used_size = 0;
-	newhash.type = hash->type;
-	newhash.first = hash->first;
+	newhash->used_size = 0;
+	newhash->type = hash->type;
+	newhash->first = hash->first;
 	
 	for (i = 0; i < hash->table_size; i++)
 		if (hash->table[i]) {
-			insert_hash_entry(&newhash, hash->table[i]);
-			insert_name_entry(&newhash, hash->table[i]);
+			insert_hash_entry(newhash, hash->table[i]);
+			insert_name_entry(newhash, hash->table[i]);
 		}
 
 	free(hash->table);
 	if (hash->nametable)
 		free(hash->nametable);
-	memcpy(hash, &newhash, sizeof(newhash));
-
+	memcpy(hash, newhash, sizeof(struct gr_hash_struct));
+	free(newhash);
 	return;
 }
 
@@ -462,9 +368,11 @@ void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
 			i = (i + 1) % 32;
 		}
 
-		if (*curr)
+		if (*curr) {
 			(*curr)->mode |= node->mode;
-		else {
+			free(node->filename);
+			gr_stat_free(node);
+		} else {
 			*curr = (struct gr_learn_file_tmp_node *)entry;
 			hash->used_size++;
 		}
@@ -559,3 +467,69 @@ void insert_nested_acl_subject(struct proc_acl *subject)
 	subject->hash = create_hash_table(GR_HASH_OBJECT);
 	return;
 }
+
+struct gr_user_map {
+	uid_t uid;
+	char *user;
+	struct gr_user_map *next;
+};
+
+struct gr_group_map {
+	gid_t gid;
+	char *group;
+	struct gr_group_map *next;
+};
+
+static struct gr_user_map *user_list;
+static struct gr_group_map *group_list;
+
+char *gr_get_user_name(uid_t uid)
+{
+	struct gr_user_map *tmpuser = user_list;
+	struct passwd *pwd;
+
+	if (tmpuser) {
+		do {
+			if (tmpuser->uid == uid)
+				return tmpuser->user;
+		} while ((tmpuser = tmpuser->next));
+	}
+
+	pwd = getpwuid(uid);
+
+	if (pwd) {
+		tmpuser = gr_stat_alloc(sizeof(struct gr_user_map));
+		tmpuser->uid = uid;
+		tmpuser->user = strdup(pwd->pw_name);
+		tmpuser->next = user_list;
+		user_list = tmpuser;
+		return pwd->pw_name;
+	} else
+		return NULL;
+}
+
+char *gr_get_group_name(gid_t gid)
+{
+	struct gr_group_map *tmpgroup = group_list;
+	struct group *grp;
+
+	if (tmpgroup) {
+		do {
+			if (tmpgroup->gid == gid)
+				return tmpgroup->group;
+		} while ((tmpgroup = tmpgroup->next));
+	}
+
+	grp = getgrgid(gid);
+
+	if (grp) {
+		tmpgroup = gr_stat_alloc(sizeof(struct gr_group_map));
+		tmpgroup->gid = gid;
+		tmpgroup->group = strdup(grp->gr_name);
+		tmpgroup->next = group_list;
+		group_list = tmpgroup;
+		return grp->gr_name;
+	} else
+		return NULL;
+}
+

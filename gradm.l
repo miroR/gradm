@@ -325,7 +325,7 @@ void add_include(char *includename)
 		if (S_ISDIR(fstat.st_mode)) {
 			struct dirent **namelist;
 			struct include_entry *last = current_stack->stack[current_stack->sp];
-			struct include_entry *tmp;
+			struct include_entry *tmp = NULL;
 			char *path;
 			int n;
 

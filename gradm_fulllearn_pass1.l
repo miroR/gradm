@@ -4,6 +4,7 @@
 
 void fulllearn_pass1error(const char *s);
 int fulllearn_pass1wrap(void);
+static struct in_addr ip;
 %}
 
 ROLENAME [_a-zA-Z0-9-]{1,30}
@@ -18,19 +19,22 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 %%
 
 {NUM}					{
-					  fulllearn_pass1lval.string = strdup(yytext);
+					  fulllearn_pass1lval.num = atol(yytext);
 					  return NUM;
 					}
 {ROLENAME}				{
-					  fulllearn_pass1lval.string = strdup(yytext);
+					  /* not used in grammar */
 					  return ROLENAME;
 					}
 {FILENAME}				{
-					  fulllearn_pass1lval.string = strdup(yytext);
+					  /* not used in grammar */
 					  return FILENAME;
 					}
 {IPADDR}				{
-					  fulllearn_pass1lval.string = strdup(yytext);
+					  if (inet_aton(yytext, &ip))
+						fulllearn_pass1lval.num = ip.s_addr;
+					  else
+						fulllearn_pass1lval.num = 0;
 					  return IPADDR;
 					}
 [\t]					{ return ':'; }

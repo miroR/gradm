@@ -1009,7 +1009,6 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 	struct user_acl_role_db *role_db;
 	struct role_acl *rtmp = NULL;
 	struct role_acl **r_tmp = NULL;
-	unsigned long i = 0;
 	unsigned long racls = 0;
 	__u16 sproles = 0;
 	int err;

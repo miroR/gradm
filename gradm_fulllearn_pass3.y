@@ -7,9 +7,11 @@ extern struct gr_learn_group_node **role_list;
 
 %union {
 	char * string;
+	unsigned long num;
 }
 
-%token <string> NUM FILENAME IPADDR ROLENAME
+%token <string> FILENAME ROLENAME
+%token <num> NUM IPADDR
 %type <string> filename
 
 %%
@@ -39,13 +41,19 @@ learn_log:
 			__u32 mode;
 			unsigned long res1, res2;
 
-			uid = atoi($5);
-			gid = atoi($7);
-			mode = atoi($19);
-			res1 = atol($13);
-			res2 = atol($15);
+			free($11);
+
+			uid = $5;
+			gid = $7;
+			mode = $19;
+			res1 = $13;
+			res2 = $15;
 
 			match_role(role_list, uid, gid, &group, &user);
+			/* only add objects for the role currently in memory */
+			if ((current_learn_rolemode == GR_ROLE_GROUP && group && !strcmp(group->rolename, current_learn_rolename)) ||
+			    (current_learn_rolemode == GR_ROLE_USER && user && !strcmp(user->rolename, current_learn_rolename)))
+			{
 			if (user)
 				subjlist = user->subject_list;
 			else if (group)
@@ -53,6 +61,8 @@ learn_log:
 
 			if (subjlist)
 				subject = match_file_node(subjlist, $9);
+			/* only learn objects for current subject in memory */
+			if (subject && !strcmp(subject->filename, current_learn_subject)) {
 			if (subject && strcmp($17, ""))
 				insert_learn_object(subject, conv_filename_to_struct($17, mode | GR_FIND));
 			else if (subject && strlen($9) > 1 && !res1 && !res2) {
@@ -63,6 +73,10 @@ learn_log:
 				}
 				subject->subject->cap_raise |= (1 << mode);
 			}
+			}
+			}
+			free($9);
+			free($17);
 		}		
 	|	ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' IPADDR ':' NUM ':' NUM ':' NUM ':' NUM ':' IPADDR
 		{
@@ -72,26 +86,29 @@ learn_log:
 			struct gr_learn_file_node *subject = NULL;
 			uid_t uid;
 			gid_t gid;
-			struct in_addr ip;
 			__u32 addr;
 			__u16 port;
 			__u8 mode, proto, socktype;
 
-			uid = atoi($5);
-			gid = atoi($7);
-			mode = atoi($19);
+			free($11);
 
-			if (inet_aton($13, &ip))
-				addr = ip.s_addr;
-			else
-				addr = 0;
+			uid = $5;
+			gid = $7;
+			mode = $19;
 
-			port = atoi($15);
-			socktype = atoi($17);
-			proto = atoi($19);
-			mode = atoi($21);
+			addr = $13;
+
+			port = $15;
+			socktype = $17;
+			proto = $19;
+			mode = $21;
 
 			match_role(role_list, uid, gid, &group, &user);
+			/* only add objects for the role currently in memory */
+			if ((current_learn_rolemode == GR_ROLE_GROUP && group && !strcmp(group->rolename, current_learn_rolename)) ||
+			    (current_learn_rolemode == GR_ROLE_USER && user && !strcmp(user->rolename, current_learn_rolename)))
+			{
+
 			if (user)
 				subjlist = user->subject_list;
 			else if (group)
@@ -99,10 +116,16 @@ learn_log:
 
 			if (subjlist)
 				subject = match_file_node(subjlist, $9);
+			/* only learn objects for current subject in memory */
+			if (subject && !strcmp(subject->filename, current_learn_subject)) {
 			if (subject && mode == GR_IP_CONNECT)
 				insert_ip(&(subject->connect_list), addr, port, proto, socktype);
 			else if (subject && mode == GR_IP_BIND)
 				insert_ip(&(subject->bind_list), addr, port, proto, socktype);
+
+			}
+			}
+			free($9);
 		}
 	;
 %%

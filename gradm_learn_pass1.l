@@ -4,6 +4,7 @@
 
 void learn_pass1error(const char *s);
 int learn_pass1wrap(void);
+static struct in_addr ip;
 %}
 
 ROLENAME [_a-zA-Z0-9-]{1,30}
@@ -18,7 +19,7 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 %%
 
 {NUM}					{
-					  learn_pass1lval.string = strdup(yytext);
+					  learn_pass1lval.num = atol(yytext);
 					  return NUM;
 					}
 {ROLENAME}				{
@@ -30,7 +31,10 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return FILENAME;
 					}
 {IPADDR}				{
-					  learn_pass1lval.string = strdup(yytext);
+					  if (inet_aton(yytext, &ip))
+						learn_pass1lval.num = ip.s_addr;
+					  else
+						learn_pass1lval.num = 0;
 					  return IPADDR;
 					}
 [\t]					{ return ':'; }

@@ -11,9 +11,11 @@ extern struct gr_learn_role_entry **special_role_list;
 
 %union {
 	char * string;
+	unsigned long num;
 }
 
-%token <string> NUM FILENAME IPADDR ROLENAME
+%token <string> FILENAME ROLENAME
+%token <num> NUM IPADDR
 %type <string> filename
 
 %%
@@ -41,10 +43,10 @@ learn_log:
 			__u16 rolemode;
 			unsigned long res1, res2;
 
-			rolemode = atoi($3);
-			mode = atoi($19);
-			res1 = atol($13);
-			res2 = atol($15);
+			rolemode = $3;
+			mode = $19;
+			res1 = $13;
+			res2 = $15;
 
 
 			if (rolemode & GR_ROLE_USER)
@@ -80,23 +82,17 @@ learn_log:
 			struct gr_learn_file_node *subjlist;
 			struct gr_learn_file_node *subject;
 			__u16 rolemode;
-			struct in_addr ip;
 			__u32 addr;
 			__u16 port;
 			__u8 mode, proto, socktype;
 
-			mode = atoi($19);
-
-			rolemode = atoi($3);
-			if (inet_aton($13, &ip))
-				addr = ip.s_addr;
-			else
-				addr = 0;
-
-			port = atoi($15);
-			socktype = atoi($17);
-			proto = atoi($19);
-			mode = atoi($21);
+			mode = $19;
+			rolemode = $3;
+			addr = $13;
+			port = $15;
+			socktype = $17;
+			proto = $19;
+			mode = $21;
 
 			if (rolemode & GR_ROLE_USER)
 				role = insert_learn_role(&user_role_list, $1, rolemode);
