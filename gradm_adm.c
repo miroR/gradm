@@ -94,6 +94,10 @@ add_gradm_acl(struct role_acl *role)
 				 proc_object_mode_conv("r"), GR_FEXIST))
 		exit(EXIT_FAILURE);
 
+	if (!add_proc_object_acl(current_subject, "/etc/ld.so.preload",
+				 proc_object_mode_conv("r"), GR_FEXIST))
+		exit(EXIT_FAILURE);
+
 	if (!add_proc_object_acl(current_subject, "/dev/urandom",
 				 proc_object_mode_conv("r"), GR_FEXIST))
 		exit(EXIT_FAILURE);
