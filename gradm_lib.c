@@ -456,7 +456,7 @@ void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
 
 		curr = (struct gr_learn_file_tmp_node **)&hash->table[index];
 
-		while (*curr && !strcmp(node->filename, (*curr)->filename)) {
+		while (*curr && strcmp(node->filename, (*curr)->filename)) {
 			index = (index + (1 << i)) % hash->table_size;
 			curr = (struct gr_learn_file_tmp_node **)&hash->table[index];
 			i = (i + 1) % 32;
