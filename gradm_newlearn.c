@@ -12,6 +12,9 @@ int is_protected_path(char *filename, u_int32_t mode)
 		return 0;
 
 	tmp = protected_paths;
+	if (tmp == NULL)
+		return 0;
+
 	while (*tmp) {
 		len = strlen(*tmp);
 		if (!strncmp(filename, *tmp, len) &&
@@ -31,6 +34,9 @@ void enforce_high_protected_paths(struct gr_learn_file_node *subject)
 	unsigned long i;
 
 	tmp = high_protected_paths;
+	if (tmp == NULL)
+		return;
+
 	tmptable = (struct gr_learn_file_tmp_node **)subject->hash->table;
 
 	while (*tmp) {
@@ -687,10 +693,12 @@ int *analyze_node_reduction(struct gr_learn_file_node *node)
 	nested_num = count_nested_depth(node);
 
 	tmp = dont_reduce_dirs;
-	while (*tmp) {
-		if (!strcmp(node->filename, *tmp))
-			return NULL;
-		tmp++;
+	if (tmp) {
+		while (*tmp) {
+			if (!strcmp(node->filename, *tmp))
+				return NULL;
+			tmp++;
+		}
 	}
 
 	if (node_num > 3)
@@ -723,10 +731,12 @@ int *analyze_node_reduction(struct gr_learn_file_node *node)
 		reduction_level++;
 
 	tmp = high_reduce_dirs;
-	while (*tmp) {
-		if (!strcmp(node->filename, *tmp) && ((node_num > 2) || child_num > 5))
-			reduction_level *= 2;
-		tmp++;
+	if (tmp) {
+		while (*tmp) {
+			if (!strcmp(node->filename, *tmp) && ((node_num > 2) || child_num > 5))
+				reduction_level *= 2;
+			tmp++;
+		}
 	}
 
 	if (node->subject)
