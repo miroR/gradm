@@ -184,12 +184,17 @@ parse_args(int argc, char *argv[])
 			gr_learn = 1;
 			if (optarg) {
 				char pathbuf[PATH_MAX];
-
-				if (!realpath(optarg, pathbuf)) {
-					fprintf(stderr, "Unable to open %s for learning logs.\n", optarg);
-					exit(EXIT_FAILURE);
+				if (*optarg = '/')
+					learn_log = strdup(pathbuf);
+				else {
+					getcwd(pathbuf, PATH_MAX - 1);
+					if (strlen(optarg) + strlen(pathbuf) + 1 > PATH_MAX) {
+						fprintf(stderr, "Unable to open %s for learning logs.\n", optarg);
+						exit(EXIT_FAILURE);
+					}
+					strcat(pathbuf, optarg);
+					learn_log = strdup(pathbuf);
 				}
-				learn_log = strdup(pathbuf);
 			}
 			break;
 		case 'O':
