@@ -74,6 +74,8 @@ void verbose_stats(void)
 	unsigned int chsobjs=0, tobjs=0;
 
 	for_each_role(rtmp, current_role) {
+		if (!strcmp(rtmp->rolename,":::kernel:::"))
+			continue;
 		troles++;
 		if (rtmp->roletype & GR_ROLE_SPECIAL) {
 			if (rtmp->roletype & GR_ROLE_NOPW)
