@@ -131,7 +131,6 @@ parse_args(int argc, char *argv[])
 			if (argc > 6)
 				show_help();
 			entry.mode = GRADM_ENABLE;
-			check_acl_status(entry.mode);
 			gr_fulllearn = 1;
 			gr_enable = 1;
 			break;
