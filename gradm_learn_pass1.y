@@ -45,7 +45,7 @@ learn_log:
 			res2 = atoi($15);
 
 			if (inet_aton($21, &ip))
-				addr = ip.s_addr;
+				addr = ntohl(ip.s_addr);
 			else
 				addr = 0;
 
@@ -82,7 +82,7 @@ learn_log:
 			rolemode = atoi($3);
 
 			if (inet_aton($23, &ip))
-				addr = ip.s_addr;
+				addr = ntohl(ip.s_addr);
 			else
 				addr = 0;
 

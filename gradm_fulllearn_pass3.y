@@ -82,7 +82,7 @@ learn_log:
 			mode = atoi($19);
 
 			if (inet_aton($13, &ip))
-				addr = ip.s_addr;
+				addr = ntohl(ip.s_addr);
 			else
 				addr = 0;
 
