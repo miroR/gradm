@@ -65,7 +65,7 @@
 
 role admin sA
 subject /
-	/ rwxi
+	/ rwcdmxi
 
 role default G
 role_transitions admin
