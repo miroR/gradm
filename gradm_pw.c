@@ -23,7 +23,7 @@ void write_user_passwd(struct gr_pw_entry * entry)
 
 	while((len = read(fd, total, sizeof(total))) == sizeof(total)) {
 		if (!memcmp(&total, entry->rolename, GR_SPROLE_LEN)) {
-			if ((offset = lseek(fd, -GR_SPROLE_LEN, SEEK_CUR)) == (off_t)-1)
+			if ((offset = lseek(fd, -sizeof(total), SEEK_CUR)) == (off_t)-1)
 				failure("lseek");
 			break;
 		}
