@@ -66,6 +66,7 @@ subject /
 	/home		rwx
 	/mnt		rw
 	/dev
+	/dev/grsec	h
 	/dev/urandom	r
 	/dev/random	r
 	/dev/zero	rw
