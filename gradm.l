@@ -251,6 +251,7 @@ int main(int argc, char *argv[])
 #ifdef GRADM_DEBUG
 	for (rolp = current_role;rolp;rolp=rolp->prev) {
 	printf("ROLE: %s type:%s uid/gid:%u\n", rolp->rolename,
+		rolp->roletype & GR_ROLE_SPECIAL ? "special" :
 		rolp->roletype & GR_ROLE_USER ? "user" :
 		rolp->roletype & GR_ROLE_GROUP ? "group" :
 		rolp->roletype & GR_ROLE_DEFAULT ? "default" : "",
