@@ -1,6 +1,6 @@
 #sample default process acl for grsecurity
 
-role default
+role G default
 subject /
 	/		r
 	/opt		rx
