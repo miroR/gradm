@@ -182,7 +182,7 @@ int display_role(struct gr_learn_group_node *group, struct gr_learn_user_node *u
 	struct gr_learn_ip_node *allowed_ips = NULL;
 
 	if (user) {
-		fprintf(stream, "role %s u\n", user->rolename);
+		fprintf(stream, "role %s u%s\n", user->rolename, strcmp(user->rolename, "root") ? "" : "G");
 		subject = user->subject_list;
 		allowed_ips = user->allowed_ips;
 	} else {
