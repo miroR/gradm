@@ -131,22 +131,6 @@ int full_reduce_object_node(struct gr_learn_file_node *subject,
 	return 0;
 }
 
-int full_reduce_objects(struct gr_learn_group_node *group,
-			 struct gr_learn_user_node *user,
-			 FILE *unused)
-{
-	struct gr_learn_file_node *subjects;
-
-	if (user)
-		subjects = user->subject_list;
-	else
-		subjects = group->subject_list;
-
-	traverse_file_tree(subjects, &full_reduce_object_node, NULL, NULL);
-
-	return 0;
-}
-
 int full_reduce_ip_node(struct gr_learn_file_node *subject,
 			struct gr_learn_file_node *unused1,
 			FILE *unused2)
@@ -161,6 +145,46 @@ int full_reduce_ip_node(struct gr_learn_file_node *subject,
 	reduce_ip_tree(tmp);
 	reduce_ports_tree(tmp);
 
+	return 0;
+}	
+
+int full_reduce_id_node(struct gr_learn_file_node *subject,
+			struct gr_learn_file_node *unused1,
+			FILE *unused2)
+{
+	unsigned int **uid_list = subject->user_trans_list;
+	unsigned int **gid_list = subject->group_trans_list;
+	unsigned int size;
+	unsigned int **p;
+
+	size = 0;
+	p = uid_list;
+	while (*p) {
+		p++;
+		size++;
+	}
+	if (size > 3) {
+		int i;
+		for (i = 0; i < size; i++)
+			free(*(uid_list + i));
+		free(uid_list);
+		subject->user_trans_list = NULL;
+	}
+
+	size = 0;
+	p = gid_list;
+	while (*p) {
+		p++;
+		size++;
+	}
+	if (size > 3) {
+		int i;
+		for (i = 0; i < size; i++)
+			free(*(gid_list + i));
+		free(gid_list);
+		subject->group_trans_list = NULL;
+	}
+	
 	return 0;
 }	
 
@@ -334,6 +358,7 @@ int fulllearn_pass3(struct gr_learn_file_node *subject, struct gr_learn_file_nod
 
 	full_reduce_object_node(subject, NULL, NULL);
 	full_reduce_ip_node(subject, NULL, NULL);
+	full_reduce_id_node(subject, NULL, NULL);
 
 	display_leaf(subject, NULL, stream);
 	free_subject_full(subject);
