@@ -775,7 +775,7 @@ static void setup_special_roles(struct gr_arg *grarg)
 		if (rtmp->roletype & GR_ROLE_SPECIAL && !(rtmp->roletype & GR_ROLE_NOPW)) {
 			strncpy(entry.rolename, rtmp->rolename, GR_SPROLE_LEN);
 			entry.rolename[GR_SPROLE_LEN - 1] = '\0';
-			if(!read_saltandpass(entry.rolename, &entry.salt, &entry.sum)) {
+			if(!read_saltandpass(entry.rolename, entry.salt, entry.sum)) {
 				fprintf(stderr, "No password exists for special "
 					"role %s.\n  Run gradm -P %s to set up a password "
 					"for the role.\n", rtmp->rolename, rtmp->rolename);
