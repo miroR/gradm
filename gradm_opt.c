@@ -93,9 +93,9 @@ expand_acls(void)
 
 	for_each_role(role, current_role) {
 		for_each_subject(proc, role) {
-			if (!(proc->mode & GR_OVERRIDE) && !proc->parent_subject)
+			if (!(proc->mode & GR_OVERRIDE) && !proc->parent_subject && strcmp(proc->filename, "/"))
 				expand_acl(proc, role);
-			else if (!(proc->mode & GR_OVERRIDE))
+			else if (!(proc->mode & GR_OVERRIDE) && proc->parent_subject)
 				expand_nested_acl(proc);
 			else {
 				proc->mode &= ~GR_OVERRIDE;
