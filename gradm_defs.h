@@ -34,68 +34,68 @@
 #define GR_NLIMITS	(RLIM_NLIMITS + 1)
 
 enum {
-	GRADM_DISABLE	= 0,
-	GRADM_ENABLE	= 1,
-	GRADM_SPROLE	= 2,
-	GRADM_RELOAD	= 3,
-	GRADM_MODSEGV	= 4
+	GRADM_DISABLE = 0,
+	GRADM_ENABLE = 1,
+	GRADM_SPROLE = 2,
+	GRADM_RELOAD = 3,
+	GRADM_MODSEGV = 4
 };
 
 enum {
-	GR_IP_BIND= 0x01,
+	GR_IP_BIND = 0x01,
 	GR_IP_CONNECT = 0x02,
 };
 
 enum {
-	GR_READ		 = 0x00000001,
-	GR_APPEND	 = 0x00000002,
-	GR_WRITE	 = 0x00000004,
-	GR_EXEC		 = 0x00000008,
-	GR_FIND		 = 0x00000010,
-	GR_INHERIT	 = 0x00000040,
-	GR_PTRACERD	 = 0x00000100,
-	GR_AUDIT_READ	 = 0x00000200,
-	GR_AUDIT_APPEND  = 0x00000400,
-	GR_AUDIT_WRITE   = 0x00001000,
-	GR_AUDIT_EXEC    = 0x00002000,
-	GR_AUDIT_FIND    = 0x00004000,
+	GR_READ = 0x00000001,
+	GR_APPEND = 0x00000002,
+	GR_WRITE = 0x00000004,
+	GR_EXEC = 0x00000008,
+	GR_FIND = 0x00000010,
+	GR_INHERIT = 0x00000040,
+	GR_PTRACERD = 0x00000100,
+	GR_AUDIT_READ = 0x00000200,
+	GR_AUDIT_APPEND = 0x00000400,
+	GR_AUDIT_WRITE = 0x00001000,
+	GR_AUDIT_EXEC = 0x00002000,
+	GR_AUDIT_FIND = 0x00004000,
 	GR_AUDIT_INHERIT = 0x00008000,
-	GR_SUPPRESS	 = 0x00010000
+	GR_SUPPRESS = 0x00010000
 };
 
 enum {
-	GR_ROLE_USER	= 0x0001,
-	GR_ROLE_GROUP	= 0x0002,
+	GR_ROLE_USER = 0x0001,
+	GR_ROLE_GROUP = 0x0002,
 	GR_ROLE_DEFAULT = 0x0004,
 	GR_ROLE_SPECIAL = 0x0008,
-	GR_ROLE_AUTH	= 0x0010,
-	GR_ROLE_NOPW	= 0x0020,
-	GR_ROLE_GOD	= 0x0040
+	GR_ROLE_AUTH = 0x0010,
+	GR_ROLE_NOPW = 0x0020,
+	GR_ROLE_GOD = 0x0040
 };
 
 enum {
-	GR_DELETED	= 0x00000080
+	GR_DELETED = 0x00000080
 };
 
 enum {
-	GR_KILL		= 0x00000001,
-	GR_VIEW		= 0x00000002,
-	GR_PROTECTED	= 0x00000100,
-	GR_LEARN	= 0x00000200,
-	GR_IGNORE	= 0x00000400,
-	GR_OVERRIDE	= 0x00000800,
-	GR_PAXPAGE	= 0x00001000,
-	GR_PAXSEGM	= 0x00002000,
-	GR_PAXGCC	= 0x00004000,
-	GR_PAXRANDMMAP	= 0x00008000,
-	GR_PAXRANDEXEC	= 0x00010000,
-	GR_PAXMPROTECT	= 0x00020000,
-	GR_PROTSHM	= 0x00040000,
-	GR_KILLPROC	= 0x00080000,
-	GR_KILLIPPROC	= 0x00100000,
-	GR_NOTROJAN	= 0x00200000,
-	GR_PROTPROCFD	= 0x00400000,
-	GR_PROCACCT	= 0x00800000
+	GR_KILL = 0x00000001,
+	GR_VIEW = 0x00000002,
+	GR_PROTECTED = 0x00000100,
+	GR_LEARN = 0x00000200,
+	GR_IGNORE = 0x00000400,
+	GR_OVERRIDE = 0x00000800,
+	GR_PAXPAGE = 0x00001000,
+	GR_PAXSEGM = 0x00002000,
+	GR_PAXGCC = 0x00004000,
+	GR_PAXRANDMMAP = 0x00008000,
+	GR_PAXRANDEXEC = 0x00010000,
+	GR_PAXMPROTECT = 0x00020000,
+	GR_PROTSHM = 0x00040000,
+	GR_KILLPROC = 0x00080000,
+	GR_KILLIPPROC = 0x00100000,
+	GR_NOTROJAN = 0x00200000,
+	GR_PROTPROCFD = 0x00400000,
+	GR_PROCACCT = 0x00800000
 };
 
 /* internal use only.  not to be modified */
@@ -106,15 +106,15 @@ struct capability_set {
 };
 
 struct rlimconv {
-	const char * name;
+	const char *name;
 	unsigned short val;
 };
 
 struct learn_info {
-	char * rolename;
+	char *rolename;
 	__u16 roletype;
 	char *subjname;
-	char * obj_name;
+	char *obj_name;
 	__u32 res_cur, res_max;
 	__u32 mode;
 };
@@ -138,7 +138,6 @@ struct chk_perm {
 	__u32 u_caps;
 };
 
-
 /************************************************************************\
 |  none of these fields are to be modified directly.			 |
 |  these structures only appear inside process acls.  They are not 	 |
@@ -158,22 +157,22 @@ struct ip_acl {
 	__u32 addr;
 	__u32 netmask;
 	__u16 low, high;
-	__u8  mode; // connect or bind
-	__u32 type; // stream, dgram, raw..etc
-	__u32 proto[8];  // we have to support all 255 protocols
+	__u8 mode;		// connect or bind
+	__u32 type;		// stream, dgram, raw..etc
+	__u32 proto[8];		// we have to support all 255 protocols
 
-	struct ip_acl * prev;
-	struct ip_acl * next;
+	struct ip_acl *prev;
+	struct ip_acl *next;
 };
 
 struct file_acl {
-        char * filename;
+	char *filename;
 	ino_t inode;
 	unsigned short dev;
-        __u32 mode;
+	__u32 mode;
 
 	struct file_acl *prev;
-        struct file_acl *next;
+	struct file_acl *next;
 };
 
 /************************************************************************\
@@ -182,7 +181,7 @@ struct file_acl {
 |  is filled out after all the proc_objects are collected for the current|
 |  process acl								 |
 \************************************************************************/
-  
+
 struct role_transition {
 	char *rolename;
 
@@ -191,7 +190,7 @@ struct role_transition {
 };
 
 struct role_acl {
-	char * rolename;
+	char *rolename;
 	uid_t uidgid;
 	__u16 roletype;
 
@@ -202,38 +201,38 @@ struct role_acl {
 	struct proc_acl *proc_subject;
 
 	struct role_acl *prev;
-        struct role_acl *next;
+	struct role_acl *next;
 
 	struct role_transition *transitions;
 	struct role_allowed_ip *allowed_ips;
 
 	struct proc_acl **subj_hash;
 	__u32 subj_hash_size;
-};	
+};
 
 struct proc_acl {
-        char * filename;
+	char *filename;
 	ino_t inode;
 	unsigned short dev;
-        __u32 mode;
-        __u32 cap_raise;
-        __u32 cap_drop;
+	__u32 mode;
+	__u32 cap_raise;
+	__u32 cap_drop;
 
 	struct rlimit res[GR_NLIMITS];
 	__u16 resmask;
 
 	__u32 ip_proto[8];
 	__u32 ip_type;
-	struct ip_acl ** ips;
+	struct ip_acl **ips;
 	__u32 ip_num;
 
 	__u32 crashes;
 	unsigned long expires;
 
-        struct file_acl *proc_object;
+	struct file_acl *proc_object;
 	struct ip_acl *ip_object;
 	struct proc_acl *prev;
-        struct proc_acl *next;
+	struct proc_acl *next;
 
 	struct file_acl **obj_hash;
 	__u32 obj_hash_size;
@@ -254,9 +253,9 @@ struct gr_pw_entry {
 	unsigned char rolename[GR_SPROLE_LEN];
 	unsigned char passwd[GR_PW_LEN];
 	unsigned char sum[GR_SHA_SUM_SIZE];
-	unsigned char salt[GR_SALT_SIZE]; 
+	unsigned char salt[GR_SALT_SIZE];
 	unsigned short segv_dev;
-	ino_t segv_inode;	
+	ino_t segv_inode;
 	uid_t segv_uid;
 	__u16 mode;
 };
@@ -300,8 +299,7 @@ struct include_line *includes;
 |  logs more informative						 |
 \************************************************************************/
 
-char * current_acl_file;
-
+char *current_acl_file;
 
 /************************************************************************\
 |  basically a dummy pointer.  its use is to set "magic" values to the   |
@@ -315,15 +313,14 @@ char * current_acl_file;
 
 unsigned int includeno;
 
-
 struct user_acl_role_db {
-	struct role_acl ** r_table;
-	__u32 r_entries; /* Number of entries in table */
-	__u32 s_entries; /* total number of subject acls */
-	__u32 i_entries; /* total number of ip acls */
-	__u32 o_entries; /* Total number of object acls */
-	__u32 a_entries; /* total number of allowed role ips */
-	__u32 t_entries; /* total number of transitions */
+	struct role_acl **r_table;
+	__u32 r_entries;	/* Number of entries in table */
+	__u32 s_entries;	/* total number of subject acls */
+	__u32 i_entries;	/* total number of ip acls */
+	__u32 o_entries;	/* Total number of object acls */
+	__u32 a_entries;	/* total number of allowed role ips */
+	__u32 t_entries;	/* total number of transitions */
 };
 
 struct sprole_pw {
@@ -333,21 +330,21 @@ struct sprole_pw {
 };
 
 struct gr_arg {
-        struct user_acl_role_db role_db;
-        unsigned char pw[GR_PW_LEN];
+	struct user_acl_role_db role_db;
+	unsigned char pw[GR_PW_LEN];
 	unsigned char salt[GR_SALT_SIZE];
 	unsigned char sum[GR_SHA_SUM_SIZE];
 	unsigned char sp_role[GR_SPROLE_LEN];
 	struct sprole_pw *sprole_pws;
 	__u16 num_sprole_pws;
 	unsigned short segv_dev;
-	ino_t segv_inode;	
+	ino_t segv_inode;
 	uid_t segv_uid;
-        __u16 mode;  
-};      
+	__u16 mode;
+};
 
-struct learn_info ** learn_db;
-struct ip_learn_info ** ip_learn_db;
+struct learn_info **learn_db;
+struct ip_learn_info **ip_learn_db;
 unsigned long learn_num;
 unsigned long ip_learn_num;
 
