@@ -319,8 +319,8 @@ struct user_acl_role_db {
 
 struct sprole_pw {
 	unsigned char *rolename;
-	unsigned char salt[GR_SALT_LEN];
-	unsigned char sum[GR_SHA_LEN];
+	unsigned char salt[GR_SALT_SIZE];
+	unsigned char sum[GR_SHA_SUM_SIZE];
 }
 
 struct gr_arg {
