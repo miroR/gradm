@@ -1,5 +1,5 @@
 ##############################################################################
-#gradm (c) 2002,2003,2004 Brad Spengler 	        http://grsecurity.net#
+#gradm (c) 2002-2005 	Brad Spengler 		        http://grsecurity.net#
 #--------------------------------------			---------------------#
 #gradm is licensed under the GNU GPL v2 or higher http://www.gnu.org         #
 ##############################################################################
