@@ -12,11 +12,15 @@ void fulllearn_pass1(FILE *stream)
 {
 	fulllearn_pass1in = stream;
 	printf("Beginning full learning 1st pass...");
+	fflush(stdout);
 	fulllearn_pass1parse();
 	printf("done.\n");
+	fflush(stdout);
 	printf("Beginning full learning role reduction...");
+	fflush(stdout);
 	reduce_roles(&role_list);
 	printf("done.\n");
+	fflush(stdout);
 
 	return;
 }
@@ -30,6 +34,7 @@ int full_reduce_subjects(struct gr_learn_group_node *group,
 
 	if (user) {
 		printf("Beginning full learning subject reduction for user %s...", user->rolename);
+		fflush(stdout);
 		if (!user->hash)
 			insert_file(&(user->subject_list), "/", GR_FIND, 1);
 		else {
@@ -43,8 +48,10 @@ int full_reduce_subjects(struct gr_learn_group_node *group,
 			}
 		}
 		printf("done.\n");
+		fflush(stdout);
 	} else {
 		printf("Beginning full learning subject reduction for group %s...", group->rolename);
+		fflush(stdout);
 		if (!group->hash)
 			insert_file(&(group->subject_list), "/", GR_FIND, 1);
 		else {
@@ -58,6 +65,7 @@ int full_reduce_subjects(struct gr_learn_group_node *group,
 			}
 		}
 		printf("done.\n");
+		fflush(stdout);
 	}
 
 	return 0;
@@ -79,8 +87,10 @@ void fulllearn_pass2(FILE *stream)
 {
 	fulllearn_pass2in = stream;
 	printf("Beginning full learning 2nd pass...");
+	fflush(stdout);
 	fulllearn_pass2parse();
 	printf("done.\n");
+	fflush(stdout);
 	traverse_roles(role_list, &full_reduce_subjects, NULL);
 	traverse_roles(role_list, &full_reduce_allowed_ips, NULL);
 
@@ -130,8 +140,10 @@ int full_reduce_objects(struct gr_learn_group_node *group,
 	printf("Beginning full learning object reduction for %s %s...", 
 		user ? "user" : "group", user ? user->rolename : 
 		group->rolename);
+	fflush(stdout);
 	traverse_file_tree(subjects, &full_reduce_object_node, NULL, NULL);
 	printf("done.\n");
+	fflush(stdout);
 
 	return 0;
 }
@@ -173,8 +185,10 @@ void fulllearn_pass3(FILE *stream)
 {
 	fulllearn_pass3in = stream;
 	printf("Beginning full learning 3rd pass...");
+	fflush(stdout);
 	fulllearn_pass3parse();
 	printf("done.\n");
+	fflush(stdout);
 	traverse_roles(role_list, &full_reduce_objects, NULL);
 	traverse_roles(role_list, &full_reduce_ips, NULL);
 
@@ -232,8 +246,10 @@ int ensure_role_security(struct gr_learn_group_node *group,
 void fulllearn_finalpass(void)
 {
 	printf("Beginning full learning final pass...");
+	fflush(stdout);
 	traverse_roles(role_list, &ensure_role_security, NULL);
 	printf("done.\n");
+	fflush(stdout);
 	return;
 }
 
