@@ -767,7 +767,7 @@ static void setup_special_roles(struct gr_arg *grarg)
 	memset(&entry, 0, sizeof(struct gr_pw_entry));
 
 	err = mlock(&entry, sizeof(struct gr_pw_entry));
-	if (err)
+	if (err && !getuid())
 		fprintf(stderr, "Warning, unable to lock authentication "
 			"structure in physical memory.\n");
 
@@ -835,7 +835,7 @@ struct gr_arg * conv_user_to_kernel(struct gr_pw_entry * entry)
 		failure("calloc");
 
 	err = mlock(retarg, sizeof(struct gr_arg));
-	if (err)
+	if (err && !getuid())
 		fprintf(stderr, "Warning, unable to lock authentication "
 			"structure in physical memory.\n");
 
@@ -846,7 +846,7 @@ struct gr_arg * conv_user_to_kernel(struct gr_pw_entry * entry)
 		failure("calloc");
 
 	err = mlock(retarg->sprole_pws, sproles * sizeof(struct sprole_pw));
-	if (err)
+	if (err && !getuid())
 		fprintf(stderr, "Warning, unable to lock authentication "
 			"structure in physical memory.\n");
 

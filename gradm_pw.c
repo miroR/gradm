@@ -57,7 +57,7 @@ void get_user_passwd(struct gr_pw_entry * entry, int mode)
 	int i, err;
 
 	err = mlock(&new, sizeof(new));
-	if (err)
+	if (err && !getuid())
 		fprintf(stderr, "Warning: Unable to lock password "
 			"into physical memory.\n");
 start_pw:

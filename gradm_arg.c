@@ -87,9 +87,9 @@ void parse_args(int argc, char *argv[])
 	};
 
 	err = mlock(&entry, sizeof(entry));
-	if (err)
+	if (err && !getuid())
 		fprintf(stderr, "Warning: Unable to lock password "
-			"in physical memory.\n");
+			"into physical memory.\n");
 
 	memset(&entry, 0, sizeof(struct gr_pw_entry));
 
