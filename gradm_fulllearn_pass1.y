@@ -63,6 +63,19 @@ learn_log:
 		}
 	|	ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' id_type ':' NUM ':' NUM ':' NUM ':' IPADDR
 		{
+			char *user;
+			char *group;
+			uid_t uid;
+			gid_t gid;
+
+			uid = $5;
+			gid = $7;
+
+			user = gr_get_user_name(uid);
+			group = gr_get_group_name(gid);
+
+			if (user && group)
+				insert_user(&role_list, user, group, uid, gid);
 		}
 	;
 %%

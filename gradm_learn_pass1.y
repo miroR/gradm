@@ -120,6 +120,30 @@ learn_log:
 		}
 	|       ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' id_type ':' NUM ':' NUM ':' NUM ':' IPADDR
 		{
+			struct gr_learn_role_entry *role;
+			u_int16_t rolemode;
+			u_int32_t addr;
+
+			rolemode = $3;
+
+			addr = $21;
+
+			if (rolemode & GR_ROLE_USER)
+				role = insert_learn_role(&user_role_list, $1, rolemode);
+			else if (rolemode & GR_ROLE_GROUP)
+				role = insert_learn_role(&group_role_list, $1, rolemode);
+			else if (rolemode & GR_ROLE_SPECIAL)
+				role = insert_learn_role(&special_role_list, $1, rolemode);
+			else {
+				if (default_role_entry == NULL) {
+					default_role_entry = calloc(1, sizeof(struct gr_learn_role_entry));
+					if (!default_role_entry)
+						failure("calloc");
+				}
+
+				role = default_role_entry;
+			}
+
 			free($1);
 			free($9);
 			free($11);
