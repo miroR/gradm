@@ -529,7 +529,7 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 
 	p->prev = oldp;
 
-	if (!strcmp(filename, "/"))
+	if (!strcmp(filename, "/") && !(flag & GR_FFAKE))
 		role->root_label = p;
 
 	if ((filename[file_len - 2] == '/') && file_len != 2)
