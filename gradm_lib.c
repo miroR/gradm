@@ -466,7 +466,7 @@ void insert_acl_subject(struct role_acl *role, struct proc_acl *subject)
 		role->hash = create_hash_table(GR_HASH_SUBJECT);
 		role->hash->first = subject;
 	} else {
-		((struct proc_acl *)subject->hash->first)->next = subject;
+		((struct proc_acl *)role->hash->first)->next = subject;
 		subject->prev = role->hash->first;
 		role->hash->first = subject;
 	}
