@@ -11,19 +11,20 @@ int current_nest_depth = 0;
 
 %union {
 	char *string;
-	__u32 long_int;
-	__u16 mode;
+	__u32 num;
+	__u16 shortnum;
 	struct var_object * var;
 }
 
 %token <string> ROLE ROLE_NAME ROLE_TYPE SUBJECT SUBJ_NAME OBJ_NAME 
-%token <string> RES_NAME RES_SOFTHARD CONNECT BIND IPADDR IPPORT IPTYPE
-%token <string> IPPROTO OBJ_MODE SUBJ_MODE IPNETMASK CAP_NAME ROLE_ALLOW_IP
+%token <string> RES_NAME RES_SOFTHARD CONNECT BIND IPPORT IPTYPE
+%token <string> IPPROTO IPNETMASK CAP_NAME ROLE_ALLOW_IP
 %token <string> ROLE_TRANSITION VARIABLE DEFINE DEFINE_NAME DISABLED
 %token <string> ID_NAME USER_TRANS_ALLOW GROUP_TRANS_ALLOW 
 %token <string> USER_TRANS_DENY GROUP_TRANS_DENY DOMAIN_TYPE DOMAIN
-%type <long_int> subj_mode obj_mode ip_netmask
-%type <mode> role_type
+%token <num> OBJ_MODE SUBJ_MODE IPADDR
+%type <num> subj_mode obj_mode ip_netmask
+%type <shortnum> role_type
 %type <var> variable_expression
 %left '&'
 %left '|'
@@ -258,13 +259,13 @@ object_res_label:		RES_NAME RES_SOFTHARD RES_SOFTHARD
 subj_mode: /* empty */
 				{ $$ = proc_subject_mode_conv(""); }
 	|			SUBJ_MODE
-				{ $$ = proc_subject_mode_conv($1); }
+				{ $$ = $1; }
 	;
 
 obj_mode: /* empty */
 				{ $$ = proc_object_mode_conv(""); }
 	|			OBJ_MODE
-				{ $$ = proc_object_mode_conv($1); }
+				{ $$ = $1; }
 	;
 
 role_transitions:		ROLE_TRANSITION role_names
@@ -284,13 +285,13 @@ role_names:			ROLE_NAME
 
 role_allow_ip:			ROLE_ALLOW_IP IPADDR ip_netmask
 				{
-					add_role_allowed_ip(current_role, get_ip($2), $3);
+					add_role_allowed_ip(current_role, $2, $3);
 				}
 	;
 
 object_connect_ip_label:	CONNECT IPADDR ip_netmask ip_ports ip_typeproto
 				{
-				 ip.addr = get_ip($2);
+				 ip.addr = $2;
 				 ip.netmask = $3;
 				 add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
 				 memset(&ip, 0, sizeof(ip));
@@ -304,7 +305,7 @@ object_connect_ip_label:	CONNECT IPADDR ip_netmask ip_ports ip_typeproto
 
 object_bind_ip_label:		BIND IPADDR ip_netmask ip_ports ip_typeproto
 				{
-				 ip.addr = get_ip($2);
+				 ip.addr = $2;
 				 ip.netmask = $3;
 				 add_ip_acl(current_subject, GR_IP_BIND, &ip);
 				 memset(&ip, 0, sizeof(ip));

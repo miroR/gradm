@@ -109,7 +109,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return SUBJ_NAME;
 					}
 <SUBJECT_STATE>[TKCAPRMSGXOolhpkvdbr]+	{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.num = proc_subject_mode_conv(yytext);
 					  return SUBJ_MODE;
 					}
 
@@ -127,7 +127,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return DISABLED;
 					}
 <IP_STATE>{IP}				{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.num = get_ip(yytext);
 					  return IPADDR;
 					}
 <IP_STATE>[/]				{
@@ -193,7 +193,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return OBJ_NAME;
 					}
 <VAR_OBJ_STATE>[rwxahitmFRWXAIMdDcCspo]+	{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.num = proc_object_mode_conv(yytext);
 					  return OBJ_MODE;
 					}
 <IDTRANS_STATE>[_a-zA-Z0-9-]{1,30}	{
@@ -282,7 +282,7 @@ $HOME[/]?[^ \t\n]*			{
 					  return OBJ_NAME;
 					}
 [rwxahitmFRWXAIMcCdDspo]+		{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.num = proc_object_mode_conv(yytext);
 					  return OBJ_MODE;
 					}
 [|&()-]					{
