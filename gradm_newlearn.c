@@ -1762,8 +1762,7 @@ find_learn_role(struct gr_learn_role_entry **role_list, char *rolename)
 void insert_learn_id_transition(unsigned int ***list, int real, int eff, int fs)
 {
 	unsigned int ids[] = { real, eff, fs };
-	unsigned int check[] = { -1, real, eff, fs };
-	int i, x, good, num;
+	int x, good, num;
 	unsigned int **p;
 
 	if (*list == NULL)
@@ -1772,10 +1771,8 @@ void insert_learn_id_transition(unsigned int ***list, int real, int eff, int fs)
 
 	for (x = 0; x < sizeof(ids)/sizeof(ids[0]); x++) {
 		good = 1;
-		for (i = 0; i < sizeof(check)/sizeof(check[0]); i++) {
-			if (((i - 1) != x && check[i] == ids[x]) || ids[x] == -1)
-				good = 0;
-		}
+		if (ids[x] == -1)
+			good = 0;
 		for (p = *list; *p; p++) {
 			if (ids[x] == **p)
 				good = 0;
