@@ -103,6 +103,18 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 	return;
 }
 
+static int
+is_role_dupe(struct role_acl *role, const char *rolename, const u_int16_t type)
+{
+	struct role_acl *tmp;
+
+	for_each_role(tmp, role)
+	    if ((tmp->roletype & type) && !strcmp(tmp->rolename, rolename))
+		return 1;
+
+	return 0;
+}
+
 void
 add_domain_child(struct role_acl *role, char *idname)
 {
@@ -241,18 +253,6 @@ add_deleted_file(char *filename)
 	}
 
 	return deleted_files;
-}
-
-static int
-is_role_dupe(struct role_acl *role, const char *rolename, const u_int16_t type)
-{
-	struct role_acl *tmp;
-
-	for_each_role(tmp, role)
-	    if ((tmp->roletype & type) && !strcmp(tmp->rolename, rolename))
-		return 1;
-
-	return 0;
 }
 
 static struct file_acl *
