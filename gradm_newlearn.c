@@ -1077,6 +1077,42 @@ int display_leaf(struct gr_learn_file_node *node,
 		bind = node->bind_list;
 		conv_subj_mode_to_str(node->mode, modes, sizeof(modes));
 		fprintf(stream, "subject %s %s {\n", node->filename, modes);
+
+		if (node->user_trans_list) {
+			unsigned int **p = node->user_trans_list;
+			struct passwd *pwd;
+			if (p)
+				fprintf(stream, "user_transition_allow");
+			while (*p) {
+				pwd = getpwuid(**p);
+				if (pwd == NULL) {
+					p++;
+					continue;
+				}
+				fprintf(stream, " %s", pwd->pw_nam);
+				p++;
+			}
+			if (node->group_trans_list == NULL)
+				fprintf(stream, "\n\n");
+		}
+
+		if (node->group_trans_list) {
+			unsigned int **p = node->user_trans_list;
+			struct group *grp;
+			if (p)
+				fprintf(stream, "group_transition_allow");
+			while (*p) {
+				grp = getgrgid(**p);
+				if (grp == NULL) {
+					p++;
+					continue;
+				}
+				fprintf(stream, " %s", grp->gr_nam);
+				p++;
+			}
+			fprintf(stream, "\n\n");
+		}
+
 		if (object)
 			display_tree(object, stream);
 		if (!node->subject) {
