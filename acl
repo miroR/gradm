@@ -32,14 +32,6 @@ subject /
 	/dev/ptmx	rw
 	/dev/dsp	rw
 	/dev/mixer	rw
-	/dev/ippp0	rw
-	/dev/ippp1	rw
-	/dev/ippp2	rw
-	/dev/ippp3	rw
-	/dev/ippp4	rw
-	/dev/ippp5	rw
-	/dev/ippp6	rw
-	/dev/ippp7	rw
 	/dev/initctl	rw
 	/dev/fd0	r
 	/dev/cdrom	r
