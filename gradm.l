@@ -154,7 +154,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 <IPPORT_STATE>[0-9]{1,5}		{
 					  BEGIN(IP_STATE);
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.shortnum = atoi(yytext);
 					  return IPPORT;
 					}
 

@@ -351,11 +351,19 @@ ip_ports: /* emtpy */
 	;
 
 ip_typeproto:			IPPROTO
-				{ conv_name_to_type(&ip, $1); }
+				{ conv_name_to_type(&ip, $1);
+				  free($1);
+				}
 	|			IPTYPE
-				{ conv_name_to_type(&ip, $1); }
+				{ conv_name_to_type(&ip, $1);
+				  free($1);
+				}
 	| 			ip_typeproto IPPROTO
-				{ conv_name_to_type(&ip, $2); }
+				{ conv_name_to_type(&ip, $2);
+				  free($2);
+				}
 	|			ip_typeproto IPTYPE
-				{ conv_name_to_type(&ip, $2); }
+				{ conv_name_to_type(&ip, $2);
+				  free($2);
+				}
 	;
