@@ -1,3 +1,28 @@
+#This configuration file aids the learning process by tweaking
+#the learning algorithm for specific paths.
+#
+#It accepts lines in the form of <command> <pathname>
+#Where <command> can be inherit-learn, no-learn, or inherit-no-learn.
+#
+#inherit-learn changes the learning process for the specified path
+#by throwing all learned accesses for every binary executed by the
+#processes contained in the pathname into the subject specified
+#by the pathname.  This is useful for cron in the case of full
+#system learning, so that scripts that eventually end up executing
+#mv or rm with privilege don't cause the root policy to grant
+#that privilege to mv or rm in all cases.
+#
+#no-learn allows processes within the path to perform any operation
+#that normal system usage would allow without restriction.  If
+#a process is generating a huge number of learning logs, it may be
+#best to use this command on that process and configure its policy
+#manually.
+#
+#inherit-no-learn combines the above two cases, such that processes
+#within the specified path will be able to perform any normal system
+#operation without restriction as will any binaries executed by
+#these processes.
+
 inherit-learn /etc/cron-hourly
 inherit-learn /etc/cron-daily
 inherit-learn /etc/cron-weekly
