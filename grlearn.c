@@ -80,15 +80,16 @@ struct cache_entry {
 	unsigned long checked;
 	unsigned char taken:1;
 } *cache[640];
+static unsigned long check_count = 0;
 
 /* maintain a cache of most recently used items */
 int check_cache(char *str)
 {
 	int i;
+	check_count++;
 	for (i = 0; i < 640; i++) {
 		if (!cache[i]->taken)
 			continue;
-		cache[i]->checked++;
 		if (!strcmp(cache[i]->entryname, str)) {
 			cache[i]->used++;
 			return 1;
@@ -112,20 +113,72 @@ void insert_into_cache(char *str)
 			least = cache[i];
 			break;
 		}
-		if (cache[i]->used < least->used && cache[i]->checked > 1280)
+		if (cache[i]->used < least->used && (cache[i]->checked + 1280) < check_count)
 			least = cache[i];
 	}
 
 	strcpy(least->entryname, str);
 	least->used = 0;
-	least->checked = 0;
+	least->checked = check_count;
 
 	return;
 }
 		
+__inline__ char * rewrite_learn_entry(char *p)
+{
+	int i;
+	char *tmp = p;
+	char *endobj;
+	char *slash;
+	char *next;
+	unsigned int len;
+
+	for (i = 0; i < 8; i++) {
+		tmp = strchr(tmp, '\t');
+		if (!tmp)
+			return;
+		tmp++;
+	}
+	/* now we have a pointer to the object name */
+	endobj = strchr(tmp, '\t');
+	if (!endobj)
+		return;
+	*endobj = '\0';
+	/* now we have separated the string */
+
+	if (strncmp(tmp, "/proc/", 6))
+		return p;
+
+	if (*(tmp + 6) < '1' || *(tmp + 6) > '9')
+		return p;
+
+	slash = strchr(tmp + 6, '/');
+	if (slash == NULL) {
+		/* we have a /proc/<pid> dir, convert to /proc */
+		*endobj = '\t';
+		next = endobj;
+		while(*next++);
+		len = next - endobj;
+		memmove(tmp + 5, endobj, len);
+		return next;
+	} else {
+		/* we have /proc/<pid>/something, convert to /proc/star/something */
+		*endobj = '\t';
+		next = endobj;
+		while(*next++);
+		len = next - slash;
+		*(tmp + 6) = '*';
+		memmov(tmp + 7, slash, len);
+		return next;
+	}
+
+	return p;
+}
+
 int main(int argc, char *argv[])
 {
 	char *buf;
+	char *next;
 	char *p;
 	ssize_t retval;
 	struct pollfd fds;
@@ -204,11 +257,15 @@ int main(int argc, char *argv[])
 		if (retval > 0) {
 			p = buf;
 			while (p < (buf + retval)) {
+				next = rewrite_learn_entry(p);
 				if (!check_cache(p)) {
 					insert_into_cache(p);
 					write(fd2, p, strlen(p));
 				}
-				while (*p++);
+				if (next == p)
+					while (*p++);
+				else
+					p = next;
 			}
 		}
 	}
