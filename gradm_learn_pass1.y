@@ -104,7 +104,7 @@ learn_log:
 				insert_ip(&(role->allowed_ips), addr, 0, 0, 0);
 				insert_temp_file(&(role->tmp_subject_list), $9, GR_FIND | GR_OVERRIDE);
 			} else
-				insert_temp_file(&(role->tmp_subject_list), $9, GR_FIND | GR_OVERRIDE);
+				insert_temp_file(&(role->tmp_subject_list), $11, GR_FIND | GR_OVERRIDE);
 		}
 	;
 %%
