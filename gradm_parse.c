@@ -893,7 +893,7 @@ set_pw:
 	strncpy(retarg->pw, entry->passwd, GR_PW_LEN - 1);
 	retarg->pw[GR_PW_LEN - 1] = '\0';
 	strncpy(retarg->sp_role, entry->rolename, GR_SPROLE_LEN);
-	retarg->sp_role[GR_GR_SPROLE_LEN - 1] = '\0';
+	retarg->sp_role[GR_SPROLE_LEN - 1] = '\0';
 
 	retarg->mode = entry->mode;
 	retarg->segv_inode = entry->segv_inode;
