@@ -101,7 +101,7 @@ void merge_acl_rules()
 	struct proc_acl *subject;
 	struct file_acl *object;
 	struct ip_acl *ipp;
-	unsigned int i, x, y;
+	unsigned int i, x, y, port;
 
 	for_each_role(role, current_role) {
 		if (role->roletype & GR_ROLE_LEARN)
@@ -141,17 +141,17 @@ void merge_acl_rules()
 				for (i = 0; i < subject->ip_num; i++) {
 					ipp = subject->ips[i];
 					if (ipp->mode == GR_IP_CONNECT) {
-						for (i = ipp->low; i <= ipp->high; i++)
+						for (port = ipp->low; port <= ipp->high; i++)
 						for (x = 0; x < 5; x++)
 						for (y = 0; y < 256; y++)
 						if ((ipp->type & (1 << x)) && (ipp->proto[y / 32] & (1 << y % 32)))
-							insert_ip(&(matchsubj->connect_list), ipp->addr, i, x, y);
+							insert_ip(&(matchsubj->connect_list), ipp->addr, port, x, y);
 					} else if (ipp->mode == GR_IP_BIND) {
-						for (i = ipp->low; i <= ipp->high; i++)
+						for (port = ipp->low; port <= ipp->high; i++)
 						for (x = 0; x < 5; x++)
 						for (y = 0; y < 256; y++)
 						if ((ipp->type & (1 << x)) && (ipp->proto[y / 32] & (1 << y % 32)))
-							insert_ip(&(matchsubj->bind_list), ipp->addr, i, x, y);
+							insert_ip(&(matchsubj->bind_list), ipp->addr, port, x, y);
 					}
 				}
 			}
