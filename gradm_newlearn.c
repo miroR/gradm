@@ -1040,7 +1040,7 @@ show_ips:
 		if (strchr(node->filename, ' ')) {
 				if (i < 8)
 					fprintf(stream, "\t\"%s\"\t\t\t\t%s\n", node->filename, modes);
-				else if (i < 13)
+				else if (i < 14)
 					fprintf(stream, "\t\"%s\"\t\t\t%s\n", node->filename, modes);
 				else if (i < 27)
 					fprintf(stream, "\t\"%s\"\t\t%s\n", node->filename, modes);
@@ -1049,7 +1049,7 @@ show_ips:
 		} else {
 			if (i < 8)
 				fprintf(stream, "\t%s\t\t\t\t%s\n", node->filename, modes);
-			else if (i < 13)
+			else if (i < 14)
 				fprintf(stream, "\t%s\t\t\t%s\n", node->filename, modes);
 			else if (i < 27)
 				fprintf(stream, "\t%s\t\t%s\n", node->filename, modes);
