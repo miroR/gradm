@@ -89,7 +89,8 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 	namelen = strlen(nestednames[i-1]);
 	for_each_object(otmp, stmp->proc_object) {
 		if (!strncmp(nestednames[i-1], otmp->filename, namelen) && (otmp->filename[namelen] == '/' || otmp->filename[namelen] == '\0'))
-			otmp->nested = current_subject;
+			if (otmp->mode & GR_EXEC)
+				otmp->nested = current_subject;
 	}
 	current_subject->parent_subject = stmp;
 
