@@ -7,7 +7,7 @@ extern int learnlex(void);
 	char * string;
 }
 
-%token <string> NUM FILENAME IPADDR DATE JUNK ROLENAME
+%token <string> NUM FILENAME IPADDR ROLENAME
 %type <string> filename
 
 %%
@@ -26,37 +26,37 @@ filename:	/*empty*/	{ $$ = strdup(""); }
 
 learn_log:
 		error
-	|	DATE ROLENAME ':' NUM ':' filename ':' NUM ':' NUM ':' filename ':' NUM
+	|	ROLENAME ':' NUM ':' filename ':' NUM ':' NUM ':' filename ':' NUM
 		{
 			__u16 rolemode;
 			__u32 l2, l3, l4;
 
-			rolemode = atoi($4);
-			l2 = atoi($8);
-			l3 = atol($10);
-			l4 = atol($14);
-			add_learn_file_info($2, rolemode, $6, l2, l3, $12, l4);
+			rolemode = atoi($3);
+			l2 = atoi($7);
+			l3 = atol($9);
+			l4 = atol($13);
+			add_learn_file_info($1, rolemode, $5, l2, l3, $11, l4);
 		}		
-	|	DATE ROLENAME ':' NUM ':' filename ':' IPADDR ':' NUM ':' NUM ':' NUM ':' NUM
+	|	ROLENAME ':' NUM ':' filename ':' IPADDR ':' NUM ':' NUM ':' NUM ':' NUM
 		{
 			__u16 rolemode;
 			__u16 s2, s3, s4, s5;
 			__u32 addr;
 			struct in_addr ip;
 
-			rolemode = atoi($4);
+			rolemode = atoi($3);
 
-			if (inet_aton($8, &ip))
+			if (inet_aton($7, &ip))
 				addr = ip.s_addr;
 			else
 				addr = 0;
 
-			s2 = atoi($10);
-			s3 = atoi($12);
-			s4 = atoi($14);
-			s5 = atoi($16);
+			s2 = atoi($9);
+			s3 = atoi($11);
+			s4 = atoi($13);
+			s5 = atoi($15);
 
-			add_learn_ip_info($2, rolemode, $6, addr, s2, s3, s4, s5);
+			add_learn_ip_info($1, rolemode, $5, addr, s2, s3, s4, s5);
 		}
 	;
 %%

@@ -7,10 +7,6 @@ void learnerror(const char *s);
 int learnwrap(void);
 %}
 
-DATE [A-Z][a-z][a-z][ ]{1,2}[0-9]{1,2}" "[0-9][0-9]:[0-9][0-9]:[0-9][0-9]
-HOSTKERNGRSEC [A-Za-z0-9\-]+" kernel: grsec: LEARN:"
-METALOGKERNGRSEC [A-Za-z0-9\-]+" [kernel] grsec: LEARN:"
-SYSLOGNGKERNGRSEC [A-Za-z0-9@\-]+" grsec: LEARN:"
 ROLENAME [_a-zA-Z0-9-]{1,30}
 NUM [0-9]+
 FILENAME [/][A-Za-z0-9@\-_#., /]*
@@ -22,9 +18,6 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
 %%
 
-^{DATE}" "{HOSTKERNGRSEC} 		{ return DATE; }
-^{DATE}" "{METALOGKERNGRSEC} 		{ return DATE; }
-^{DATE}" "{SYSLOGNGKERNGRSEC} 		{ return DATE; }
 {NUM}					{
 					  learnlval.string = strdup(yytext);
 					  return NUM;
