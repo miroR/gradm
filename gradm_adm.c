@@ -86,9 +86,13 @@ void add_admin_acl(void)
 
 void add_kernel_acl(void)
 {
-	if(!add_proc_subject_acl(current_role, "kernel", proc_subject_mode_conv("ho")))
+	if(!add_proc_subject_acl(current_role, "kernel", proc_subject_mode_conv("o")))
 		exit(EXIT_FAILURE);
-	if(!add_proc_object_acl(current_subject, "/", proc_object_mode_conv("h"), 0))
+	if(!add_proc_object_acl(current_subject, "/", proc_object_mode_conv(""), 0))
+		exit(EXIT_FAILURE);
+	if(!add_proc_object_acl(current_subject, "/sbin/hotplug", proc_object_mode_conv("x"), 0))
+		exit(EXIT_FAILURE);
+	if(!add_proc_object_acl(current_subject, "/sbin/modprobe", proc_object_mode_conv("x"), 0))
 		exit(EXIT_FAILURE);
 
 	return;
