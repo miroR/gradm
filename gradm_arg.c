@@ -47,7 +47,7 @@ show_help(void)
 }
 
 static void
-conv_name_to_num(const char *filename, unsigned short *dev, ino_t * inode)
+conv_name_to_num(const char *filename, gr_dev_t *dev, ino_t * inode)
 {
 	struct stat fstat;
 

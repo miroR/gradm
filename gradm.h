@@ -29,6 +29,7 @@
 #include <linux/capability.h>
 #include <linux/limits.h>
 #include <linux/threads.h>
+#include <linux/version.h>
 
 #include "gradm_defs.h"
 #include "gradm_func.h"
@@ -59,8 +60,22 @@
 #define for_each_globbed(x, y) \
 	for(x = (y)->globbed; x; x = (x)->next)
 
+
+KERNEL_VERSION(a,b,c)
+
+#if KERNEL_VERSION(2,6,0) < KERNEL_VERSION_CODE
+typedef gr_dev_t __u32;
+#undef MAJOR
+#undef MINOR
+#undef MKDEV
+#define MAJOR(dev)     ((unsigned int) ((dev)>>20))
+#define MINOR(dev)     ((unsigned int) ((dev) & ((1U << 20) - 1)))
+#define MKDEV(ma,mi)   ((mi & 0xff) | (ma << 8) | ((mi & ~0xff) << 12))
+#else
+typedef gr_dev_t unsigned short
 #define MAJOR(dev)	((dev)>>8)
 #define MINOR(dev)	((dev) & 0xff)
 #define MKDEV(ma,mi)	((ma)<<8 | (mi))
+#endif
 
 #endif

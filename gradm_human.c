@@ -38,6 +38,7 @@ static struct mode_name_table {
 	GR_AUDIT_CREATE, 'C'}, {
 	GR_AUDIT_DELETE, 'D'}, {
 	GR_SUPPRESS, 's'}, {
+	GR_NOPTRACE, 'p'}, {
 	GR_FIND, 'h'}
 };
 
@@ -64,7 +65,6 @@ static struct subj_mode_name_table {
 	GR_NOTROJAN, 'T'}, {
 	GR_PROTPROCFD, 'd'}, {
 	GR_PROCACCT, 'b'}, {
-	GR_NOPTRACE, 't'}, {
 	GR_RELAXPTRACE, 'r'}
 };
 
