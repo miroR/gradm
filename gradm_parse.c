@@ -401,7 +401,7 @@ int add_proc_object_acl(struct proc_acl * subject, char * filename,
 	p->inode = fstat.st_ino;
 	p->dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
 
-	if(type & GR_LEARN) {
+	if(type & GR_FLEARN) {
 	        struct file_acl *tmp = *filp;
         
 		for_each_object(tmp, *filp) {
