@@ -16,7 +16,7 @@
 
 
 #define GR_LEARN_PID_PATH "/etc/grsec/.grlearn.pid"
-#define LEARN_BUFFER_SLOTS 64
+#define LEARN_BUFFER_SLOTS 256
 #define LEARN_BUFFER_SIZE 16384
 
 int stop_daemon(void)
