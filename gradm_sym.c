@@ -72,19 +72,27 @@ struct var_object * differentiate_objects(struct var_object *var1, struct var_ob
 {
 	struct var_object *tmpvar1, *tmpvar2, *retvar = NULL;
 	int found_dupe = 0;
+	char *path;
 
 	for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
+		path = calloc(strlen(tmpvar1->filename) + 1, sizeof(char));
+		if (!path)
+			failure("calloc")
+		strcpy(path, tmpvar1->filename);
 		found_dupe = 0;
-		for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
-			if (!strcmp(tmpvar1->filename, tmpvar2->filename)) {
-				found_dupe = 1;
-				if (tmpvar1->mode != tmpvar2->mode)
-					add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode &= ~tmpvar2->mode);
-				break;
+		do {
+			for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
+				if (!strcmp(path, tmpvar2->filename)) {
+					found_dupe = 1;
+					if (tmpvar1->mode != tmpvar2->mode)
+						add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode &= ~tmpvar2->mode);
+					break;
+				}
 			}
-		}
+		} while(parent_dir(tmpvar1->filename, &path));
 		if (!found_dupe)
 			add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode);
+		free(path);
 	}
 
 	return retvar;
