@@ -10,6 +10,7 @@ static struct in_addr ip;
 ROLENAME [_a-zA-Z0-9-]{1,30}
 NUM [0-9]+
 FILENAME [/][^\t\n]*
+DELETEDFILE [/][^\t\n]*" (deleted)"
 IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
 %option nounput
@@ -27,6 +28,13 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return ROLENAME;
 					}
 {FILENAME}				{
+					  fulllearn_pass2lval.string = strdup(yytext);
+					  return FILENAME;
+					}
+{DELETEDFILE}				{
+					  unsigned int len = strlen(yytext);
+					  char *p = yytext;
+					  *(p + len - strlen(" (deleted)")) = '\0';
 					  fulllearn_pass2lval.string = strdup(yytext);
 					  return FILENAME;
 					}
