@@ -360,6 +360,18 @@ add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 	return 1;
 }
 
+int count_slashes(char *str)
+{
+	int i = 0;
+	while (*str) {
+		if (*str == '/')
+			i++;
+		str++;
+	}
+
+	return i;
+}
+
 static int
 add_globbing_file(struct proc_acl *subject, char *filename,
 		  __u32 mode, int type)
@@ -368,6 +380,7 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 	char *p, *p2;
 	struct file_acl *anchor;
 	struct file_acl *glob, *glob2;
+	int lnum, onum;
 
 	/* one for the object itself, one for the filename */
 	num_pointers += 2;
@@ -401,11 +414,32 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 
 	if (anchor->globbed) {
 		glob = anchor->globbed;
-		while (glob->next)
-			glob = glob->next;
 		glob2 = calloc(1, sizeof(struct file_acl));
 		if (!glob2)
 			failure("calloc");
+		onum = count_slashes(filename);
+		lnum = count_slashes(glob->filename);
+		if (onum > lnum) {
+			glob2->next = glob;
+			anchor->globbed = glob2;
+			glob2->filename = filename;
+			glob2->mode = mode;
+			glob->prev = glob2;
+			return 1;
+		}
+		while (glob->next) {
+			lnum = count_slashes(glob->next->filename);
+			if (onum > lnum) {
+				glob2->next = glob->next;
+				glob->next = glob2;
+				glob2->filename = filename;
+				glob2->mode = mode;
+				glob2->prev = glob;
+				glob->next->prev = glob2;
+				return 1;
+			}
+			glob = glob->next;
+		}
 		glob2->filename = filename;
 		glob2->mode = mode;
 		glob2->prev = glob;
