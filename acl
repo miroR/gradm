@@ -69,6 +69,18 @@
 #      other than its own descendants)
 # t -> reject all ptraces to this process
 #
+# user/group transitions:
+# You may now specify what users and groups a given subject can
+# transition to.  This can be done on an inclusive or exclusive basis.
+# Examples:
+# subject /bin/su
+# user_transition_allow root spender
+# group_transition_allow root spender
+# subject /bin/su
+# user_transition_deny evilhacker
+# subject /bin/su
+# group_transition_deny evilhacker1 evilhacker2
+#
 # New learning system:
 # To learn on a given subject: add l (the letter l, not the number 1)
 # to the subject mode
