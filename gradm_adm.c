@@ -151,8 +151,8 @@ add_grlearn_acl(struct role_acl *role)
 void add_fulllearn_admin_acl(void)
 {
 	add_role_acl(&current_role, gr_strdup("admin"), role_mode_conv("sA"), 0);
-	add_proc_subject_acl(&current_role, "/", proc_subject_mode_conv("or"), 0);
-	add_proc_object_acl(&current_subject, "/", proc_object_mode_conv("rwcdmlxi"), GR_FEXIST);
+	add_proc_subject_acl(current_role, "/", proc_subject_mode_conv("or"), 0);
+	add_proc_object_acl(current_subject, "/", proc_object_mode_conv("rwcdmlxi"), GR_FEXIST);
 
 	return;
 }
