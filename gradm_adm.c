@@ -118,7 +118,7 @@ add_grlearn_acl(struct role_acl *role)
 	struct ip_acl ip;
 
 	if (stat(GRLEARN_PATH, &fstat)) {
-		fprintf("%s does not exist.  Please reinstall gradm.\n", GRLEARN_PATH);
+		fprintf(stderr, "%s does not exist.  Please reinstall gradm.\n", GRLEARN_PATH);
 		exit(EXIT_FAILURE);
 	}
 
