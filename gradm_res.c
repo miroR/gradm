@@ -145,7 +145,7 @@ add_res_acl(struct proc_acl *subject, const char *name,
 
 	if (!strcmp(name, "RES_NOFILE") &&
 	    (((lim.rlim_cur != ~0UL) && (lim.rlim_cur > NR_OPEN)) ||
-	     ((lim.rlim_max != ~0UL) && (lim.rlim_max > NR_OPEN))) {
+	     ((lim.rlim_max != ~0UL) && (lim.rlim_max > NR_OPEN)))) {
 		fprintf(stderr, "Limits for RES_NOFILE cannot be larger "
 			"than %u.\n", NR_OPEN);
 		exit(EXIT_FAILURE);
