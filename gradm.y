@@ -36,7 +36,7 @@ various_acls:			role_label
 role_label: 			ROLE ROLE_NAME role_type
 				{
 				printf("adding role %s\n", $2);
-				 if (!add_role_acl(&current_role, $2, $3))
+				 if (!add_role_acl(&current_role, $2, $3, 0))
 					exit(EXIT_FAILURE);
 				}
 	;
