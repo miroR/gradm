@@ -63,6 +63,21 @@
 # C -> audit the creation
 # d -> allow deletion of the file/directory
 # D -> audit the deletion
+#
+# New learning system:
+# To learn on a given subject: add l (the letter l, not the number 1)
+# to the subject mode
+# To learn on a given role, add l to the role mode
+# For both of these, to enable learning, enable the system like:
+# gradm -L /etc/grsec/learning.logs -E
+# and then generate the rules after disabling the system after the 
+# learning phase with:
+# gradm -L /etc/grsec/learning.logs -O /etc/grsec/acl
+# To use full system learning, enable the system like:
+# gradm -F -L /etc/grsec/learning.logs
+# and then generate the rules after disabling the system after the 
+# learning phase with:
+# gradm -F -L /etc/grsec/learning.logs -O /etc/grsec/acl
 
 role admin sA
 subject /
