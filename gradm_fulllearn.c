@@ -170,6 +170,9 @@ void free_subject_uids(struct gr_learn_file_node *subject, int thresh)
 			free(*(uid_list + i));
 		free(uid_list);
 		subject->user_trans_list = NULL;
+	} else if (thresh == 0) {
+		free(uid_list);
+		subject->user_trans_list = NULL;
 	}
 
 	return;
@@ -193,6 +196,9 @@ void free_subject_gids(struct gr_learn_file_node *subject, int thresh)
 	if (size > thresh) {
 		for (i = 0; i < size; i++)
 			free(*(group_list + i));
+		free(group_list);
+		subject->group_trans_list = NULL;
+	} else if (thresh == 0) {
 		free(group_list);
 		subject->group_trans_list = NULL;
 	}
