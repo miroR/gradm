@@ -27,10 +27,13 @@ gradm \- Administration program for grsecurity ACLs
 <subject> <object>
 ]
 [
-.B \-P
+.B \-P [rolename]
 ]
 [
-.B \-a 
+.B \-a <rolename>
+]
+[
+.B \-n <rolename>
 ]
 [
 .B \-h 
@@ -90,12 +93,18 @@ Disable the ACL system
 Displays the permissions for object allowed by subject
 .TP
 
-.B \-P
-Setup the password for the ACL system
+.B \-P [rolename]
+Without an argument, it sets the password for administering
+the ACL system.  With a role name as an argument, it sets
+the password for that given special role.
 .TP
 
-.B \-a
-Obtain full administrative capabilities(override ACL system)
+.B \-a <rolename>
+Authenticate to a special role that requires a password.
+.TP
+
+.B \-n <rolename>
+Authenticate to a special role that does not require a password.
 .TP
 
 .B \-h
