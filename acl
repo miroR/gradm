@@ -4,6 +4,7 @@ subject /
 	/ rwxi
 
 role default G
+role_transitions admin
 subject /
 	/		r
 	/opt		rx
