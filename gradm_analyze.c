@@ -244,6 +244,8 @@ handle_notrojan_mode(void)
 	int ret = 0;
 
 	for_each_role(role, current_role) {
+		if (!strcmp(role->rolename, "::kernel::"))
+			continue;
 		for_each_subject(subj, role) {
 			if (!(subj->mode & GR_NOTROJAN))
 				continue;
@@ -256,6 +258,8 @@ handle_notrojan_mode(void)
 				strcpy(objname, obj->filename);
 				do {
 					for_each_role(role2, current_role) {
+						if (!strcmp(role->rolename, "::kernel::"))
+							continue;
 						for_each_subject(subj2, role2) {
 							if (subj2 == subj
 							    || (subj2->
