@@ -60,7 +60,7 @@ int write_pid_log(pid_t pid)
 		unlink(GR_LEARN_PID_PATH);
 	}
 		
-	fd = open(GR_LEARN_PID_PATH, O_WRONLY | O_CREAT | O_EXCL);
+	fd = open(GR_LEARN_PID_PATH, O_WRONLY | O_CREAT | O_EXCL, 0600);
 
 	if (fd < 0) {
 		fprintf(stderr, "Unable to open %s:\n"
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	fd2 = open(argv[1], O_WRONLY | O_APPEND | O_CREAT | O_SYNC);
+	fd2 = open(argv[1], O_WRONLY | O_APPEND | O_CREAT | O_SYNC, 0600);
 
 	if (fd2 < 0) {
 		fprintf(stderr, "Error opening %s\n"
