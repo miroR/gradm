@@ -243,8 +243,7 @@ void analyze_acls(void)
 	struct role_acl *role;
 
 	for_each_role(role, current_role) {
-	if (!strcmp(role->rolename, ":::kernel:::") ||
-	    !strcmp(role->rolename, ":::admin:::"))
+	if (role->roletype & GR_ROLE_SPECIAL)
 		continue;
 
 	def_acl = role->root_label;
