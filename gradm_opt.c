@@ -19,10 +19,9 @@ compute_cap_creds(struct proc_acl *set, struct proc_acl *cmp)
 }
 
 static void
-expand_acl(struct proc_acl *proc)
+expand_acl(struct proc_acl *proc, struct role_acl *role)
 {
 	char *tmpproc;
-	struct role_acl *tmpr;
 	struct proc_acl *tmpp;
 	struct file_acl *tmpf1;
 	struct file_acl *tmpf2;
@@ -33,27 +32,25 @@ expand_acl(struct proc_acl *proc)
 
 	strncpy(tmpproc, proc->filename, strlen(proc->filename));
 
-	for_each_role(tmpr, current_role) {
-		while (parent_dir(proc->filename, &tmpproc)) {
-			for_each_subject(tmpp, tmpr) {
-				if (!strcmp(tmpproc, tmpp->filename)) {
-					compute_cap_creds(proc, tmpp);	// perform capability inheritance
-					for_each_object(tmpf1,
-							tmpp->proc_object) {
-						for_each_object(tmpf2,
-								proc->
-								proc_object)
-						    if (!strcmp
-							(tmpf1->filename,
-							 tmpf2->filename))
-							break;
-						if (!tmpf2)	// object not found in current subject
-							add_proc_object_acl
-							    (proc,
-							     tmpf1->filename,
-							     tmpf1->mode,
-							     GR_FEXIST);
-					}
+	while (parent_dir(proc->filename, &tmpproc)) {
+		for_each_subject(tmpp, role) {
+			if (!strcmp(tmpproc, tmpp->filename)) {
+				compute_cap_creds(proc, tmpp);	// perform capability inheritance
+				for_each_object(tmpf1,
+						tmpp->proc_object) {
+					for_each_object(tmpf2,
+							proc->
+							proc_object)
+					    if (!strcmp
+						(tmpf1->filename,
+						 tmpf2->filename))
+						break;
+					if (!tmpf2)	// object not found in current subject
+						add_proc_object_acl
+						    (proc,
+						     tmpf1->filename,
+						     tmpf1->mode,
+						     GR_FEXIST);
 				}
 			}
 		}
@@ -72,7 +69,7 @@ expand_acls(void)
 	for_each_role(role, current_role) {
 		for_each_subject(proc, role) {
 			if (!(proc->mode & GR_OVERRIDE))
-				expand_acl(proc);
+				expand_acl(proc, role);
 			else
 				proc->mode &= ~GR_OVERRIDE;
 		}
