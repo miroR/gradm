@@ -931,7 +931,7 @@ void insert_file(struct gr_learn_file_node **base, char *filename, u_int32_t mod
 	/* we're inserting a new file, and an entry for / does not exist, add it */
 	if (!(*base)) {
 		if (subj) {
-			do_insert_file(base, "/", GR_FIND, subj);
+			do_insert_file(base, "/", GR_PROCFIND, subj);
 			if (subj == 2) /* learning in non-full mode, don't display / subject */
 				(*base)->dont_display = 1;
 		} else
