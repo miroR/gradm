@@ -1089,7 +1089,7 @@ int display_leaf(struct gr_learn_file_node *node,
 					p++;
 					continue;
 				}
-				fprintf(stream, " %s", pwd->pw_nam);
+				fprintf(stream, " %s", pwd->pw_name);
 				p++;
 			}
 			if (node->group_trans_list == NULL)
@@ -1107,7 +1107,7 @@ int display_leaf(struct gr_learn_file_node *node,
 					p++;
 					continue;
 				}
-				fprintf(stream, " %s", grp->gr_nam);
+				fprintf(stream, " %s", grp->gr_name);
 				p++;
 			}
 			fprintf(stream, "\n\n");
