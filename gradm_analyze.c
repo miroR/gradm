@@ -82,7 +82,7 @@ static void check_default_objects(struct role_acl *role)
 	return;
 }
 
-static int check_lilo_conf(struct proc_acl * def_acl)
+static int check_lilo_conf(struct role_acl *role, struct proc_acl * def_acl)
 {
 	FILE * liloconf;
 	char buf[PATH_MAX];
@@ -103,10 +103,10 @@ static int check_lilo_conf(struct proc_acl * def_acl)
 			buf[strlen(buf) - 1] = '\0';
 		if((p = strstr(buf, "image="))) {
 			p += 6;	
-			if(!stat(p, &fstat) && !check_permission(def_acl, p, &chk)) {
+			if(!stat(p, &fstat) && !check_permission(role, def_acl, p, &chk)) {
 				fprintf(stderr, "Write access is allowed by role %s to %s, a kernel "
 				       "for your system specified in "
-				       "/etc/lilo.conf.\n\n", p);
+				       "/etc/lilo.conf.\n\n", role->rolename, p);
 				errs_found++;
 			}
 		}
