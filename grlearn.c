@@ -1,8 +1,24 @@
 #include "gradm.h"
+#include <signal.h>
 
 #define GR_LEARN_PID_PATH GRSEC_DIR "/.grlearn.pid"
 #define LEARN_BUFFER_SIZE (1024 * 1024)
 #define MAX_ENTRY_SIZE 16384
+
+static char *writebuf;
+static char *writep;
+static int fd2 = -1;
+
+/* handle flushing of buffer when grlearn is stopped */
+void term_handler(int sig)
+{
+	char c;
+
+	signal(sig, SIG_IGN);
+	if (fd2 >= 0)
+		write(fd2, writebuf, writep - writebuf);
+	exit(0);	
+}
 
 int stop_daemon(void)
 {
@@ -16,7 +32,8 @@ int stop_daemon(void)
 
 	read(fd, &learn_pid, sizeof(learn_pid));
 
-	kill(learn_pid, 9);
+	/* send SIGTERM, will be handled */
+	kill(learn_pid, 15);
 
 	close(fd);
 
@@ -185,13 +202,11 @@ __inline__ char * rewrite_learn_entry(char *p)
 int main(int argc, char *argv[])
 {
 	char *buf;
-	char *writebuf;
-	char *writep;
 	char *next;
 	char *p;
 	ssize_t retval;
 	struct pollfd fds;
-	int fd, fd2;
+	int fd;
 	pid_t pid;
 	struct sched_param schedulerparam;
 	unsigned int len;
@@ -203,6 +218,8 @@ int main(int argc, char *argv[])
 	if (!strcmp(argv[1], "-stop"))
 		return stop_daemon();
 		
+	signal(SIGTERM, term_handler);
+
 	/* perform various operations to make us act in near real-time */
 
 	srandom(getpid());
