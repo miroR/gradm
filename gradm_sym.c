@@ -77,7 +77,7 @@ struct var_object * differentiate_objects(struct var_object *var1, struct var_ob
 	for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
 		path = calloc(strlen(tmpvar1->filename) + 1, sizeof(char));
 		if (!path)
-			failure("calloc")
+			failure("calloc");
 		strcpy(path, tmpvar1->filename);
 		found_dupe = 0;
 		do {
