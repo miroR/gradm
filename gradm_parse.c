@@ -583,6 +583,12 @@ __u8 role_mode_conv(const char * mode)
 			retmode &= ~GR_ROLE_DEFAULT;
 			retmode |= GR_ROLE_SPECIAL;
 			break;
+		case 'A':
+			retmode |= GR_ROLE_GOD;
+			break;
+		case 'N':
+			retmode |= GR_ROLE_NOPW;
+			break;
 		case 'G':
 			retmode |= GR_ROLE_AUTH;
 			break;
