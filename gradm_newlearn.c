@@ -1088,8 +1088,7 @@ int display_leaf(struct gr_learn_file_node *node,
 		if (node->user_trans_list) {
 			unsigned int **p = node->user_trans_list;
 			struct passwd *pwd;
-			if (p)
-				fprintf(stream, "user_transition_allow");
+			fprintf(stream, "user_transition_allow");
 			while (*p) {
 				pwd = getpwuid(**p);
 				if (pwd == NULL) {
@@ -1107,10 +1106,9 @@ int display_leaf(struct gr_learn_file_node *node,
 		}
 
 		if (node->group_trans_list) {
-			unsigned int **p = node->user_trans_list;
+			unsigned int **p = node->group_trans_list;
 			struct group *grp;
-			if (p)
-				fprintf(stream, "group_transition_allow");
+			fprintf(stream, "group_transition_allow");
 			while (*p) {
 				grp = getgrgid(**p);
 				if (grp == NULL) {
