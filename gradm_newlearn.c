@@ -1344,8 +1344,8 @@ void do_reduce_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node *a
 	}
 
 	for (i = 0; i < (sizeof(node->ip_proto)/sizeof(node->ip_proto[0])); i++)
-		actor->ip_proto[node->ip_proto[i] / 32] |= (1 << (node->ip_proto[i] % 32));
-	actor->ip_type |= (1 << node->ip_type);
+		actor->ip_proto[i] |= node->ip_proto[i];
+	actor->ip_type |= node->ip_type;
 
 	if (!node->leaves) {
 		free(node);
