@@ -17,12 +17,13 @@ int current_nest_depth = 0;
 }
 
 %token <string> ROLE ROLE_NAME ROLE_TYPE SUBJECT SUBJ_NAME OBJ_NAME 
-%token <string> RES_NAME RES_SOFTHARD CONNECT BIND IPPORT IPTYPE
+%token <string> RES_NAME RES_SOFTHARD CONNECT BIND IPTYPE
 %token <string> IPPROTO IPNETMASK CAP_NAME ROLE_ALLOW_IP
 %token <string> ROLE_TRANSITION VARIABLE DEFINE DEFINE_NAME DISABLED
 %token <string> ID_NAME USER_TRANS_ALLOW GROUP_TRANS_ALLOW 
 %token <string> USER_TRANS_DENY GROUP_TRANS_DENY DOMAIN_TYPE DOMAIN
 %token <num> OBJ_MODE SUBJ_MODE IPADDR
+%token <shortnum> IPPORT
 %type <num> subj_mode obj_mode ip_netmask
 %type <shortnum> role_type
 %type <var> variable_expression
@@ -341,12 +342,12 @@ ip_ports: /* emtpy */
 				}
 	|			':' IPPORT
 				{
-				 ip.low = ip.high = atoi($2);
+				 ip.low = ip.high = $2;
 				}
 	|			':' IPPORT '-' IPPORT
 				{
-				 ip.low = atoi($2);
-				 ip.high = atoi($4);
+				 ip.low = $2;
+				 ip.high = $4;
 				}
 	;
 

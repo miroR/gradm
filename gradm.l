@@ -123,7 +123,6 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 
 <IP_STATE>"disabled"			{
-					  gradmlval.string = strdup(yytext);
 					  return DISABLED;
 					}
 <IP_STATE>{IP}				{
