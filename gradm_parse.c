@@ -781,9 +781,10 @@ static void setup_special_roles(struct gr_arg *grarg)
 					"for the role.\n", rtmp->rolename, rtmp->rolename);
 				exit(EXIT_FAILURE);
 			}
-			memcpy(grarg->sprole_pws + (i * sizeof(struct sprole_pw)), entry.rolename, GR_SPROLE_LEN);
-			memcpy(grarg->sprole_pws + (i * sizeof(struct sprole_pw)) + GR_SPROLE_LEN, entry.salt, GR_SALT_SIZE);
-			memcpy(grarg->sprole_pws + (i * sizeof(struct sprole_pw)) + GR_SPROLE_LEN + GR_SALT_SIZE, entry.sum, GR_SHA_SUM_SIZE);
+			grarg->sprole_pws[i].rolename = (unsigned char *)rtmp->rolename;
+			memcpy(grarg->sprole_pws[i].salt, entry.salt, GR_SALT_SIZE);
+			memcpy(grarg->sprole_pws[i].sum, entry.sum, GR_SHA_SUM_SIZE);
+			memset(&entry, 0, sizeof(struct gr_pw_entry));
 			i++;
 		}
 	}
@@ -843,6 +844,11 @@ struct gr_arg * conv_user_to_kernel(struct gr_pw_entry * entry)
 
 	if((retarg->sprole_pws = (struct sprole_pw *) calloc(sproles, sizeof(struct sprole_pw))) == NULL)
 		failure("calloc");
+
+	err = mlock(retarg->sprole_pws, sproles * sizeof(struct sprole_pw));
+	if (err)
+		fprintf(stderr, "Warning, unable to lock authentication "
+			"structure in physical memory.\n");
 
 	setup_special_roles(retarg);
 
