@@ -491,7 +491,7 @@ struct gr_hash_struct *create_hash_table(int type)
 	return hash;
 }
 
-void insert_learn_object(struct gr_learn_file_tmp_node *subject, struct gr_learn_file_tmp_node *object)
+void insert_learn_object(struct gr_learn_file_node *subject, struct gr_learn_file_tmp_node *object)
 {
 	if (subject->hash == NULL)
 		subject->hash = create_hash_table(GR_HASH_FILENAME);
