@@ -455,6 +455,7 @@ void no_coredump(void)
 #ifdef GRADM_DEBUG
 void show_policy(void) {
 	struct file_acl *filp;
+	struct ip_acl *ipp;
 	struct proc_acl *proc;
 	struct role_acl *rolp;
 	struct role_transition *rolet;
@@ -476,8 +477,52 @@ void show_policy(void) {
 		printf("\tSUBJECT: %s dev:%d inode:%lu mode:%d c_raise:%x c_drop:%x\n",
 			proc->filename, proc->dev, proc->inode, proc->mode, ~proc->cap_drop,
 			proc->cap_drop);
-		if (!proc->ips)
-			printf("\t\tNo socket restrictions\n");
+		for (i = 0; i < proc->ip_num; i++) {
+			char ipaddr[4];
+			int c;
+			int netmask = 0;
+
+			ipp = *(proc->ips + i);
+			memcpy(&ipaddr, &(ipp->addr), sizeof(ipaddr));
+			for (c = 0; c < 32; c++)
+				if (ipp->addr & (1 << c))
+					netmask++;
+			if (ipp->mode == GR_IP_CONNECT)
+				printf("\tCONNECT %u.%u.%u.%u/%u:%d-%d", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], netmask, ipp->low, ipp->high);
+			else
+				printf("\tBIND %u.%u.%u.%u/%u:%d-%d", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], netmask, ipp->low, ipp->high);
+
+			for (c = 1; c < 5; c++) {
+				if (ipp->type & (1 << c)) {
+					switch (c) {
+					case SOCK_RAW:
+						printf(" raw_sock");
+						break;
+					case SOCK_DGRAM:
+						printf(" dgram");
+						break;
+					case SOCK_STREAM:
+						printf(" stream");
+						break;
+					case SOCK_RDM:
+						printf(" rdm");
+						break;
+					}
+				}
+			}
+			for (c = 0; c < 256; c++) {
+				if (ipp->proto[c / 32] & (1 << (c % 32))) {
+					if (c == IPPROTO_RAW)
+						printf(" raw_proto");
+					else {
+						struct protoent *proto;
+						proto = getprotobynumber(c);
+						printf(" %s", proto->p_name);
+					}
+				}
+			}
+			printf("\n");
+		}
 		for (filp = proc->hash->first;filp;filp=filp->prev)
                         printf("\t\tOBJECT: %s dev:%d inode:%lu mode:%d\n", filp->filename, filp->dev, filp->inode, filp->mode);
 		for (i=0;i<GR_NLIMITS;i++)
