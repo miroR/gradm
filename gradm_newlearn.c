@@ -562,10 +562,11 @@ int reduce_all_leaves(struct gr_learn_file_node *node)
 __u16 greatest_occurring_mode(struct gr_learn_file_node *node)
 {
 	struct gr_learn_file_node **tmp;
-	__u16 modes[11] = { GR_FIND,
+	__u16 modes[12] = { GR_FIND,
 			    GR_FIND | GR_READ,
 			    GR_FIND | GR_READ | GR_WRITE,
 			    GR_FIND | GR_READ | GR_EXEC,
+			    GR_FIND | GR_EXEC,
 			    GR_FIND | GR_WRITE,
 			    GR_FIND | GR_WRITE | GR_CREATE,
 			    GR_FIND | GR_WRITE | GR_DELETE,
@@ -574,14 +575,14 @@ __u16 greatest_occurring_mode(struct gr_learn_file_node *node)
 			    GR_FIND | GR_READ | GR_WRITE | GR_DELETE,
 			    GR_FIND | GR_READ | GR_WRITE | GR_CREATE,
 			};
-	unsigned long counts[11] = {0};
+	unsigned long counts[12] = {0};
 	__u16 max;
 	int i;
 
 	tmp = node->leaves;
 
 	while (*tmp) {
-		for (i = 0; i < 11; i++) {
+		for (i = 0; i < 12; i++) {
 			if ((*tmp)->mode == modes[i])
 				counts[i]++;
 		}
@@ -591,7 +592,7 @@ __u16 greatest_occurring_mode(struct gr_learn_file_node *node)
 
 	max = 0;
 
-	for (i = 0; i < 11; i++) {
+	for (i = 0; i < 12; i++) {
 		if (counts[i] > counts[max])
 			max = i;
 	}
