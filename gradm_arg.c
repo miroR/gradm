@@ -21,6 +21,7 @@ show_help(void)
 	       "Options:\n"
 	       "	-E, --enable	Enable the grsecurity RBAC system\n"
 	       "	-D, --disable	Disable the grsecurity RBAC system\n"
+	       "	-S, --status	Check status of RBAC system\n"
 	       "	-F, --fulllearn Enable full system learning\n"
 	       "	-P [rolename], --passwd\n"
 	       "			Create password for RBAC administration\n"
@@ -74,10 +75,11 @@ parse_args(int argc, char *argv[])
 	int gr_fulllearn = 0;
 	struct gr_pw_entry entry;
 	struct gr_arg *grarg;
-	const char *const short_opts = "EFDP::RL:O:M:a:n:hv";
+	const char *const short_opts = "SEFDP::RL:O:M:a:n:hv";
 	const struct option long_opts[] = {
 		{"help", 0, NULL, 'h'},
 		{"version", 0, NULL, 'v'},
+		{"status", 0, NULL, 'S'},
 		{"enable", 0, NULL, 'E'},
 		{"disable", 0, NULL, 'D'},
 		{"passwd", 2, NULL, 'P'},
@@ -105,10 +107,16 @@ parse_args(int argc, char *argv[])
 		getopt_long(argc, argv, short_opts, long_opts, NULL)) != -1) {
 
 		switch (next_option) {
+		case 'S':
+			if (argc > 2)
+				show_help();
+			check_acl_status(GRADM_STATUS);
+			break;
 		case 'E':
 			if (argc > 5)
 				show_help();
 			entry.mode = GRADM_ENABLE;
+			check_acl_status(entry.mode);
 			parse_acls();
 			expand_acls();
 			analyze_acls();
@@ -118,6 +126,7 @@ parse_args(int argc, char *argv[])
 			if (argc > 6)
 				show_help();
 			entry.mode = GRADM_ENABLE;
+			check_acl_status(entry.mode);
 			gr_fulllearn = 1;
 			gr_enable = 1;
 			break;
@@ -125,6 +134,7 @@ parse_args(int argc, char *argv[])
 			if (argc > 2)
 				show_help();
 			entry.mode = GRADM_RELOAD;
+			check_acl_status(entry.mode);
 			get_user_passwd(&entry, GR_PWONLY);
 			parse_acls();
 			expand_acls();
@@ -140,6 +150,7 @@ parse_args(int argc, char *argv[])
 			    || (strlen(optarg) < 1))
 				show_help();
 			entry.mode = GRADM_MODSEGV;
+			check_acl_status(entry.mode);
 			get_user_passwd(&entry, GR_PWONLY);
 
 			if (isdigit(optarg[0]))
@@ -153,8 +164,11 @@ parse_args(int argc, char *argv[])
 			exit(EXIT_SUCCESS);
 			break;
 		case 'D':
-			get_user_passwd(&entry, GR_PWONLY);
+			if (argc > 2)
+				show_help();
 			entry.mode = GRADM_DISABLE;
+			check_acl_status(entry.mode);
+			get_user_passwd(&entry, GR_PWONLY);
 			grarg = conv_user_to_kernel(&entry);
 			if (transmit_to_kernel(grarg, sizeof (struct gr_arg)))
 				memset(grarg, 0, sizeof (struct gr_arg));
@@ -200,8 +214,9 @@ parse_args(int argc, char *argv[])
 				show_help();
 			strncpy(entry.rolename, argv[2], GR_SPROLE_LEN);
 			entry.rolename[GR_SPROLE_LEN - 1] = '\0';
-			get_user_passwd(&entry, GR_PWONLY);
 			entry.mode = GRADM_SPROLE;
+			check_acl_status(entry.mode);
+			get_user_passwd(&entry, GR_PWONLY);
 			grarg = conv_user_to_kernel(&entry);
 			transmit_to_kernel(grarg, sizeof (struct gr_arg));
 			memset(grarg, 0, sizeof (struct gr_arg));
@@ -213,6 +228,7 @@ parse_args(int argc, char *argv[])
 			strncpy(entry.rolename, argv[2], GR_SPROLE_LEN);
 			entry.rolename[GR_SPROLE_LEN - 1] = '\0';
 			entry.mode = GRADM_SPROLE;
+			check_acl_status(entry.mode);
 			grarg = conv_user_to_kernel(&entry);
 			transmit_to_kernel(grarg, sizeof (struct gr_arg));
 			memset(grarg, 0, sizeof (struct gr_arg));

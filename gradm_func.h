@@ -107,3 +107,4 @@ int ensure_subject_security(struct gr_learn_file_node *subject,
 			struct gr_learn_file_node *unused1,
 			FILE *unused2);
 
+void check_acl_status(__u16 reqmode);

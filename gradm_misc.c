@@ -60,6 +60,54 @@ transmit_to_kernel(void *buf, unsigned long len)
 	return err;
 }
 
+void check_acl_status(__u16 reqmode)
+{
+	int fd;
+	int retval;
+	struct gr_arg arg;
+
+	arg.mode = GRADM_STATUS;
+
+	if ((fd = open("/dev/grsec", O_WRONLY)) < 0) {
+		fprintf(stderr, "Could not open /dev/grsec\n");
+		failure("open");
+	}
+
+	retval = write(fd, &arg, sizeof(arg));
+	close(fd);
+
+	switch (reqmode) {
+	case GRADM_STATUS:
+		if (retval == 1) {
+			printf("The ACL system is currently enabled.\n");
+			exit(0);
+		} else if (retval == 2) {
+			printf("The ACL system is currently disabled.\n");
+			exit(1);
+		}
+		break;
+	case GRADM_ENABLE:
+	case GRADM_RELOAD:
+		if (retval == 1) {
+			printf("The operation you requested cannot be performed "
+				"because the RBAC system is currently enabled.\n");
+			exit(EXIT_FAILURE);
+		}
+		break;
+	case GRADM_DISABLE:
+	case GRADM_SPROLE:
+	case GRADM_MODSEGV:
+		if (retval == 2) {
+			printf("The operation you requested cannot be performed "
+				"because the RBAC system is currently disabled.\n");
+			exit(EXIT_FAILURE);
+		}
+		break;
+	}
+
+	return;
+}
+
 void
 init_variables(void)
 {
