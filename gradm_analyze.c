@@ -54,7 +54,7 @@ static int check_subjects(struct role_acl *role)
 		if((tmp->filename[0] == '/') && (tmp->filename[1] != '\0'))
 		if(!check_permission(role, def_acl, tmp->filename, &chk))
 			fprintf(stderr, "Warning: write access is allowed to your " 
-				"subject ACL for %s in role %s.\n\n", tmp->filename, role->rolename);
+				"subject ACL for %s in role %s.  Please ensure that the subject is running with less privilege than the default ACL.\n", tmp->filename, role->rolename);
 
 	return errs_found;
 }
