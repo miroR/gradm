@@ -15,12 +15,11 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 	int subj_found = 0;
 	int nest_found = 0;
 
-	if ((nestmode & GR_LEARN) || !(nestmode & GR_OVERRIDE)) {
+	if (nestmode & GR_LEARN) {
 		fprintf(stderr, "Error on line %lu of %s:\n", lineno,
 			current_acl_file);
 		fprintf(stderr,
-			"Learning is not yet implemented for nested subjects, "
-			"and nested subjects must have \"o\" in their mode.\n");
+			"Learning is not yet implemented for nested subjects.\n");
 		exit(EXIT_FAILURE);
 	}
 

@@ -60,6 +60,31 @@ expand_acl(struct proc_acl *proc, struct role_acl *role)
 	return;
 }
 
+static void
+expand_nested_acl(struct proc_acl *proc)
+{
+	struct proc_acl *tmpp = proc;
+	struct file_acl *tmpf1;
+	struct file_acl *tmpf2;
+
+	while (tmpp = tmpp->parent_subject) {
+		compute_cap_creds(proc, tmpp);	// perform capability inheritance
+		for_each_object(tmpf1, tmpp->proc_object) {
+			for_each_object(tmpf2, proc->proc_object)
+				if (!strcmp(tmpf1->filename,
+					    tmpf2->filename))
+					break;
+			if (!tmpf2)	// object not found in current subject
+				add_proc_object_acl(proc,
+						    tmpf1->filename,
+						    tmpf1->mode,
+						    GR_FEXIST);
+		}
+	}
+
+	return;
+}
+
 void
 expand_acls(void)
 {
@@ -68,8 +93,10 @@ expand_acls(void)
 
 	for_each_role(role, current_role) {
 		for_each_subject(proc, role) {
-			if (!(proc->mode & GR_OVERRIDE))
+			if (!(proc->mode & GR_OVERRIDE) && !proc->parent_subject)
 				expand_acl(proc, role);
+			else if (!(proc->mode & GR_OVERRIDE))
+				expand_nested_acl(proc);
 			else
 				proc->mode &= ~GR_OVERRIDE;
 		}
