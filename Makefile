@@ -22,11 +22,12 @@ STRIP=/usr/bin/strip
 #for sparc64
 #LIBS=
 LIBS=-lfl
+KERNVER=`uname -r | cut -d"." -f 2`
 #for sparc64
 #OPT_FLAGS=-O2 -m64 -mcpu=ultrasparc -mcmodel=medlow -ffixed-g4 \
 #	-fcall-used-g5 -fcall-used-g5 -fcall-used-g7 -Wno-sign-compare
 OPT_FLAGS=-O2
-CFLAGS=$(OPT_FLAGS) -DGRSEC_DIR=\"$(GRSEC_DIR)\"
+CFLAGS=$(OPT_FLAGS) -DGRSEC_DIR=\"$(GRSEC_DIR)\" -DKERNVER=$(KERNVER)
 LDFLAGS=
 INSTALL = /usr/bin/install -c
 

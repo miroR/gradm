@@ -58,7 +58,7 @@
 	for(x = (y)->globbed; x; x = (x)->next)
 
 
-#if KERNEL_VERSION(2,6,0) < KERNEL_VERSION_CODE
+#if KERNVER == 6
 typedef __u32 gr_dev_t;
 #undef MAJOR
 #undef MINOR
