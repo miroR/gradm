@@ -84,7 +84,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(gr_line);
 					  return SUBJ_NAME;
 					}
-<SUBJECT_STATE>[TKCAPRMSGXOolhpkvdbrt]+	{
+<SUBJECT_STATE>[TKCAPRMSGXOolhpkvdbr]+	{
 					  gradmlval.string = strdup(yytext);
 					  return SUBJ_MODE;
 					}
@@ -168,7 +168,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(gr_line);
 					  return OBJ_NAME;
 					}
-<VAR_OBJ_STATE>[rwxahitmFRWXAIMdDcCso]+	{
+<VAR_OBJ_STATE>[rwxahitmFRWXAIMdDcCspo]+	{
 					  gradmlval.string = strdup(yytext);
 					  return OBJ_MODE;
 					}
@@ -253,7 +253,7 @@ $HOME[/]?[^ \t\n]*			{
 					  gradmlval.string = strdup(gr_line);
 					  return OBJ_NAME;
 					}
-[rwxahitmFRWXAIMcCdDso]+		{
+[rwxahitmFRWXAIMcCdDspo]+		{
 					  gradmlval.string = strdup(yytext);
 					  return OBJ_MODE;
 					}

@@ -64,10 +64,10 @@
 # C -> audit the creation
 # d -> allow deletion of the file/directory
 # D -> audit the deletion
+# p -> reject all ptraces to this object
 # new subject modes:
 # r -> relax ptrace restrictions (allows process to ptrace processes
 #      other than its own descendants)
-# t -> reject all ptraces to this process
 #
 # user/group transitions:
 # You may now specify what users and groups a given subject can

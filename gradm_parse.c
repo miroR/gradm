@@ -707,9 +707,6 @@ proc_subject_mode_conv(const char *mode)
 		case 'r':
 			retmode |= GR_RELAXPTRACE;
 			break;
-		case 't':
-			retmode |= GR_NOPTRACE;
-			break;
 		default:
 			fprintf(stderr, "Invalid proc subject mode "
 				"\'%c\' found on line %lu "
@@ -791,6 +788,9 @@ proc_object_mode_conv(const char *mode)
 			break;
 		case 'm':
 			retmode |= GR_SETID;
+			break;
+		case 'p':
+			retmode |= GR_NOPTRACE;
 			break;
 		default:
 			fprintf(stderr, "Invalid proc object mode "
