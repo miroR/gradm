@@ -266,13 +266,14 @@ handle_notrojan_mode(void)
 							if (obj2 && obj2->mode & GR_WRITE) {
 								ret++;
 								fprintf(stderr,
-								     "\'T\' specified in mode for %s."
-								     "  %s's executable object %s is "
-								     "writable by %s, due to its "
+								     "\'T\' specified in mode for role %s, subject %s.\n"
+								     "%s's executable object %s is "
+								     "writable by role %s, subject %s, due to its "
 								     "writable object %s.\nThis would "
 								     "allow %s to execute trojaned code.\n\n",
-								     subj->filename, subj->filename,
-								     obj->filename, subj2->filename,
+								     role->rolename, subj->filename,
+								     subj->filename, obj->filename,
+								     role2->rolename, subj2->filename,
 								     obj2->filename, subj->filename);
 								break;
 							}
