@@ -247,12 +247,16 @@ object_file_label:		OBJ_NAME obj_mode
 object_cap_label:		CAP_NAME
 				{
 				 add_cap_acl(current_subject, $1);
+				 free($1);
 				}
 	;
 
 object_res_label:		RES_NAME RES_SOFTHARD RES_SOFTHARD
 				{
 				 add_res_acl(current_subject, $1, $2, $3);
+				 free($1);
+				 free($2);
+				 free($3);
 				}
 	;
 
