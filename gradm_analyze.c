@@ -1,6 +1,6 @@
 #include "gradm.h"
 
-static int check_permission(struct proc_acl * def_acl, const char * filename, struct chk_perm * chk)
+static int check_permission(struct role_acl * role, struct proc_acl * def_acl, const char * filename, struct chk_perm * chk)
 {
 	struct file_acl *tmpf = NULL;
 	char * tmpname;
@@ -49,9 +49,9 @@ static int check_subjects(struct role_acl *role)
 
 	for_each_subject(tmp, role)
 		if((tmp->filename[0] == '/') && (tmp->filename[1] != '\0'))
-		if(!check_permission(def_acl, tmp->filename, &chk))
+		if(!check_permission(role, def_acl, tmp->filename, &chk))
 			fprintf(stderr, "Warning: write access is allowed to your " 
-				"subject ACL for %s.\n\n", tmp->filename);
+				"subject ACL for %s in role %s.\n\n", tmp->filename, role->rolename);
 
 	return errs_found;
 }
@@ -68,9 +68,9 @@ static void check_default_objects(struct role_acl *role)
 				def_notfound = 0;
 		if(def_notfound) {
 			fprintf(stderr, "Default ACL object not found for "
-					"subject %s\nThe ACL system will "
+					"role %s subject %s\nThe ACL system will "
 					"not load until you correct this "
-					"error.\n", tmp->filename);
+					"error.\n", role->rolename, tmp->filename);
 			exit(EXIT_FAILURE);
 		}
 		def_notfound = 1;
@@ -101,7 +101,7 @@ static int check_lilo_conf(struct proc_acl * def_acl)
 		if((p = strstr(buf, "image="))) {
 			p += 6;	
 			if(!stat(p, &fstat) && !check_permission(def_acl, p, &chk)) {
-				fprintf(stderr, "Write access is allowed to %s, a kernel "
+				fprintf(stderr, "Write access is allowed by role %s to %s, a kernel "
 				       "for your system specified in "
 				       "/etc/lilo.conf.\n\n", p);
 				errs_found++;
@@ -114,7 +114,7 @@ static int check_lilo_conf(struct proc_acl * def_acl)
 	return errs_found;
 }
 
-static int check_lib_paths(struct proc_acl * def_acl)
+static int check_lib_paths(struct role_acl *role, struct proc_acl * def_acl)
 {
 	FILE * ldconf;
 	char buf[PATH_MAX];
@@ -133,10 +133,10 @@ static int check_lib_paths(struct proc_acl * def_acl)
 		if(buf[strlen(buf) - 1] == '\n')
 			buf[strlen(buf) - 1] = '\0';
 
-		if(!stat(buf, &fstat) && !check_permission(def_acl, buf, &chk)) {
-			fprintf(stderr, "Write access is allowed to %s, a directory which "
+		if(!stat(buf, &fstat) && !check_permission(role, def_acl, buf, &chk)) {
+			fprintf(stderr, "Write access is allowed by role %s to %s, a directory which "
 			       "holds libraries for your system and is included "
-			       "in /etc/ld.so.conf.\n\n", buf);
+			       "in /etc/ld.so.conf.\n\n", role->rolename, buf);
 			errs_found++;
 		}
 	}
@@ -146,7 +146,7 @@ static int check_lib_paths(struct proc_acl * def_acl)
 	return errs_found;
 }
 
-static int check_path_env(struct proc_acl * def_acl)
+static int check_path_env(struct role_acl *role, struct proc_acl * def_acl)
 {
 	char *pathstr, *p, *p2;
 	struct stat fstat;
@@ -163,19 +163,19 @@ static int check_path_env(struct proc_acl * def_acl)
 	
 	while((p2 = strchr(p, ':'))) {
 		*p2++ = '\0';
-		if(!stat(p, &fstat) && !check_permission(def_acl, p, &chk)) {
-			fprintf(stderr, "Write access is allowed to %s, a directory which "
+		if(!stat(p, &fstat) && !check_permission(role, def_acl, p, &chk)) {
+			fprintf(stderr, "Write access is allowed by role %s to %s, a directory which "
 			       "holds binaries for your system and is included "
-			       "in the PATH environment variable.\n\n", p);
+			       "in the PATH environment variable.\n\n", role->rolename, p);
 			errs_found++;
 		}
 		p = p2;
 	}
 
-	if(!stat(p, &fstat) && !check_permission(def_acl, p, &chk)) {
-		fprintf(stderr, "Write access is allowed to %s, a directory which "
+	if(!stat(p, &fstat) && !check_permission(role, def_acl, p, &chk)) {
+		fprintf(stderr, "Write access is allowed by role %s to %s, a directory which "
 		       "holds binaries for your system and is included "
-		       "in the PATH environment variable.\n\n", p);
+		       "in the PATH environment variable.\n\n", role->rolename, p);
 		errs_found++;
 	}
 
@@ -261,99 +261,99 @@ void analyze_acls(void)
 	chk.u_modes = GR_FIND;
 	chk.w_modes = 0xffff;
 	
-	if(!check_permission(def_acl, GRSEC_DIR, &chk)) {
-		fprintf(stderr, "Viewing access is allowed to %s, the directory which "
-		       "holds ACL and ACL password information.\n\n", GRSEC_DIR);
+	if(!check_permission(role, def_acl, GRSEC_DIR, &chk)) {
+		fprintf(stderr, "Viewing access is allowed by role %s to %s, the directory which "
+		       "holds ACL and ACL password information.\n\n", role->rolename, GRSEC_DIR);
 		errs_found++;
 	}
 
-	if(!check_permission(def_acl, "/dev/kmem", &chk)) {
-		fprintf(stderr, "Viewing access is allowed to /dev/kmem.  This could "
+	if(!check_permission(role, def_acl, "/dev/kmem", &chk)) {
+		fprintf(stderr, "Viewing access is allowed by role %s to /dev/kmem.  This could "
 		       "allow an attacker to modify the code of your "
-		       "running kernel.\n\n");
+		       "running kernel.\n\n", role->rolename);
 		errs_found++;
 	}
 
-	if(!check_permission(def_acl, "/dev/mem", &chk)) {
-		fprintf(stderr, "Viewing access is allowed to /dev/mem.  This would "
+	if(!check_permission(role, def_acl, "/dev/mem", &chk)) {
+		fprintf(stderr, "Viewing access is allowed by role %s to /dev/mem.  This would "
 		       "allow an attacker to modify the code of programs "
-		       "running on your system.\n\n");
+		       "running on your system.\n\n", role->rolename);
 		errs_found++;
 	}
 
-	if(!check_permission(def_acl, "/dev/port", &chk)) {
-		fprintf(stderr, "Viewing access is allowed to /dev/port.  This would "
+	if(!check_permission(role, def_acl, "/dev/port", &chk)) {
+		fprintf(stderr, "Viewing access is allowed by role %s to /dev/port.  This would "
 		       "allow an attacker to modify the code of programs "
-		       "running on your system.\n\n");
+		       "running on your system.\n\n", role->rolename);
 		errs_found++;
 	}
 
-	if(!check_permission(def_acl, "/proc/kcore", &chk)) {
-		fprintf(stderr, "Viewing access is allowed to /proc/kcore.  This would "
+	if(!check_permission(role, def_acl, "/proc/kcore", &chk)) {
+		fprintf(stderr, "Viewing access is allowed by role %s to /proc/kcore.  This would "
 		       "allow an attacker to view the raw memory of processes "
-		       "running on your system.\n\n");
+		       "running on your system.\n\n", role->rolename);
 		errs_found++;
 	}
 
 	chk.u_modes = GR_WRITE;
 
-	if(!check_permission(def_acl, "/boot", &chk)) {
-		fprintf(stderr, "Writing access is allowed to /boot, the directory which "
-		       "holds boot and kernel information.\n\n");
+	if(!check_permission(role, def_acl, "/boot", &chk)) {
+		fprintf(stderr, "Writing access is allowed by role %s to /boot, the directory which "
+		       "holds boot and kernel information.\n\n", role->rolename);
 		errs_found++;
 	}
 
 
-	if(!check_permission(def_acl, "/dev", &chk)) {
-		fprintf(stderr, "Writing access is allowed to /dev, the directory which "
-		       "holds system devices.\n\n");
+	if(!check_permission(role, def_acl, "/dev", &chk)) {
+		fprintf(stderr, "Writing access is allowed by role %s to /dev, the directory which "
+		       "holds system devices.\n\n", role->rolename);
 		errs_found++;
 	}
 
-	if(!check_permission(def_acl, "/dev/log", &chk)) {
-		fprintf(stderr, "Writing access is allowed to /dev/log.  This could in some cases allow an attacker"
-				" to spoof learning logs on your system.\n\n");
+	if(!check_permission(role, def_acl, "/dev/log", &chk)) {
+		fprintf(stderr, "Writing access is allowed by role %s to /dev/log.  This could in some cases allow an attacker"
+				" to spoof learning logs on your system.\n\n", role->rolename);
 		errs_found++;
 	}
 
-	if(!check_permission(def_acl, "/root", &chk)) {
-		fprintf(stderr, "Writing access is allowed to /root, the directory which "
+	if(!check_permission(role, def_acl, "/root", &chk)) {
+		fprintf(stderr, "Writing access is allowed by role %s to /root, the directory which "
 		       "holds shell configurations for the root user.  "
 			"If writing is allowed to this directory, an attacker "
 			"could modify your $PATH environment to fool you "
-			"into executing a trojaned gradm.\n\n");
+			"into executing a trojaned gradm.\n\n", role->rolename);
 		errs_found++;
 	}
 
-	if(!check_permission(def_acl, "/proc/sys", &chk)) {
-		fprintf(stderr, "Write access is allowed to /proc/sys, the directory which "
-		       "holds entries that allow modifying kernel variables.\n\n");
+	if(!check_permission(role, def_acl, "/proc/sys", &chk)) {
+		fprintf(stderr, "Write access is allowed by role %s to /proc/sys, the directory which "
+		       "holds entries that allow modifying kernel variables.\n\n", role->rolename);
 		errs_found++;
 	}
 
-	if(!check_permission(def_acl, "/etc", &chk)) {
-		fprintf(stderr, "Write access is allowed to /etc, the directory which "
-		       "holds initialization scripts and configuration files.\n\n");
+	if(!check_permission(role, def_acl, "/etc", &chk)) {
+		fprintf(stderr, "Write access is allowed by role %s to /etc, the directory which "
+		       "holds initialization scripts and configuration files.\n\n", role->rolename);
 		errs_found++;
 	}
 
-	if(!check_permission(def_acl, "/lib", &chk)) {
-		fprintf(stderr, "Write access is allowed to /lib, a directory which "
-		       "holds system libraries and loadable modules.\n\n");
+	if(!check_permission(role, def_acl, "/lib", &chk)) {
+		fprintf(stderr, "Write access is allowed by role %s to /lib, a directory which "
+		       "holds system libraries and loadable modules.\n\n", role->rolename);
 		errs_found++;
 	}
 
-	if(!check_permission(def_acl, "/usr/lib", &chk)) {
-		fprintf(stderr, "Write access is allowed to /usr/lib, a directory which "
-		       "holds system libraries.\n\n");
+	if(!check_permission(role, def_acl, "/usr/lib", &chk)) {
+		fprintf(stderr, "Write access is allowed by role %s to /usr/lib, a directory which "
+		       "holds system libraries.\n\n", role->rolename);
 		errs_found++;
 	}
 
 	chk.u_modes = GR_READ;
 
-	if(!check_permission(def_acl, "/dev", &chk)) {
-		fprintf(stderr, "Reading access is allowed to /dev, the directory which "
-		       "holds system devices.\n\n");
+	if(!check_permission(role, def_acl, "/dev", &chk)) {
+		fprintf(stderr, "Reading access is allowed by role %s to /dev, the directory which "
+		       "holds system devices.\n\n", role->rolename);
 		errs_found++;
 	}
 
@@ -361,17 +361,17 @@ void analyze_acls(void)
 	chk.u_caps = (1 << CAP_SYS_MODULE) | (1 << CAP_SYS_RAWIO) | (1 << CAP_MKNOD);;
 	chk.w_caps = 0xffffffff;
 
-	if(!check_permission(def_acl, "", &chk)) {
+	if(!check_permission(role, def_acl, "", &chk)) {
 		fprintf(stderr, "CAP_SYS_MODULE, CAP_SYS_RAWIO, and CAP_MKNOD are both not "
-		       "removed for all users.  This would allow an "
+		       "removed in role %s.  This would allow an "
 		       "attacker to modify the kernel by means of a "
-		       "module or corrupt devices on your system.\n\n");
+		       "module or corrupt devices on your system.\n\n", role->rolename);
 		errs_found++;
 	}
 
-	errs_found += check_path_env(def_acl);
-	errs_found += check_lib_paths(def_acl);
-	errs_found += check_lilo_conf(def_acl);
+	errs_found += check_path_env(role, def_acl);
+	errs_found += check_lib_paths(role, def_acl);
+	errs_found += check_lilo_conf(role, def_acl);
 	
 	errs_found += handle_notrojan_mode();
 
