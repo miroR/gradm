@@ -124,7 +124,7 @@ int full_reduce_objects(struct gr_learn_group_node *group,
 		subjects = group->subject_list;
 
 	printf("Beginning full learning object reduction for %s %s...", 
-		, user ? "user" : "group", user ? user->rolename : 
+		user ? "user" : "group", user ? user->rolename : 
 		group->rolename);
 	traverse_file_tree(subjects, &full_reduce_object_node, NULL, NULL);
 	printf("done.\n");
