@@ -1519,6 +1519,7 @@ void insert_ip(struct gr_learn_ip_node **base, __u32 ip, __u16 port, __u8 proto,
 	struct gr_learn_ip_node **node;
 	struct gr_learn_ip_node *parent = NULL;
 	struct gr_learn_ip_node *insert;
+	__u8 ip_node[4];
 
 	insert = calloc(1, sizeof(struct gr_learn_ip_node));
 	if (!insert)
@@ -1527,7 +1528,8 @@ void insert_ip(struct gr_learn_ip_node **base, __u32 ip, __u16 port, __u8 proto,
 	insert_port(insert, port);
 	insert->ip_proto[proto / 32] = (1 << (proto % 32));
 	insert->ip_type |= (1 << socktype);
-	insert->ip_node = ((ip & 0xff000000) >> 24);
+	memset(&ip_node, &ip, sizeof(ip));
+	insert->ip_node = ip_node[0];
 
 	node = find_insert_ip(base, ip, &parent);
 
