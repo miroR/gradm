@@ -558,6 +558,16 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 
 	if (!strncmp(filename, "$HOME", 5))
 		filename = parse_homedir(filename);
+	else if (!strncmp(filename, "/dev/pts/", 8)) {
+		fprintf(stderr, "Error on line %lu of %s.  Grsecurity does "
+				"not support fine-grained policy on devpts mounts.\n"
+				"Please change your more fine-grained object to a /dev/pts "
+				"object.  This will in addition produce a better policy that "
+				"will not break as unnecessarily.\n"
+				"The RBAC system will not load until this "
+				"error is fixed.\n", lineno, current_acl_file);
+		exit(EXIT_FAILURE);
+	}
 
 	str = filename;
 	file_len = 0;
