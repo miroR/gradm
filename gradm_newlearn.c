@@ -1265,7 +1265,7 @@ int analyze_ip_node(struct gr_learn_ip_node *node)
 	unsigned long num_ips = count_total_ips(node);
 	unsigned long analysis_factor = (depth + 1) * num_ips;
 
-	if (analysis_factor > 23)
+	if (analysis_factor > 19)
 		return 1;
 	else
 		return 0;
@@ -1395,9 +1395,9 @@ int analyze_port_node(struct gr_learn_ip_node *node)
 		tmpport++;
 	}
 
-	if (low_ports > 6)
+	if (low_ports > 5)
 		ret += 1;
-	if (high_ports > 5)
+	if (high_ports > 4)
 		ret += 2;
 
 	return ret;
