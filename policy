@@ -115,7 +115,7 @@
 # gradm -F -L /etc/grsec/learning.logs -O /etc/grsec/policy
 
 role admin sA
-subject / r
+subject / rvk
 	/ rwcdmlxi
 
 role default G
