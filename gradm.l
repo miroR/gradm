@@ -402,6 +402,8 @@ int is_eof(void)
 		} else {
 			current_stack = current_stack->prev;
 			lineno = 1;
+			change_current_acl_file(current_stack->name);
+			yy_delete_buffer(YY_CURRENT_BUFFER);
 			yyin = fopen(current_stack->name, "r");
 			if (yyin == NULL) {
 				fprintf(stderr, "Unable to open included file: %s\n", current_stack->name);
