@@ -190,6 +190,7 @@ static int
 check_path_env(struct role_acl *role, struct proc_acl *def_acl)
 {
 	char *pathstr, *p, *p2;
+	char pathbuf[PATH_MAX];
 	struct stat fstat;
 	struct chk_perm chk;
 	unsigned int errs_found = 0;
@@ -205,24 +206,28 @@ check_path_env(struct role_acl *role, struct proc_acl *def_acl)
 
 	while ((p2 = strchr(p, ':'))) {
 		*p2++ = '\0';
-		if (!stat(p, &fstat)
-		    && !check_permission(role, def_acl, p, &chk)) {
+		memset(pathbuf, 0, sizeof(pathbuf));
+		realpath(p, pathbuf);
+		if (!stat(pathbuf, &fstat)
+		    && !check_permission(role, def_acl, pathbuf, &chk)) {
 			fprintf(stderr,
 				"Write access is allowed by role %s to %s, a directory which "
 				"holds binaries for your system and is included "
 				"in the PATH environment variable.\n\n",
-				role->rolename, p);
+				role->rolename, pathbuf);
 			errs_found++;
 		}
 		p = p2;
 	}
 
-	if (!stat(p, &fstat) && !check_permission(role, def_acl, p, &chk)) {
+	memset(pathbuf, 0, sizeof(pathbuf));
+	realpath(p, pathbuf);
+	if (!stat(pathbuf, &fstat) && !check_permission(role, def_acl, pathbuf, &chk)) {
 		fprintf(stderr,
 			"Write access is allowed by role %s to %s, a directory which "
 			"holds binaries for your system and is included "
 			"in the PATH environment variable.\n\n", role->rolename,
-			p);
+			pathbuf);
 		errs_found++;
 	}
 
