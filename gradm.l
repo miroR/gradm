@@ -47,7 +47,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(gr_line);
 					  return SUBJ_NAME;
 					}
-<SUBJECT_STATE>[TKCAPRMSGXOolhpkv]+	{
+<SUBJECT_STATE>[TKCAPRMSGXOolhpkvd]+	{
 					  gradmlval.string = strdup(yytext);
 					  return SUBJ_MODE;
 					}

@@ -38,7 +38,8 @@ static struct subj_mode_name_table {
 	{ GR_PAXRANDEXEC, 'X' },
 	{ GR_KILLPROC, 'K' },
 	{ GR_KILLIPPROC, 'C' },
-	{ GR_NOTROJAN, 'T' }
+	{ GR_NOTROJAN, 'T' },
+	{ GR_PROTPROCPID, 'd' }
 };
 	
 static int netmask_to_int(unsigned long netmask)

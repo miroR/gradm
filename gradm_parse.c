@@ -530,6 +530,9 @@ __u32 proc_subject_mode_conv(const char * mode)
 			case 'v':
 				retmode |= GR_VIEW;
 				break;
+			case 'd':
+				retmode |= GR_PROTPROCPID;
+				break;
 			default:
 				fprintf(stderr, "Invalid proc subject mode "
 						"\'%c\' found on line %lu "
