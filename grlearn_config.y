@@ -1,6 +1,6 @@
 %{
 #include "gradm.h"
-extern int grlearnlex(void);
+extern int grlearn_configlex(void);
 %}
 
 %union {
@@ -8,7 +8,7 @@ extern int grlearnlex(void);
 	unsigned long num;
 }
 
-%token <string> FILENAME
+%token <string> FILENAME NOLEARN INHERITLEARN CACHESIZE
 %token <num> NUM
 
 %%

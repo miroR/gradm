@@ -39,7 +39,8 @@ OBJECTS=gradm.tab.o lex.gradm.o learn_pass1.tab.o learn_pass2.tab.o \
 	gradm_human.o gradm_learn.o gradm_net.o gradm_nest.o \
 	gradm_sym.o gradm_newlearn.o gradm_fulllearn.o gradm_lib.o \
 	lex.fulllearn_pass1.o lex.fulllearn_pass2.o \
-	lex.fulllearn_pass3.o lex.learn_pass1.o lex.learn_pass2.o
+	lex.fulllearn_pass3.o lex.learn_pass1.o lex.learn_pass2.o \
+	grlearn_config.tab.o lex.grlearn_config.o
 
 all: $(USE_YACC) $(USE_LEX) $(GRADM_BIN) grlearn
 
@@ -64,6 +65,12 @@ $(GRADM_BIN): $(OBJECTS)
 grlearn: grlearn.c gradm_lib.c
 	$(CC) $(CFLAGS) -o $@ grlearn.c gradm_lib.c $(LIBS) $(LDFLAGS)
 
+
+grlearn_config.tab.c: grlearn_config.y
+	$(USE_YACC) -b grlearn_config -p grlearn_config -d ./grlearn_config.y
+
+lex.grlearn_config.c: grlearn_config.l
+	$(USE_LEX) $(LEXFLAGS) -Pgrlearn_config ./grlearn_config.l
 
 gradm.tab.c: gradm.y
 	$(USE_YACC) -b gradm -p gradm -d ./gradm.y
@@ -108,6 +115,9 @@ install: $(GRADM_BIN) gradm.8 policy grlearn
 		else \
 			$(INSTALL) -m 0600 policy $(DESTDIR)$(GRSEC_DIR) ; \
 		fi \
+	fi
+	@if [ ! -f $(DESTDIR)$(GRSEC_DIR)/learn_config ] ; then \
+		$(INSTALL) -m 0600 learn_config $(DESTDIR)$(GRSEC_DIR) ; \
 	fi
 	@if [ -z "`cut -d" " -f3 /proc/mounts | grep "^devfs"`" ] ; then \
 		rm -f $(DESTDIR)/dev/grsec ; \

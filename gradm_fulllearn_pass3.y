@@ -40,8 +40,14 @@ learn_log:
 			gid_t gid;
 			__u32 mode;
 			unsigned long res1, res2;
+			char *filename = $9;
 
-			free($11);
+			/* check if we have an inherited learning subject */
+			if (strcmp($11, "/")) {
+				filename = $11;
+				free($9);
+			} else
+				free($11);
 
 			uid = $5;
 			gid = $7;
@@ -60,12 +66,12 @@ learn_log:
 				subjlist = group->subject_list;
 
 			if (subjlist)
-				subject = match_file_node(subjlist, $9);
+				subject = match_file_node(subjlist, filename);
 			/* only learn objects for current subject in memory */
 			if (subject && !strcmp(subject->filename, current_learn_subject)) {
 			if (subject && strcmp($17, ""))
 				insert_learn_object(subject, conv_filename_to_struct($17, mode | GR_FIND));
-			else if (subject && strlen($9) > 1 && !res1 && !res2) {
+			else if (subject && strlen(filename) > 1 && !res1 && !res2) {
 				if (subject->subject == NULL) {
 					subject->subject = calloc(1, sizeof(struct gr_learn_subject_node));
 					if (subject->subject == NULL)
@@ -75,7 +81,7 @@ learn_log:
 			}
 			}
 			}
-			free($9);
+			free(filename);
 			free($17);
 		}		
 	|	ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' IPADDR ':' NUM ':' NUM ':' NUM ':' NUM ':' IPADDR
@@ -89,8 +95,14 @@ learn_log:
 			__u32 addr;
 			__u16 port;
 			__u8 mode, proto, socktype;
+			char *filename = $9;
 
-			free($11);
+			/* check if we have an inherited learning subject */
+			if (strcmp($11, "/")) {
+				filename = $11;
+				free($9);
+			} else
+				free($11);
 
 			uid = $5;
 			gid = $7;
@@ -115,7 +127,7 @@ learn_log:
 				subjlist = group->subject_list;
 
 			if (subjlist)
-				subject = match_file_node(subjlist, $9);
+				subject = match_file_node(subjlist, filename);
 			/* only learn objects for current subject in memory */
 			if (subject && !strcmp(subject->filename, current_learn_subject)) {
 			if (subject && mode == GR_IP_CONNECT)
@@ -125,7 +137,7 @@ learn_log:
 
 			}
 			}
-			free($9);
+			free(filename);
 		}
 	;
 %%

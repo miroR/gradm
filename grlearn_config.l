@@ -1,9 +1,9 @@
 %{
 #include "gradm.h"
-#include "grlearn.tab.h"
+#include "grlearn_config.tab.h"
 
-void grlearnerror(const char *s);
-int grlearnwrap(void);
+void grlearn_configerror(const char *s);
+int grlearn_configwrap(void);
 %}
 
 NUM [0-9]+
@@ -26,15 +26,15 @@ FILENAME [/][^\t\n]*
 					}
 
 {NUM}					{
-					  learn_pass1lval.num = atol(yytext);
+					  grlearn_configlval.num = atol(yytext);
 					  return NUM;
 					}
 {FILENAME}				{
-					  learn_pass1lval.string = strdup(yytext);
+					  grlearn_configlval.string = strdup(yytext);
 					  return FILENAME;
 					}
 .					;
 %%
 
-void grlearnerror(const char *s) { return; }
-int grlearnwrap(void) { return 1; }
+void grlearn_configerror(const char *s) { return; }
+int grlearn_configwrap(void) { return 1; }

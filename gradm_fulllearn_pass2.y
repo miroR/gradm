@@ -38,8 +38,14 @@ learn_log:
 			gid_t gid;
 			unsigned long res1, res2;
 			__u32 addr;
+			char *filename = $9;
 
-			free($11);
+			/* check if we have an inherited learning subject */
+			if (strcmp($11, "/")) {
+				filename = $11;
+				free($9);
+			} else
+				free($11);
 
 			uid = $5;
 			gid = $7;
@@ -55,12 +61,12 @@ learn_log:
 			else if (group)
 				insert_ip(&(group->allowed_ips), addr, 0, 0, 0);
 				
-			if (user && ((!strcmp($17, "")  && strlen($9) > 1 && !res1 && !res2) || is_protected_path($17, $19)))
-				insert_learn_user_subject(user, conv_filename_to_struct($9, GR_FIND | GR_OVERRIDE));
-			else if (group && ((!strcmp($17, "") && strlen($9) > 1 && !res1 && !res2) || is_protected_path($17, $19)))
-				insert_learn_group_subject(group, conv_filename_to_struct($9, GR_FIND | GR_OVERRIDE));
+			if (user && ((!strcmp($17, "")  && strlen(filename) > 1 && !res1 && !res2) || is_protected_path($17, $19)))
+				insert_learn_user_subject(user, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
+			else if (group && ((!strcmp($17, "") && strlen(filename) > 1 && !res1 && !res2) || is_protected_path($17, $19)))
+				insert_learn_group_subject(group, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
 
-			free($9);
+			free(filename);
 			free($17);
 		}		
 	|	ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' IPADDR ':' NUM ':' NUM ':' NUM ':' NUM ':' IPADDR
@@ -70,8 +76,14 @@ learn_log:
 			uid_t uid;
 			gid_t gid;
 			__u32 addr;
+			char *filename = $9;
 
-			free($11);
+			/* check if we have an inherited learning subject */
+			if (strcmp($11, "/")) {
+				filename = $11;
+				free($9);
+			} else
+				free($11);
 
 			uid = $5;
 			gid = $7;
@@ -86,9 +98,9 @@ learn_log:
 				insert_ip(&(group->allowed_ips), addr, 0, 0, 0);
 
 			if (user)
-				insert_learn_user_subject(user, conv_filename_to_struct($9, GR_FIND | GR_OVERRIDE));
+				insert_learn_user_subject(user, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
 			else if (group)
-				insert_learn_group_subject(group, conv_filename_to_struct($9, GR_FIND | GR_OVERRIDE));
+				insert_learn_group_subject(group, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
 
 			free($9);
 		}
