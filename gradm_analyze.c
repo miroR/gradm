@@ -484,6 +484,53 @@ analyze_acls(void)
 			errs_found++;
 		}
 
+		chk.u_caps = (1 << CAP_SYS_ADMIN);
+		chk.w_caps = 0xffffffff;
+
+		if (!check_permission(role, def_acl, "", &chk)) {
+			fprintf(stderr, "CAP_SYS_ADMIN is not "
+				"removed in role %s.  This would allow an "
+				"attacker to mount filesystems to bypass ACLs\n\n",
+				role->rolename);
+			errs_found++;
+		}
+
+		chk.u_caps = (1 << CAP_NET_ADMIN);
+		chk.w_caps = 0xffffffff;
+
+		if (!check_permission(role, def_acl, "", &chk)) {
+			fprintf(stderr, "CAP_NET_ADMIN is not "
+				"removed for role %s.  This would allow an "
+				"attacker to modify your firewall configuration or redirect private information\n\n",
+				role->rolename);
+			errs_found++;
+		}
+
+		chk.u_caps = (1 << CAP_NET_BIND_SERVICE);
+		chk.w_caps = 0xffffffff;
+
+		if (!check_permission(role, def_acl, "", &chk)) {
+			fprintf(stderr, "CAP_NET_BIND_SERVICE is not "
+			        "removed for role %s.  This would allow an "
+			        "attacker (if he can kill a network daemon) to "
+			        "launch a trojaned daemon that could steal privileged information\n\n",
+				role->rolename);
+			errs_found++;
+		}
+
+		chk.u_caps = (1 << CAP_SYS_TTY_CONFIG);
+		chk.w_caps = 0xffffffff;
+
+		if (!check_permission(role, def_acl, "", &chk)) {
+			fprintf(stderr, "CAP_SYS_TTY_CONFIG is not "
+				"removed for role %s.  This would allow an "
+				"attacker to hijack terminals of "
+				"privileged processes\n\n",
+				role->rolename);
+			errs_found++;
+		}
+
+
 		errs_found += check_path_env(role, def_acl);
 		errs_found += check_lib_paths(role, def_acl);
 		errs_found += check_lilo_conf(role, def_acl);
