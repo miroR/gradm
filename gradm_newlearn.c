@@ -326,7 +326,7 @@ void reduce_roles(struct gr_learn_group_node ***grouplist)
 				*tmpuser = NULL;
 				tmpuser++;
 			}
-			/* free((*group)->users); */
+			gr_dyn_free((*group)->users);
 			(*group)->users = NULL;
 		}
 		group++;
@@ -519,7 +519,7 @@ int reduce_all_children(struct gr_learn_file_node *node)
 	}
 
 	if (!not_leaf) {
-		/* free(node->leaves); */
+		gr_dyn_free(node->leaves);
 		node->leaves = NULL;
 		return 0;
 	}
@@ -552,7 +552,7 @@ int reduce_all_leaves(struct gr_learn_file_node *node)
 		*tmp = NULL;
 		tmp++;
 	}
-	/* free(node->leaves); */
+	gr_dyn_free(node->leaves);
 	node->leaves = NULL;
 
 	return 0;
@@ -1320,7 +1320,7 @@ void do_reduce_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node *a
 		tmpport++;
 	}
 	if (node->ports) {
-		/* free(node->ports); */
+		gr_dyn_free(node->ports);
 		node->ports = NULL;
 	}
 
@@ -1340,7 +1340,7 @@ void do_reduce_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node *a
 		tmpip++;
 	}
 
-	/* free(node->leaves); */
+	gr_dyn_free(node->leaves);
 	node->leaves = NULL;
 
 	return;
