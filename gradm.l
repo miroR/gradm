@@ -229,6 +229,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
 void add_include(char *includename)
 {
+	struct stat fstat;
 	FILE *tmpfile;
 
 	if (include_stack_ptr >= MAX_INCLUDE_DEPTH) {
@@ -237,6 +238,14 @@ void add_include(char *includename)
 		exit(EXIT_FAILURE);
 	}
 
+	if (!stat(includename, &fstat)) {
+		if (S_ISDIR(fstat.st_mode)) {
+			fprintf(stderr, "Error while including %s: "
+				"Directories cannot be specified by an "
+				"include directive.\n", includename);
+			exit(EXIT_FAILURE);
+		}
+	}
 	tmpfile = fopen(includename, "r");
 
 	if (!tmpfile) {
