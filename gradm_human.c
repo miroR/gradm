@@ -16,7 +16,7 @@ static struct mode_name_table {
 	{ GR_AUDIT_EXEC, 'X' },
 	{ GR_AUDIT_APPEND, 'A' },
 	{ GR_AUDIT_INHERIT, 'I' },
-	{ GR_AUDIT_PTRACERD, 'T' },
+	{ GR_SUPPRESS, 's' },
 	{ GR_FIND, 'h' }
 };
 
@@ -39,7 +39,8 @@ static struct subj_mode_name_table {
 	{ GR_KILLPROC, 'K' },
 	{ GR_KILLIPPROC, 'C' },
 	{ GR_NOTROJAN, 'T' },
-	{ GR_PROTPROCPID, 'd' }
+	{ GR_PROTPROCPID, 'd' },
+	( GR_PROCACCT, 'b' }
 };
 	
 static int netmask_to_int(unsigned long netmask)

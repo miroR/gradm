@@ -47,7 +47,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(gr_line);
 					  return SUBJ_NAME;
 					}
-<SUBJECT_STATE>[TKCAPRMSGXOolhpkvd]+	{
+<SUBJECT_STATE>[TKCAPRMSGXOolhpkvdb]+	{
 					  gradmlval.string = strdup(yytext);
 					  return SUBJ_MODE;
 					}
@@ -142,7 +142,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(gr_line);
 					  return OBJ_NAME;
 					}
-[rwxahitFRWXAITo]+			{
+[rwxahitFRWXAIso]+			{
 					  gradmlval.string = strdup(yytext);
 					  return OBJ_MODE;
 					}

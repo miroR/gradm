@@ -223,6 +223,8 @@ out2:
 			snprintf(tmp, sizeof(tmp), "%s/%s",
 				*(pglob.gl_pathv + i),
 				last);
+			if (is_proc_object_dupe(subject->proc_object, tmp))
+				continue;
 			if (!add_proc_object_acl(subject, strdup(tmp), mode, type))
 				return 0;
 		}
@@ -252,6 +254,8 @@ out2:
 					continue;
 			}
 
+			if (is_proc_object_dupe(subject->proc_object, *(pglob.gl_pathv + i)))
+				continue;
 			if (!add_proc_object_acl(subject, *(pglob.gl_pathv + i), mode, type))
 				return 0;
 		}
@@ -546,6 +550,9 @@ __u32 proc_subject_mode_conv(const char * mode)
 			case 'd':
 				retmode |= GR_PROTPROCPID;
 				break;
+			case 'b':
+				retmode |= GR_PROCACCT;
+				break;
 			default:
 				fprintf(stderr, "Invalid proc subject mode "
 						"\'%c\' found on line %lu "
@@ -607,8 +614,8 @@ __u32 proc_object_mode_conv(const char * mode)
 			case 'I':
 				retmode |= GR_AUDIT_INHERIT;
 				break;
-			case 'T':
-				retmode |= GR_AUDIT_PTRACERD;
+			case 's':
+				retmode |= GR_SUPPRESS;
 				break;
 			default:
 				fprintf(stderr, "Invalid proc object mode "
