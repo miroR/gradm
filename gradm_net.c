@@ -32,6 +32,7 @@ add_ip_acl(struct proc_acl *subject, __u8 mode, struct ip_acl *acl_tmp)
 {
 	struct ip_acl **ipp;
 	struct ip_acl *p;
+	int i;
 
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.\n  Definition "
@@ -60,6 +61,10 @@ add_ip_acl(struct proc_acl *subject, __u8 mode, struct ip_acl *acl_tmp)
 	p->high = acl_tmp->high;
 	memcpy(p->proto, acl_tmp->proto, sizeof (acl_tmp->proto));
 	p->type = acl_tmp->type;
+
+	for (i = 0; i < 8; i++)
+		subject->ip_proto[i] |= p->proto[i];
+	subject->ip_type |= p->type;
 
 	*ipp = p;
 

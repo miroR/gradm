@@ -558,23 +558,6 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode)
 	p->filename = filename;
 	p->mode = mode;
 
-	if (p->ip_object) {
-		for_each_object(tmpi, p->ip_object) {
-			for (i = 0; i < 8; i++)
-				p->ip_proto[i] |= tmpi->proto[i];
-			p->ip_type |= tmpi->type;
-		}
-	}
-
-	if ((p->resmask & (1 << RLIM_NLIMITS)) &&	// check for RES_CRASH
-	    S_ISDIR(fstat.st_mode) && !(mode & GR_DELETED)) {
-		fprintf(stderr, "RES_CRASH is only valid for binary "
-			"ACL subjects.\n"
-			"The ACL system will not load until this "
-			"error in subject ACL: %s is fixed.\n\n", p->filename);
-		exit(EXIT_FAILURE);
-	}
-
 	p->dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
 	p->inode = fstat.st_ino;
 
