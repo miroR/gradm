@@ -170,7 +170,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gr_line = yytext;
 					  gr_line++;
 					  gradmlval.string = gr_strdup(gr_line);
-					  return VARIABLE;
+					  if (!strcmp(gr_line, "HOME"))
+						return OBJ_NAME;
+					  else
+					  	return VARIABLE;
 					}
 <VAR_STATE>[a-zA-Z0-9_]+		{
 					  gradmlval.string = gr_strdup(yytext);
