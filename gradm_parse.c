@@ -198,8 +198,14 @@ out2:
 
 		err = glob(filename, GLOB_PERIOD | GLOB_ONLYDIR, NULL, &pglob);
 
-		if (err)
-			failure("glob");
+		if (err) {
+			fprintf(stderr, "glob() error \"%s\" encountered"
+				" on line %lu of %s.\n"
+				"The ACL system will not load until this"
+				" error is fixed.\n", strerror(errno), lineno,
+				current_acl_file);
+			exit(EXIT_FAILURE);
+		}
 
 		for(i = 0; i < pglob.gl_pathc; i++) {
 			len = strlen(*(pglob.gl_pathv + i));
@@ -223,8 +229,15 @@ out2:
 		globfree(&pglob);
 	} else {
 		err = glob(filename, GLOB_PERIOD, NULL, &pglob);
-		if (err)
-			failure("glob");
+
+		if (err) {
+			fprintf(stderr, "glob() error \"%s\" encountered"
+				" on line %lu of %s.\n"
+				"The ACL system will not load until this"
+				" error is fixed.\n", strerror(errno), lineno,
+				current_acl_file);
+			exit(EXIT_FAILURE);
+		}
 
 		for(i = 0; i < pglob.gl_pathc; i++) {
 			len = strlen(*(pglob.gl_pathv + i));
