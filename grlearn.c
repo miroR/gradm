@@ -13,7 +13,6 @@
 
 int stop_daemon(void)
 {
-	struct stat fstat;
 	int fd;
 	pid_t learn_pid;
 

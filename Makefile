@@ -23,9 +23,10 @@ STRIP=/usr/bin/strip
 #LIBS=
 LIBS=-lfl
 #for sparc64
-#CFLAGS=-O2 -m64 -mcpu=ultrasparc -mcmodel=medlow -ffixed-g4 \
-#	-fcall-used-g5 -fcall-used-g5 -fcall-used-g7 -Wno-sign-compare -DGRSEC_DIR=\"$(GRSEC_DIR)\"
-CFLAGS=-O2 -DGRSEC_DIR=\"$(GRSEC_DIR)\"
+#OPT_FLAGS=-O2 -m64 -mcpu=ultrasparc -mcmodel=medlow -ffixed-g4 \
+#	-fcall-used-g5 -fcall-used-g5 -fcall-used-g7 -Wno-sign-compare
+OPT_FLAGS=-O2
+CFLAGS=$(OPT_FLAGS) -DGRSEC_DIR=\"$(GRSEC_DIR)\"
 LDFLAGS=-static		    # must be left as static,otherwise requires 
 		            # modification in gradm_adm.c
 INSTALL = /usr/bin/install -c
