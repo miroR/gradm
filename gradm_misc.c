@@ -79,10 +79,10 @@ void check_acl_status(__u16 reqmode)
 	switch (reqmode) {
 	case GRADM_STATUS:
 		if (retval == 1) {
-			printf("The ACL system is currently enabled.\n");
+			printf("The RBAC system is currently enabled.\n");
 			exit(0);
 		} else if (retval == 2) {
-			printf("The ACL system is currently disabled.\n");
+			printf("The RBAC system is currently disabled.\n");
 			exit(1);
 		}
 		break;
