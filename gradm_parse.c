@@ -289,13 +289,14 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 						if (is_proc_object_dupe
 						    (subject->proc_object,
 						     &ftmp2))
-							continue;
+							goto add_link1;
 						if (!add_proc_object_acl
 						    (subject, strdup(buf), mode,
 						     type | GR_GLOB))
 							return 0;
 					}
 				}
+add_link1:
 				if (is_proc_object_dupe
 				    (subject->proc_object, &ftmp))
 					continue;
@@ -354,13 +355,14 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 						if (is_proc_object_dupe
 						    (subject->proc_object,
 						     &ftmp2))
-							continue;
+							goto add_link2;
 						if (!add_proc_object_acl
 						    (subject, strdup(buf), mode,
 						     type | GR_GLOB))
 							return 0;
 					}
 				}
+add_link2:
 				if (is_proc_object_dupe
 				    (subject->proc_object, &ftmp))
 					continue;
