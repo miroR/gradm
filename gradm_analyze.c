@@ -63,7 +63,7 @@ check_subjects(struct role_acl *role)
 		if (!check_permission(role, def_acl, tmp->filename, &chk))
 			fprintf(stderr,
 				"Warning: write access is allowed to your "
-				"subject ACL for %s in role %s.  Please ensure that the subject is running with less privilege than the default ACL.\n",
+				"subject ACL for %s in role %s.  Please ensure that the subject is running with less privilege than the default subject.\n",
 				tmp->filename, role->rolename);
 
 	return errs_found;
@@ -81,7 +81,7 @@ check_default_objects(struct role_acl *role)
 		    if (!strcmp(tmpf->filename, "/"))
 			def_notfound = 0;
 		if (def_notfound) {
-			fprintf(stderr, "Default ACL object not found for "
+			fprintf(stderr, "Default object not found for "
 				"role %s subject %s\nThe RBAC system will "
 				"not load until you correct this "
 				"error.\n", role->rolename, tmp->filename);
@@ -330,9 +330,9 @@ analyze_acls(void)
 		if (!def_acl) {
 			fprintf(stderr, "There is no default subject for "
 				"the role for %s present in your "
-				"configuration.\nPlease read the ACL "
-				"documentation and create a default ACL "
-				"before attempting to enable the ACL "
+				"configuration.\nPlease read the RBAC "
+				"documentation and create a default subject "
+				"before attempting to enable the RBAC "
 				"system.\n", role->rolename);
 			exit(EXIT_FAILURE);
 		}
