@@ -209,7 +209,6 @@ int main(int argc, char *argv[])
 					write(fd2, p, strlen(p));
 				}
 				while (*p++);
-				p++;
 			}
 		}
 	}
