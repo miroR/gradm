@@ -807,12 +807,12 @@ parse_acls(void)
 		exit(EXIT_FAILURE);
 	}
 
-	add_kernel_acl();
-
 	gradmin = open_acl_file(GR_ACL_PATH);
 	change_current_acl_file(GR_ACL_PATH);
 	gradmparse();
 	fclose(gradmin);
+
+	add_kernel_acl();
 
 	return;
 }
