@@ -153,6 +153,8 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  if (is_eof())
 						yyterminate();
 					}
+.					{ gradmerror("invalid character"); }
+
 %%
 
 void add_include(char *includename)
