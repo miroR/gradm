@@ -395,6 +395,7 @@ void add_include(char *includename)
 
 int is_eof(void)
 {
+repeat:
 	if (current_stack->sp)
 		fclose(yyin);
 	current_stack->sp--;
@@ -406,9 +407,7 @@ int is_eof(void)
 				return 1;
 			} else {
 				current_stack = current_stack->parent;
-				if (current_stack->prev != NULL)
-					current_stack = current_stack->prev;
-				goto regular;
+				goto repeat;
 			}
 		} else {
 			current_stack = current_stack->prev;
