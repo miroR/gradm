@@ -5,6 +5,7 @@
 #define GRDEV_PATH		"/dev/grsec"
 #define GR_POLICY_PATH 		GRSEC_DIR "/policy"
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
+#define GR_LEARN_CONFIG_PATH	GRSEC_DIR "/learn_config"
 
 #define GR_VERSION		"2.0.2"
 #define GRADM_VERSION		0x202
