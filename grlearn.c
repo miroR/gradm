@@ -156,7 +156,14 @@ __inline__ char * rewrite_learn_entry(char *p)
 		return p;
 	}
 
-	slash = strchr(tmp + 6, '/');
+	*endobj = '\t';
+	next = endobj;
+	while (*next++);
+	len = next - endobj;
+	memmove(tmp + 5, endobj, len);
+	return next;
+
+/*	slash = strchr(tmp + 6, '/');
 	*endobj = '\t';
 	next = endobj;
 	while(*next++);
@@ -164,16 +171,16 @@ __inline__ char * rewrite_learn_entry(char *p)
 		/* we have a /proc/<pid> dir, convert to /proc */
 		len = next - endobj;
 		memmove(tmp + 5, endobj, len);
-		return next;
+		return p;
 	} else {
 		/* we have /proc/<pid>/something, convert to /proc/star/something */
 		len = next - slash;
 		*(tmp + 6) = '*';
 		memmove(tmp + 7, slash, len);
-		return next;
+		return p;
 	}
-
 	return p;
+*/
 }
 
 int main(int argc, char *argv[])
@@ -258,8 +265,7 @@ int main(int argc, char *argv[])
 		if (retval > 0) {
 			p = buf;
 			while (p < (buf + retval)) {
-				next = p;
-				/* next = rewrite_learn_entry(p); */
+				next = rewrite_learn_entry(p);
 				if (!check_cache(p)) {
 					insert_into_cache(p);
 					write(fd2, p, strlen(p));

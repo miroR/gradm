@@ -2,6 +2,7 @@
 
 char *high_reduce_dirs[] = {
 				"/tmp",
+				"/dev/pts",
 				"/var/tmp",
 				"/proc",
 				"/lib",
@@ -51,6 +52,7 @@ char *high_protected_paths[] = {
 				GRDEV_PATH,
 				"/proc/kcore",
 				"/proc/sys",
+				"/proc/bus",
 				"/etc/shadow",
 				"/etc/passwd",
 				"/var/log",
