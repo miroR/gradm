@@ -26,7 +26,7 @@ check_permission(struct role_acl *role, struct proc_acl *def_acl,
 				    if (!strcmp(tmpf->filename, tmpname)) {
 					/* check globbed objects */
 					for_each_globbed(tmpg, tmpf) {
-						if (!fnmatch(tmpg->filename, filename)) {
+						if (!fnmatch(tmpg->filename, filename, 0)) {
 							if (((chk->w_modes == 0xffff)
 							     || (tmpg->mode & chk->w_modes))
 							    && ((chk->u_modes == 0xffff)
