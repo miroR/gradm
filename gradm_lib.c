@@ -218,7 +218,7 @@ void resize_hash_table(struct gr_hash_struct *hash)
 
 	newhash.used_size = 0;
 	newhash.type = hash->type;
-
+	newhash.first = hash->first;
 	
 	for (i = 0; i < hash->table_size; i++)
 		if (hash->table[i]) {
