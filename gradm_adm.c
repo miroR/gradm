@@ -75,6 +75,10 @@ add_gradm_acl(struct role_acl *role)
 				 proc_object_mode_conv("h"), GR_FEXIST))
 		exit(EXIT_FAILURE);
 
+	if (!add_proc_object_acl(current_subject, "/etc/ld.so.cache",
+				 proc_object_mode_conv("r"), GR_FEXIST))
+		exit(EXIT_FAILURE);
+
 	if (!add_proc_object_acl(current_subject, "/lib",
 				 proc_object_mode_conv("rx"), GR_FEXIST))
 		exit(EXIT_FAILURE);
