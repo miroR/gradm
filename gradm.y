@@ -18,11 +18,11 @@ int current_nest_depth = 0;
 
 %token <string> ROLE ROLE_NAME ROLE_TYPE SUBJECT SUBJ_NAME OBJ_NAME 
 %token <string> RES_NAME RES_SOFTHARD CONNECT BIND IPTYPE
-%token <string> IPPROTO IPNETMASK CAP_NAME ROLE_ALLOW_IP
+%token <string> IPPROTO CAP_NAME ROLE_ALLOW_IP
 %token <string> ROLE_TRANSITION VARIABLE DEFINE DEFINE_NAME DISABLED
 %token <string> ID_NAME USER_TRANS_ALLOW GROUP_TRANS_ALLOW 
 %token <string> USER_TRANS_DENY GROUP_TRANS_DENY DOMAIN_TYPE DOMAIN
-%token <num> OBJ_MODE SUBJ_MODE IPADDR
+%token <num> OBJ_MODE SUBJ_MODE IPADDR IPNETMASK
 %token <shortnum> IPPORT
 %type <num> subj_mode obj_mode ip_netmask
 %type <shortnum> role_type
@@ -325,14 +325,7 @@ object_bind_ip_label:		BIND IPADDR ip_netmask ip_ports ip_typeproto
 ip_netmask: /* emtpy */
 				{ $$ = 0xffffffff; }
 	|			'/' IPNETMASK
-				{
-				  unsigned int bits = atoi($2);
-
-				  if (!bits)
-					$$ = 0UL;
-				  else
-					$$ = 0xffffffff << (32 - bits);
-				}
+				{ $$ = $2; }
 	;
 
 ip_ports: /* emtpy */

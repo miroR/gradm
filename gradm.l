@@ -56,7 +56,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 <COMMENT_STATE>.*			;
 
 <ROLETYPE_STATE>[ugslGNAT]*		{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.shortnum = role_mode_conv(yytext);
 					  return ROLE_TYPE;
 					}
 <DOMAINTYPE_STATE>([ug]l?)|(l?[ug])	{
