@@ -76,10 +76,6 @@ add_cap_acl(struct proc_acl *subject, const char *cap)
 	else
 		subject->cap_drop |= kcap;
 
-	cap_same = subject->cap_raise & subject->cap_drop;
-	subject->cap_raise &= ~cap_same;
-	subject->cap_drop &= ~cap_same;
-
 	return;
 }
 

@@ -97,8 +97,10 @@ expand_acls(void)
 				expand_acl(proc, role);
 			else if (!(proc->mode & GR_OVERRIDE))
 				expand_nested_acl(proc);
-			else
+			else {
 				proc->mode &= ~GR_OVERRIDE;
+				compute_cap_creds(proc, proc);
+			}
 		}
 	}
 

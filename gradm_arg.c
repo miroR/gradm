@@ -177,7 +177,7 @@ parse_args(int argc, char *argv[])
 				printf("Setting up password for role %s\n",
 				       entry.rolename);
 			} else
-				printf("Setting up grsecurity ACL password\n");
+				printf("Setting up grsecurity RBAC password\n");
 			get_user_passwd(&entry, GR_PWANDSUM);
 			generate_salt(&entry);
 			generate_hash(&entry);
