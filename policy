@@ -162,6 +162,9 @@ subject /
 	/boot		r
 	/etc/grsec	h
 	/etc/ssh	h
+
+# if sshd needs to be restarted, it can be done through the admin role
+	/usr/sbin/sshd
 	
 	-CAP_SYS_TTY_CONFIG
 	-CAP_LINUX_IMMUTABLE
