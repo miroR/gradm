@@ -10,7 +10,6 @@ int gradmwrap(void);
 int is_eof(void);
 void add_include(char *includename);
 
-#define MAX_INCLUDE_DEPTH 10
 int include_stack_ptr = 0;
 unsigned long lineno_stack[MAX_INCLUDE_DEPTH];
 YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
@@ -50,11 +49,14 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return ROLE_NAME;
 					}
 
-<SUBJECT_STATE>[/][^ \t\n]*		{ 
+<SUBJECT_STATE>":"			{ 
+					  return ':';
+					}
+<SUBJECT_STATE>[/][^ :\t\n]*		{ 
 					  gradmlval.string = strdup(yytext);
 					  return SUBJ_NAME;
 					}
-<SUBJECT_STATE>["][/].*["]		{
+<SUBJECT_STATE>["][/][^:\n]*["]		{
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';

@@ -484,22 +484,8 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	return 1;
 }
 
-/*
-void rem_proc_object_acl(struct proc_acl *proc, struct file_acl *filp)
-{
-	if(filp->next)
-		filp->next->prev = filp->prev;
-	else if(filp->prev) // we're in the first run of the for loop
-		filp->prev->next = NULL;
-	// else - we're the only acl in this subject
-	free(filp); 
-
-	return;
-}
-*/
-
 int
-add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode)
+add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag)
 {
 	struct proc_acl *p;
 	struct proc_acl *p2;
@@ -561,7 +547,7 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode)
 	p->dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
 	p->inode = fstat.st_ino;
 
-	if ((p2 = is_proc_subject_dupe(role, p))) {
+	if (!(flag & GR_FFAKE) && (p2 = is_proc_subject_dupe(role, p))) {
 		fprintf(stderr, "Duplicate ACL entry found for \"%s\""
 			" on line %lu of %s.\n"
 			"\"%s\" references the same object as \"%s\""
@@ -577,31 +563,6 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode)
 
 	return 1;
 }
-
-/*
-void rem_proc_subject_acl(struct proc_acl * proc)
-{
-	struct file_acl * filp = proc->proc_object;
-
-	while(filp && filp->prev) {
-		filp = filp->prev;
-		free(filp->next);
-	}
-
-	if(filp)
-		free(filp);
-	
-	if(proc->next)
-		proc->next->prev = proc->prev;
-	else if(proc->prev) // we're at the end of process acls
-		proc->prev->next = NULL;
-	// else - we're the only subject acl, impossible
-
-	free(proc);
-
-	return;
-}
-*/
 
 __u16
 role_mode_conv(const char *mode)

@@ -65,7 +65,6 @@ init_variables(void)
 	lineno = 1;
 
 	current_acl_file = NULL;
-	includes = NULL;
 	current_role = NULL;
 	current_subject = NULL;
 

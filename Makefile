@@ -35,7 +35,7 @@ DESTDIR=
 OBJECTS=gradm.tab.o lex.gradm.o learn.tab.o lex.learn.o gradm_misc.o \
 	gradm_parse.o gradm_arg.o gradm_pw.o gradm_opt.o gradm_cap.o \
 	gradm_sha256.o gradm_adm.o gradm_analyze.o gradm_res.o \
-	gradm_human.o gradm_learn.o gradm_net.o
+	gradm_human.o gradm_learn.o gradm_net.o gradm_nest.o
 
 all: $(USE_YACC) $(USE_LEX) gradm
 

@@ -29,6 +29,9 @@
 #define PATH_MAX 		4096
 #define MAX_LINE_LEN 		5000
 
+#define MAX_INCLUDE_DEPTH	10
+#define MAX_NEST_DEPTH		8
+
 #define GR_LEARN_THRESH		4
 
 #define GR_NLIMITS	(RLIM_NLIMITS + 1)
@@ -138,13 +141,6 @@ struct chk_perm {
 	__u32 u_caps;
 };
 
-/************************************************************************\
-|  none of these fields are to be modified directly.			 |
-|  these structures only appear inside process acls.  They are not 	 |
-|  permitted in the grammar of the configuration files to be outside of a| 
-|  process acl.								 |
-\************************************************************************/
-
 struct role_allowed_ip {
 	__u32 addr;
 	__u32 netmask;
@@ -171,16 +167,11 @@ struct file_acl {
 	unsigned short dev;
 	__u32 mode;
 
+	struct proc_acl *nested;
+
 	struct file_acl *prev;
 	struct file_acl *next;
 };
-
-/************************************************************************\
-|  none of these fields are to be modified directly.  modes, 		 |
-|  capabilities, and filenames are verified before set.  proc_subject	 |
-|  is filled out after all the proc_objects are collected for the current|
-|  process acl								 |
-\************************************************************************/
 
 struct role_transition {
 	char *rolename;
@@ -229,6 +220,7 @@ struct proc_acl {
 	__u32 crashes;
 	unsigned long expires;
 
+	struct proc_acl *parent_subject;
 	struct file_acl *proc_object;
 	struct ip_acl *ip_object;
 	struct proc_acl *prev;
@@ -237,17 +229,6 @@ struct proc_acl {
 	struct file_acl **obj_hash;
 	__u32 obj_hash_size;
 };
-
-/************************************************************************\
-|  32768 permutations of each password. a dictionary attack of		 | 
-|  1,000,000 passwords would require storage space of 32768 * 		 |
-|  1000000 * (32 + 16) = 1.6 Terabytes					 |
-|									 |
-|  mode stores the operation we want to perform with the acl system.	 |
-|  not all modes operate with the kernel.  Mode that initializes the 	 |
-|  acl system and reads acls is enable.		 			 |
-|  disable, and admin also interact with the kernel.		         |
-\************************************************************************/
 
 struct gr_pw_entry {
 	unsigned char rolename[GR_SPROLE_LEN];
@@ -270,48 +251,12 @@ struct deleted_file {
 	struct deleted_file *next;
 } *deleted_files;
 
-/************************************************************************\
-|  used for keeping track of the current line number of the file we're   |
-|  reading.  initialized to 1 before every new acl file is read		 |
-\************************************************************************/
-
 unsigned long lineno;
 
 struct role_acl *current_role;
 struct proc_acl *current_subject;
 
-/************************************************************************\
-|  used for the linked list of included files in acl configs.  no 	 |
-|  structures of the linked list should be modified while in use, since	 |
-|  it is used for duplicate checking.  This explains the somewhat	 |
-|  complex code in gradm_parse.c in parse_acls()			 |
-|  includes->next should never exist.  includes points to the last	 |
-|  added include file.  The rest can be accessed through includes->prev  |
-\************************************************************************/
-
-struct include_line *includes;
-
-/************************************************************************\
-|  used to hold the name of the current acl file being read.  This	 |
-|  pointer should not be modified directly.  Rather, 			 |
-|  change_current_acl_file() should be used to change it, since it 	 |
-|  auto-frees the current pointer.  This mainly has use to make error 	 |
-|  logs more informative						 |
-\************************************************************************/
-
 char *current_acl_file;
-
-/************************************************************************\
-|  basically a dummy pointer.  its use is to set "magic" values to the   |
-|  left member of the include_line structure.  We need this because while| 
-|  we're operating on the current state of the includes linked list, by  |
-|  parsing the included files, more included files may show up.		 |
-|  Therefore we need some way to make sure that we don't re-parse a file |
-|  we've already parsed (this would generated a duplicate error) and we  |
-|  can't modify the important contents of the linked list.		 |
-\************************************************************************/
-
-unsigned int includeno;
 
 struct user_acl_role_db {
 	struct role_acl **r_table;

@@ -4,6 +4,8 @@
 extern int gradmlex(void);
 
 struct ip_acl ip;
+char *nested[MAX_NEST_DEPTH];
+int current_nest_depth = 0;
 %}
 
 %union {
@@ -29,6 +31,7 @@ various_acls:			role_label
 	|			role_allow_ip
 	|			role_transitions
 	|			subject_label
+	|			nested_label
 	|			object_file_label
 	|			object_cap_label
 	|			object_res_label
@@ -53,7 +56,7 @@ subject_label:			SUBJECT SUBJ_NAME subj_mode
 				{
 				 struct stat fstat;
 
-				 if (!add_proc_subject_acl(current_role, $2, $3))
+				 if (!add_proc_subject_acl(current_role, $2, $3, 0))
 					exit(EXIT_FAILURE);
 
 				 if (!stat($2, &fstat) && S_ISREG(fstat.st_mode)) {
@@ -65,6 +68,31 @@ subject_label:			SUBJECT SUBJ_NAME subj_mode
 							exit(EXIT_FAILURE);
 					}
 				 }
+				}
+	;
+
+nested_label:			SUBJECT SUBJ_NAME nested_subjs subj_mode
+				{
+					add_proc_nested_acl(current_role, $2, nested, current_nest_depth, $4);
+					current_nest_depth = 0;
+				}
+	;
+
+nested_subjs:			':' SUBJ_NAME
+				{
+					nested[current_nest_depth] = $2;
+					current_nest_depth++;
+				}
+	|
+				nested_subjs ':' SUBJ_NAME
+				{
+					if (current_nest_depth >= MAX_NEST_DEPTH) {
+						fprintf(stderr, "Nesting too deep (over %d) on line %lu of %s.\n", MAX_NEST_DEPTH,
+								lineno, current_acl_file);
+						exit(EXIT_FAILURE);
+					}
+					nested[current_nest_depth] = $3;
+					current_nest_depth++;
 				}
 	;
 

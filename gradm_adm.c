@@ -52,7 +52,7 @@ add_gradm_acl(struct role_acl *role)
 	gradm_name = strdup(gradm_realpath);
 
 	if (!add_proc_subject_acl(role, gradm_name,
-				  proc_subject_mode_conv("do")))
+				  proc_subject_mode_conv("do"), 0))
 		exit(EXIT_FAILURE);
 
 	if (!stat("/proc/sys/kernel/grsecurity/acl", &fstat)) {
@@ -91,7 +91,7 @@ add_kernel_acl(void)
 	    (&current_role, strdup(":::kernel:::"), role_mode_conv("sN"), 1))
 		exit(EXIT_FAILURE);
 	if (!add_proc_subject_acl
-	    (current_role, "/", proc_subject_mode_conv("o")))
+	    (current_role, "/", proc_subject_mode_conv("o"), 0))
 		exit(EXIT_FAILURE);
 	if (!add_proc_object_acl
 	    (current_subject, "/", proc_object_mode_conv(""), GR_FEXIST))
