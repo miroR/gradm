@@ -842,7 +842,6 @@ proc_subject_mode_conv(const char *mode)
 			retmode |= GR_PAXGCC;
 			break;
 		case 'O':
-			printf("wtf!\n");
 			retmode |= GR_IGNORE;
 			break;
 		case 'o':
