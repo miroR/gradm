@@ -40,13 +40,13 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 				"not be allowed to be enabled until "
 				"this error is fixed.\n", idname,
 				lineno, current_acl_file);
-			return 0;
+			exit(EXIT_FAILURE);
 		}
 
 		subject->user_trans_num++;
 		subject->user_transitions = gr_dyn_realloc(subject->user_transitions, subject->user_trans_num);
 		*(subject->user_transitions + subject->user_trans_num - 1) = pwd->pw_uid;
-	else if (usergroup == GR_ID_GROUP) {
+	} else if (usergroup == GR_ID_GROUP) {
 		if (allowdeny == GR_ID_ALLOW) {
 			if (subject->group_trans_type & GR_ID_DENY) {
 				fprintf(stderr, "Error on line %lu of %s.  You cannot use "
@@ -75,7 +75,7 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 				"not be allowed to be enabled until "
 				"this error is fixed.\n", idname,
 				lineno, current_acl_file);
-			return 0;
+			exit(EXIT_FAILURE);
 		}
 
 		subject->group_trans_num++;
