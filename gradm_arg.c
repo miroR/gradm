@@ -356,13 +356,13 @@ parse_args(int argc, char *argv[])
 			verbose_stats();
 		if (gr_fulllearn)
 			add_fulllearn_acl();
+		grarg = conv_user_to_kernel(&entry);
+		read_saltandpass(entry.rolename, grarg->arg->salt,
+				 grarg->arg->sum);
 		if (gr_learn) {
 			start_grlearn(learn_log);
 			free(learn_log);
 		}
-		grarg = conv_user_to_kernel(&entry);
-		read_saltandpass(entry.rolename, grarg->arg->salt,
-				 grarg->arg->sum);
 		transmit_to_kernel(grarg);
 	} else if (gr_learn && gr_output) {
 		FILE *stream;
