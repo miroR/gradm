@@ -104,7 +104,7 @@ void verbose_stats(void)
 
 			for_each_object(otmp, stmp) {
 				tobjs++;
-				if (otmp->mode & GR_SETID)
+				if (otmp->mode & GR_SETID && !(rtmp->roletype & GR_ROLE_GOD))
 					chsobjs++;
 			}
 		}
