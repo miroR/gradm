@@ -305,7 +305,7 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 	while (*p != '\0') {
 		if (*p == '/')
 			p2 = p;
-		if (*p == '?' || *p == '*')
+		if (*p == '?' || *p == '*' || *p == '[')
 			break;
 		p++;
 	}
@@ -410,6 +410,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	struct stat fstat;
 	struct deleted_file *dfile;
 	unsigned int file_len;
+	char *str;
 
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "
@@ -427,10 +428,24 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	if (!strncmp(filename, "$HOME", 5))
 		filename = parse_homedir(filename);
 
-	file_len = strlen(filename) + 1;
+	str = filename;
+	file_len = 0;
+	while (*str) {
+		file_len++;
+		if (*str == '?' || *str == '*')
+			return add_globbing_file(subject, filename, mode, type);
+		if (*str == '[') {
+			char *str2 = str;
+			while (*str2) {
+				if (*str2 == ']')	
+					return add_globbing_file(subject, filename, mode, type);
+				str2++;
+			}
+		}
+		str++;
+	}
 
-	if (strchr(filename, '?') || strchr(filename, '*'))
-		return add_globbing_file(subject, filename, mode, type);
+	file_len++;
 
 	if (lstat(filename, &fstat)) {
 		dfile = add_deleted_file(filename);
