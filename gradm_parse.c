@@ -589,6 +589,12 @@ proc_subject_mode_conv(const char *mode)
 		case 'b':
 			retmode |= GR_PROCACCT;
 			break;
+		case 'r':
+			retmode |= GR_RELAXPTRACE;
+			break;
+		case 't':
+			retmode |= GR_NOPTRACE;
+			break;
 		default:
 			fprintf(stderr, "Invalid proc subject mode "
 				"\'%c\' found on line %lu "

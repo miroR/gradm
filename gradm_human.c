@@ -63,7 +63,9 @@ static struct subj_mode_name_table {
 	GR_KILLIPPROC, 'C'}, {
 	GR_NOTROJAN, 'T'}, {
 	GR_PROTPROCFD, 'd'}, {
-	GR_PROCACCT, 'b'}
+	GR_PROCACCT, 'b'}, {
+	GR_NOPTRACE, 't'}, {
+	GR_RELAXPTRACE, 'r'}
 };
 
 void
