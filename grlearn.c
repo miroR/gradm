@@ -46,10 +46,10 @@ int write_pid_log(pid_t pid)
 	struct stat fstat;
 	int fd;
 	pid_t learn_pid;
+	char pathname[PATH_MAX] = {0};
+	char procname[64] = {0};
 
 	if (!stat(GR_LEARN_PID_PATH, &fstat)) {
-		fprintf(stderr, "Learning daemon possibly running already...killing process.\n");
-
 		fd = open(GR_LEARN_PID_PATH, O_RDONLY);
 
 		if (fd < 0) {
@@ -60,14 +60,19 @@ int write_pid_log(pid_t pid)
 		}
 
 		read(fd, &learn_pid, sizeof(learn_pid));
+		close(fd);
+		unlink(GR_LEARN_PID_PATH);
+
+		snprintf(procname, sizeof(procname) - 1, "/proc/%d/exe", learn_pid);
+		if (readlink(procname, pathname, PATH_MAX - 1) < 0)
+			goto start;
+		if (strcmp(pathname, GRLEARN_PATH))
+			goto start;
+		fprintf(stderr, "Learning daemon possibly running already...killing process.\n");
 
 		kill(learn_pid, 9);
-
-		close(fd);
-
-		unlink(GR_LEARN_PID_PATH);
 	}
-		
+start:		
 	fd = open(GR_LEARN_PID_PATH, O_WRONLY | O_CREAT | O_EXCL, 0600);
 
 	if (fd < 0) {
