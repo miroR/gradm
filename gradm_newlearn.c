@@ -559,6 +559,74 @@ int reduce_all_leaves(struct gr_learn_file_node *node)
 	return 0;
 }
 
+__u16 greatest_occurring_mode(struct gr_learn_file_node *node)
+{
+	struct gr_learn_file_node **tmp;
+	__u16 modes[11] = { GR_FIND,
+			    GR_FIND | GR_READ,
+			    GR_FIND | GR_READ | GR_WRITE,
+			    GR_FIND | GR_READ | GR_EXEC,
+			    GR_FIND | GR_WRITE,
+			    GR_FIND | GR_WRITE | GR_CREATE,
+			    GR_FIND | GR_WRITE | GR_DELETE,
+			    GR_FIND | GR_WRITE | GR_CREATE | GR_DELETE,
+			    GR_FIND | GR_READ | GR_WRITE | GR_CREATE | GR_DELETE,
+			    GR_FIND | GR_READ | GR_WRITE | GR_DELETE,
+			    GR_FIND | GR_READ | GR_WRITE | GR_CREATE,
+			};
+	unsigned long counts[11] = {0};
+	__u16 max;
+	int i;
+
+	tmp = node->leaves;
+
+	while (*tmp) {
+		for (i = 0; i < 11; i++) {
+			if ((*tmp)->mode == modes[i])
+				counts[i]++;
+		}
+
+		tmp++;
+	}
+
+	max = 0;
+
+	for (i = 0; i < 11; i++) {
+		if (counts[i] > counts[max])
+			max = i;
+	}
+
+	return modes[max];
+}
+
+int reduce_children_mode(struct gr_learn_file_node *node)
+{
+	struct gr_learn_file_node **tmp;
+	struct gr_learn_file_node **tmp2;
+	__u16 mode;
+
+	tmp = node->leaves;
+	if (!tmp)
+		return 0;
+	
+	mode = greatest_occurring_mode(node);
+
+	node->mode |= mode;
+
+	while (*tmp) {
+		if ((*tmp)->mode == mode && !(*tmp)->leaves) {
+			tmp2 = tmp + 1;
+			while (*tmp2++) {
+				/* free *(tmp2 - 1) */
+				*(tmp2 - 1) = *tmp2;
+			}
+		}
+		tmp++;
+	}
+
+	return 0;
+}
+
 int analyze_node_read_permissions(struct gr_learn_file_node *node)
 {
 	struct gr_learn_file_node **tmp;
@@ -698,21 +766,6 @@ int *analyze_node_reduction(struct gr_learn_file_node *node)
 	if (depth_num > 6)
 		reduction_level++;
 
-	if (analyze_node_read_permissions(node) || analyze_node_write_permissions(node))
-		reduction_level *= 2;
-	else {
-		if (analyze_child_read_permissions(node) || analyze_child_write_permissions(node))
-			reduction_level = reduce_child_thresh;
-		else {
-			if (nested_num < 3)
-				reduction_level /= 8;
-			if (reduction_level > 8)
-				reduction_level /= 4;
-			if (depth_num > 5)
-				reduction_level /= 2;
-		}
-	}
-
 	tmp = high_reduce_dirs;
 	while (*tmp) {
 		if (!strcmp(node->filename, *tmp) && ((node_num > 4) || (child_num > 10)))
@@ -720,6 +773,17 @@ int *analyze_node_reduction(struct gr_learn_file_node *node)
 		tmp++;
 	}
 
+	if (node->subject)
+		goto final;
+
+	if (analyze_node_read_permissions(node) || analyze_node_write_permissions(node))
+		reduction_level *= 2;
+	else {
+		if (reduction_level >= reduce_leaves_thresh)
+			return (int *)&reduce_children_mode;
+	}
+
+final:
 	if (reduction_level >= reduce_leaves_thresh)
 		return (int *)&reduce_all_leaves;
 	else if (reduction_level >= reduce_child_thresh)
@@ -845,6 +909,7 @@ void do_insert_file(struct gr_learn_file_node **base, char *filename, __u32 mode
 
 	insert->filename = filename;
 	insert->mode = mode;
+
 	if (subj)
 		insert_file(&(insert->object_list), strdup("/"), 0, 0);		
 
