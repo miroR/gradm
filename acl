@@ -36,6 +36,23 @@
 # require password authentication as well.  If a user tries to
 # authenticate to a role that is not within his transition table, he
 # will receive a permission denied error
+#
+# Nested subjects
+# subject /bin/su:/bin/bash:/bin/cat
+#	  / rwx
+#	  +CAP_ALL
+# grant privilege to specific processes if they are executed
+# within a trusted path.  In this case, privilege is
+# granted if /bin/cat is executed from /bin/bash, which is
+# executed from /bin/su.
+#
+# Configuration inheritance on nested subjects
+# nested subjects inherit rules from their parents.  In the
+# example above, the nested subject would inherit rules
+# from the nested subject for /bin/su:/bin/bash,
+# and the subject /bin/su
+# View the 1.9.x documentation for more information on
+# configuration inheritance
 
 role admin sA
 subject /
