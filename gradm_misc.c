@@ -131,7 +131,7 @@ void check_acl_status(u_int16_t reqmode)
 			printf("The RBAC system is currently disabled.\n");
 			exit(1);
 		} else if (retval == 3) {
-			printf("The terminal you are using is unsafe for this operation.  Use another terminal.\n");
+			printf("The terminal you are using is unsafe.  Use another terminal.\n");
 			exit(2);
 		}
 		break;
@@ -153,7 +153,7 @@ void check_acl_status(u_int16_t reqmode)
 				"because the RBAC system is currently disabled.\n");
 			ioctl(0, TIOCNXCL);
 			exit(EXIT_FAILURE);
-		} else if (retval == 3) {
+		} else if (retval == 3 && reqmode != GRADM_UNSPROLE) {
 			printf("The terminal you are using is unsafe for this operation.  Use another terminal.\n");
 			ioctl(0, TIOCNXCL);
 			exit(EXIT_FAILURE);
