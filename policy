@@ -185,6 +185,10 @@ subject /
 #	bind	0.0.0.0 stream dgram tcp udp
 
 # the d flag protects /proc fd and mem entries for sshd
+# all daemons should have 'p' in their subject mode to prevent
+# an attacker from killing the service (and restarting it with trojaned
+# config file or taking the port it reserved to run a trojaned service)
+
 subject /usr/sbin/sshd dpo
 	/		h
 	/bin/bash	x
