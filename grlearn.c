@@ -7,6 +7,7 @@
 #include <sys/poll.h>
 #include <unistd.h>
 #include <errno.h>
+#include <signal.h>
 
 #define GR_LEARN_PID_PATH "/etc/grsec/.grlearn.pid"
 
@@ -29,7 +30,7 @@ int stop_daemon(void)
 
 	unlink(GR_LEARN_PID_PATH);
 
-	return;
+	return 0;
 }
 		
 

@@ -7,9 +7,8 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 	int i;
 	char *nestname;
 	unsigned int namelen = 0;
-	struct role_acl *rtmp;
 	struct proc_acl *stmp;
-	struct file_acl *otmp;
+	struct file_acl *otmp = NULL;
 	struct stat fstat;
 
 	int subj_found = 0;

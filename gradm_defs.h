@@ -1,4 +1,6 @@
+#ifndef GRSEC_DIR
 #define GRSEC_DIR		"/etc/grsec"
+#endif
 #define GRLEARN_PATH		"/sbin/grlearn"
 #define GR_ACL_PATH 		GRSEC_DIR "/acl"
 #define GR_PW_PATH 		GRSEC_DIR "/pw"

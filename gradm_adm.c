@@ -114,7 +114,6 @@ add_kernel_acl(void)
 void
 add_grlearn_acl(struct role_acl *role)
 {
-	struct stat fstat;
 	struct ip_acl ip;
 
 	if (!add_proc_subject_acl(role, GRLEARN_PATH,

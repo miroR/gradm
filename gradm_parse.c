@@ -499,9 +499,7 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 	struct proc_acl *p2;
 	struct proc_acl *oldp;
 	struct deleted_file *dfile;
-	struct ip_acl *tmpi;
 	struct stat fstat;
-	unsigned short i;
 	unsigned int file_len;
 
 	if (!role) {

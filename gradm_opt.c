@@ -67,7 +67,7 @@ expand_nested_acl(struct proc_acl *proc)
 	struct file_acl *tmpf1;
 	struct file_acl *tmpf2;
 
-	while (tmpp = tmpp->parent_subject) {
+	while ((tmpp = tmpp->parent_subject)) {
 		compute_cap_creds(proc, tmpp);	// perform capability inheritance
 		for_each_object(tmpf1, tmpp->proc_object) {
 			for_each_object(tmpf2, proc->proc_object)
