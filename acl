@@ -1,4 +1,42 @@
 #sample default process acl for grsecurity
+# Role flags:
+# A -> This role is a "god" role, thus it has special privilege normal
+#      roles do not have.  In particular, this role bypasses the 
+#      additional ptrace restrictions
+# N -> Don't require authentication for this role.  To access
+#      the role, use gradm -n <rolename>
+# s -> This role is a special role, meaning it does not belong to a
+#      user or group, and does not fall under ACL enforcement
+# u -> This role is a user role
+# g -> This role is a group role
+# G -> This role can use gradm to authenticate to the kernel
+#      An ACL for gradm will automatically be added to the role
+#
+# a role can only be one of user, group, or special
+#
+# role_allow_ip IP/optional netmask
+# eg: role_allow_ip 192.168.1.0/24
+# You can have as many of these per role as you want
+# They restrict the use of a role to a list of IPs.  If a user
+# is on the system that would normally get the role does not
+# belong to those lists of IPs, the system falls back through
+# its method of determining a role for the user
+#
+# Role hierarchy
+# user -> group -> default
+# First a user role attempts to match, if one is not found,
+# a group role attempts to match, if one is not found,
+# the default role is used.
+#
+# role_transitions <special role 1> <special role 2> ... <special role n>
+# eg: role_transitions www_admin dns_admin
+#
+# role transitions specify which special roles a given role is allowed
+# to authenticate to.  This applies to special roles that do not
+# require password authentication as well.  If a user tries to
+# authenticate to a role that is not within his transition table, he
+# will receive a permission denied error
+
 role admin sA
 subject /
 	/ rwxi
@@ -59,3 +97,9 @@ subject /
 	-CAP_MKNOD
 	-CAP_SYS_RAWIO
 	-CAP_SYS_MODULE
+
+#	RES_AS 100M 100M
+
+#	connect 192.168.1.0/24:22 stream tcp
+#	bind	0.0.0.0 stream dgram tcp udp
+
