@@ -281,7 +281,7 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 					realpath(ftmp.filename, buf);
 					ftmp2.filename = buf;
 
-					if (!lstat(ftmp2.filename, &fstat)) {
+					if (!stat(ftmp2.filename, &fstat)) {
 						ftmp2.inode = fstat.st_ino;
 						ftmp2.dev =
 						    MKDEV(MAJOR(fstat.st_dev),
@@ -333,7 +333,7 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 
 			ftmp.filename = *(pglob.gl_pathv + i);
 
-			if (!stat(ftmp.filename, &fstat)) {
+			if (!lstat(ftmp.filename, &fstat)) {
 				ftmp.inode = fstat.st_ino;
 				ftmp.dev =
 				    MKDEV(MAJOR(fstat.st_dev),
@@ -345,7 +345,7 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 					realpath(ftmp.filename, buf);
 					ftmp2.filename = buf;
 
-					if (!lstat(ftmp2.filename, &fstat)) {
+					if (!stat(ftmp2.filename, &fstat)) {
 						ftmp2.inode = fstat.st_ino;
 						ftmp2.dev =
 						    MKDEV(MAJOR(fstat.st_dev),
