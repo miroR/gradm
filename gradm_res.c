@@ -111,11 +111,19 @@ conv_res(const char *lim)
 void
 modify_res(struct proc_acl *proc, int res, unsigned long cur, unsigned long max)
 {
+	int i;
+
 	if ((res < 0)
 	    || (res > (sizeof (rlim_table) / sizeof (struct rlimconv))))
 		return;
 
-	if (proc->resmask & res_to_mask(rlim_table[res].val)) {
+	/* some archs can define resource limit order */
+	for (i = 0; i < (sizeof(rlim_table) / sizeof (struct rlimconv)); i++) {
+		if (rlim_table[i].val == res)
+			break;
+	}
+
+	if (proc->resmask & res_to_mask(rlim_table[i].val)) {
 		proc->res[res].rlim_cur = cur;
 		proc->res[res].rlim_max = max;
 	}
