@@ -38,6 +38,7 @@ show_help(void)
 	       "	-u, --unauth    Remove yourself from your current special role\n"
 	       "	-n <rolename> , --noauth\n"
 	       "			Authenticates to a special role that doesn't require auth\n"
+	       "	-V, --verbose   Display verbose policy statistics when enabling system\n"
 	       "	-h, --help	Display this help\n"
 	       "	-v, --version	Display version information\n",
 	       GR_VERSION);
@@ -63,11 +64,82 @@ conv_name_to_num(const char *filename, gr_dev_t *dev, ino_t * inode)
 	return;
 }
 
+void verbose_stats(void)
+{
+	struct role_acl *rtmp;
+	struct proc_acl *stmp;
+	struct file_acl *otmp;
+	unsigned int uroles=0, groles=0, saroles=0, snroles=0, troles=0;
+	unsigned int usubjs=0, gsubjs=0, sasubjs=0, snsubjs=0, ksubjs=0, smsubjs=0, tsubjs=0, nsubjs=0;
+	unsigned int chsobjs=0, tobjs=0;
+
+	for_each_role(rtmp, current_role) {
+		troles++;
+		if (rtmp->roletype & GR_ROLE_SPECIAL) {
+			if (rtmp->roletype & GR_ROLE_NOPW)
+				snroles++;
+			else
+				saroles++;
+		} else if (rtmp->roletype & GR_ROLE_USER)
+			uroles++;
+		else if (rtmp->roletype & GR_ROLE_GROUP)
+			groles++;
+		
+		for_each_subject(stmp, rtmp) {
+			tsubjs++;
+			if (rtmp->roletype & GR_ROLE_SPECIAL) {
+				if (rtmp->roletype & GR_ROLE_NOPW)
+					snsubjs++;
+				else
+					sasubjs++;
+			} else if (rtmp->roletype & GR_ROLE_USER)
+				usubjs++;
+			else if (rtmp->roletype & GR_ROLE_GROUP)
+				gsubjs++;
+
+			if (!(stmp->mode & GR_PROTECTED))
+				ksubjs++;
+			if (!(stmp->mode & GR_PROTSHM))
+				shmsubjs++;
+
+			for_each_object(otmp, stmp) {
+				tobjs++;
+				if (otmp->mode & GR_SETID)
+					chsobjs++;
+			}
+		}
+	}				
+
+	printf("Policy statistics:\n");
+	printf("-----------------------------------------------\n");
+	printf("\tRole summary:\n");
+	printf("\t%d user roles\n", uroles);
+	printf("\t%d group roles\n", groles);
+	printf("\t%d special roles with authentication\n", saroles);
+	printf("\t%d special roles without authentication\n", snroles);
+	printf("\t%d total roles\n\n", troles);
+	printf("\tSubject summary:\n");
+	printf("\t%d subjects in user roles\n", usubjs);
+	printf("\t%d subjects in group roles\n", gsubjs);
+	printf("\t%d subjects in special roles with authentication\n", sasubjs);
+	printf("\t%d subjects in special roles without authentication\n", snsubjs);
+	printf("\t%d nested subjects\n", nsubjs);
+	printf("\t%d subjects can be killed by outside processes\n", ksubjs);
+	printf("\t%d subjects have unprotected shared memory\n", smsubjs);
+	printf("\t%d total subjects\n\n", tsubjs);
+	printf("\tObject summary:\n");
+	printf("\t%d objects in non-admin roles allow chmod +s\n", chsobjs);
+	printf("\t%d total objects\n\n", tobjs);
+
+	return;
+}
+
 void
 parse_args(int argc, char *argv[])
 {
 	int next_option = 0;
 	int err;
+	int verbose = 0;
 	char *output_log = NULL;
 	char *learn_log = NULL;
 	int gr_learn = 0;
@@ -77,7 +149,7 @@ parse_args(int argc, char *argv[])
 	struct gr_pw_entry entry;
 	struct gr_arg_wrapper *grarg;
 	char cwd[PATH_MAX];
-	const char *const short_opts = "SEFuDP::RL:O:M:a:n:hv";
+	const char *const short_opts = "SVEFuDP::RL:O:M:a:n:hv";
 	const struct option long_opts[] = {
 		{"help", 0, NULL, 'h'},
 		{"version", 0, NULL, 'v'},
@@ -89,6 +161,7 @@ parse_args(int argc, char *argv[])
 		{"noauth", 1, NULL, 'n'},
 		{"reload", 0, NULL, 'R'},
 		{"modsegv", 1, NULL, 'M'},
+		{"verbose", 0, NULL, 'V'},
 		{"learn", 1, NULL, 'L'},
 		{"fulllearn", 0, NULL, 'F'},
 		{"output", 1, NULL, 'O'},
@@ -112,13 +185,16 @@ parse_args(int argc, char *argv[])
 		getopt_long(argc, argv, short_opts, long_opts, NULL)) != -1) {
 
 		switch (next_option) {
+		case 'V':
+			verbose = 1;
+			break;
 		case 'S':
 			if (argc > 2)
 				show_help();
 			check_acl_status(GRADM_STATUS);
 			break;
 		case 'E':
-			if (argc > 4)
+			if (argc > 5)
 				show_help();
 			entry.mode = GRADM_ENABLE;
 			check_acl_status(entry.mode);
@@ -128,7 +204,7 @@ parse_args(int argc, char *argv[])
 			gr_enable = 1;
 			break;
 		case 'F':
-			if (argc > 6)
+			if (argc > 7)
 				show_help();
 			entry.mode = GRADM_ENABLE;
 			gr_fulllearn = 1;
@@ -143,7 +219,7 @@ parse_args(int argc, char *argv[])
 			transmit_to_kernel(grarg);
 			break;
 		case 'R':
-			if (argc > 2)
+			if (argc > 3)
 				show_help();
 			entry.mode = GRADM_RELOAD;
 			check_acl_status(entry.mode);
@@ -184,7 +260,7 @@ parse_args(int argc, char *argv[])
 			exit(EXIT_SUCCESS);
 			break;
 		case 'L':
-			if (argc > 6 || argc < 3)
+			if (argc > 7 || argc < 3)
 				show_help();
 			gr_learn = 1;
 			if (optarg) {
@@ -279,6 +355,8 @@ parse_args(int argc, char *argv[])
 
 	if (gr_enable) {
 		check_acl_status(entry.mode);
+		if (verbose)
+			verbose_stats();
 		if (gr_fulllearn)
 			add_fulllearn_acl();
 		if (gr_learn) {

@@ -506,6 +506,18 @@ analyze_acls(void)
 			errs_found++;
 		}
 
+
+		chk.u_caps = cap_conv("CAP_SYS_BOOT");
+		chk.w_caps = 0xffffffff;
+
+		if (!check_permission(role, def_acl, "", &chk)) {
+			fprintf(stderr, "CAP_SYS_BOOT is not "
+				"removed in role %s.  This would allow an "
+				"attacker to reboot the system.\n\n"
+				role->rolename);
+			errs_found++;
+		}
+
 		chk.u_caps = cap_conv("CAP_NET_ADMIN");
 		chk.w_caps = 0xffffffff;
 
