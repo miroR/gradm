@@ -184,8 +184,8 @@ parse_args(int argc, char *argv[])
 			gr_learn = 1;
 			if (optarg) {
 				char pathbuf[PATH_MAX];
-				if (*optarg = '/')
-					learn_log = strdup(pathbuf);
+				if (*optarg == '/')
+					learn_log = strdup(optarg);
 				else {
 					getcwd(pathbuf, PATH_MAX - 1);
 					if (strlen(optarg) + strlen(pathbuf) + 1 > PATH_MAX) {
