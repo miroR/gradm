@@ -19,11 +19,11 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 %%
 
 "u"					{
-					  fulllearn_pass1lval.string = "user";
+					  fulllearn_pass1lval.num = USER;
 					  return USER;
 					}
 "g"					{
-					  fulllearn_pass1lval.string = "group";
+					  fulllearn_pass1lval.num = GROUP;
 					  return GROUP;
 					}
 {NUM}					{

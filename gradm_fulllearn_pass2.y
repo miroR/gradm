@@ -11,8 +11,9 @@ extern struct gr_learn_group_node **role_list;
 }
 
 %token <string> FILENAME ROLENAME
-%token <num> NUM IPADDR
+%token <num> NUM IPADDR USER GROUP
 %type <string> filename
+%type <num> id_type
 
 %%
 
@@ -26,6 +27,10 @@ filename:	/*empty*/	{ $$ = strdup(""); }
 					$1[1] = '\0';
 				  $$ = $1;
 				}
+	;
+
+id_type:	USER
+	|	GROUP
 	;
 
 learn_log:
@@ -92,17 +97,51 @@ learn_log:
 
 			match_role(role_list, uid, gid, &group, &user);
 
-			if (user)
+			if (user) {
 				insert_ip(&(user->allowed_ips), addr, 0, 0, 0);
-			else if (group)
-				insert_ip(&(group->allowed_ips), addr, 0, 0, 0);
-
-			if (user)
 				insert_learn_user_subject(user, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
-			else if (group)
+			} else if (group) {
+				insert_ip(&(group->allowed_ips), addr, 0, 0, 0);
 				insert_learn_group_subject(group, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
+			}
 
 			free($9);
 		}
+	| ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' id_type ':' NUM ':' NUM ':' NUM ':' IPADDR
+	{
+			struct gr_learn_group_node *group = NULL;
+			struct gr_learn_user_node *user = NULL;
+			uid_t uid;
+			gid_t gid;
+			unsigned long res1, res2;
+			__u32 addr;
+			char *filename = $9;
+
+			/* check if we have an inherited learning subject */
+			if (strcmp($11, "/")) {
+				filename = $11;
+				free($9);
+			} else
+				free($11);
+
+			uid = $5;
+			gid = $7;
+			res1 = $13;
+			res2 = $15;
+
+			addr = $21;
+
+			match_role(role_list, uid, gid, &group, &user);
+	
+			if (user) {
+				insert_ip(&(user->allowed_ips), addr, 0, 0, 0);
+				insert_learn_user_subject(user, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
+			} else if (group) {
+				insert_ip(&(group->allowed_ips), addr, 0, 0, 0);
+				insert_learn_group_subject(group, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
+			}
+
+			free($9);
+	}
 	;
 %%

@@ -18,6 +18,13 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
 %%
 
+"u"					{
+					  fulllearn_pass2lval.num = USER;
+					  return USER;
+					}
+"g"					{
+					  fulllearn_pass2lval.num = GROUP;
+					  return GROUP;
 {NUM}					{
 					  fulllearn_pass2lval.num = atol(yytext);
 					  return NUM;
