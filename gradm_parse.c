@@ -8,8 +8,6 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 {
 	struct passwd *pwd;
 	struct group *grp;
-	uid_t *uidlist;
-	gid_t *gidlist;
 
 	if (usergroup == GR_ID_USER) {
 		if (allowdeny == GR_ID_ALLOW) {

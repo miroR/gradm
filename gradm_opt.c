@@ -5,8 +5,6 @@ expand_acl(struct proc_acl *proc, struct role_acl *role)
 {
 	char *tmpproc;
 	struct proc_acl *tmpp;
-	struct file_acl *tmpf1;
-	struct file_acl *tmpf2;
 
 	tmpproc = alloca(strlen(proc->filename) + 1);
 	strcpy(tmpproc, proc->filename);

@@ -43,6 +43,7 @@ __u32 get_ip(char *p);
 void conv_name_to_type(struct ip_acl *ip, char *name);
 void add_role_allowed_ip(struct role_acl *role, __u32 addr, __u32 netmask);
 void add_role_transition(struct role_acl *role, char *rolename);
+void add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int allowdeny);
 void add_proc_nested_acl(struct role_acl *role, char *mainsubjname, char **nestednames, int nestlen, __u32 nestmode);
 void start_grlearn(char *logfile);
 void stop_grlearn(void);
@@ -55,6 +56,7 @@ struct var_object *intersect_objects(struct var_object *var1, struct var_object 
 struct var_object *differentiate_objects(struct var_object *var1, struct var_object *var2);
 void sort_file_list(struct gr_hash_struct *hash);
 struct gr_learn_file_node *match_file_node(struct gr_learn_file_node *base, const char *filename);
+struct gr_learn_file_tmp_node *conv_filename_to_struct(char *filename, __u32 mode);
 void match_role(struct gr_learn_group_node **grouplist, uid_t uid, gid_t gid, struct gr_learn_group_node **group, struct gr_learn_user_node **user);
 struct gr_learn_ip_node ** find_insert_ip(struct gr_learn_ip_node **base, __u32 ip, struct gr_learn_ip_node **parent);
 void conv_mode_to_str(__u32 mode, char *modestr, unsigned short len);
@@ -81,6 +83,10 @@ int is_protected_path(char *filename, __u32 mode);
 
 struct gr_learn_role_entry *
 insert_learn_role(struct gr_learn_role_entry ***role_list, char *rolename, __u16 rolemode);
+void insert_learn_object(struct gr_learn_file_node *subject, struct gr_learn_file_tmp_node *object);
+void insert_learn_role_subject(struct gr_learn_role_entry *role, struct gr_learn_file_tmp_node *subject);
+void insert_learn_group_subject(struct gr_learn_group_node *role, struct gr_learn_file_tmp_node *subject);
+void insert_learn_user_subject(struct gr_learn_user_node *role, struct gr_learn_file_tmp_node *subject);
 struct gr_learn_role_entry *
 find_learn_role(struct gr_learn_role_entry **role_list, char *rolename);
 int full_reduce_object_node(struct gr_learn_file_node *subject,
@@ -115,6 +121,7 @@ struct proc_acl *lookup_acl_subject(struct role_acl *role, struct proc_acl *subj
 void * gr_dyn_alloc(unsigned long len);
 void * gr_stat_alloc(unsigned long len);
 void * gr_dyn_realloc(void *addr, unsigned long len);
+void gr_dyn_free(void *addr);
 
 void insert_acl_object(struct proc_acl *subject, struct file_acl *object);
 void insert_acl_subject(struct role_acl *role, struct proc_acl *subject);

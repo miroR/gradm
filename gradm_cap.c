@@ -83,8 +83,6 @@ add_cap_acl(struct proc_acl *subject, const char *cap)
 void
 modify_caps(struct proc_acl *proc, int cap)
 {
-	__u32 cap_same;
-
 	proc->cap_drop &= ~(1 << cap);
 	proc->cap_mask |= (1 << cap);
 
