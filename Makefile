@@ -7,22 +7,23 @@
 GRADM_BIN=gradm
 GRSEC_DIR=/etc/grsec
 
-LEX=/usr/bin/lex
+LLEX=/usr/bin/lex
 FLEX=/usr/bin/flex
+LEX := $(shell if [ -x $(FLEX) ]; then echo $(FLEX); else echo $(LLEX); fi)
 LEXFLAGS=-B
-YACC=/usr/bin/yacc
 BYACC=/usr/bin/byacc
 BISON=/usr/bin/bison
+YACC := $(shell if [ -x $(BYACC) ]; then echo $(BYACC); else echo $(BISON); fi)
 MKNOD=/bin/mknod
 #for dietlibc
 #CC=/usr/bin/diet /usr/bin/gcc
 CC=/usr/bin/gcc
 FIND=/usr/bin/find
 STRIP=/usr/bin/strip
-KERNVER=$(shell uname -r | cut -d"." -f 2)
-LIBS = $(shell if [ "`uname -m`" != "sparc64" ]; then echo "-lfl" ; else echo "" ; fi)
-OPT_FLAGS = $(shell if [ "`uname -m`" != "sparc64" ]; then echo "-O2" ; else echo "-O2 -m64" ; fi)
-CFLAGS=$(OPT_FLAGS) -DGRSEC_DIR=\"$(GRSEC_DIR)\" -DKERNVER=$(KERNVER)
+KERNVER := $(shell uname -r | cut -d"." -f 2)
+LIBS := $(shell if [ "`uname -m`" != "sparc64" ]; then echo "-lfl" ; else echo "" ; fi)
+OPT_FLAGS := $(shell if [ "`uname -m`" != "sparc64" ]; then echo "-O2" ; else echo "-O2 -m64" ; fi)
+CFLAGS := $(OPT_FLAGS) -DGRSEC_DIR=\"$(GRSEC_DIR)\" -DKERNVER=$(KERNVER)
 LDFLAGS=
 INSTALL = /usr/bin/install -c
 
@@ -42,22 +43,7 @@ OBJECTS=gradm.tab.o lex.gradm.o learn_pass1.tab.o learn_pass2.tab.o \
 	lex.fulllearn_pass3.o lex.learn_pass1.o lex.learn_pass2.o \
 	grlearn_config.tab.o lex.grlearn_config.o
 
-all: $(USE_YACC) $(USE_LEX) $(GRADM_BIN) grlearn
-
-USE_YACC = $(shell if [ -x $(BYACC) ]; then echo $(BYACC); \
-	else if [ -x $(BISON) ]; then echo $(BISON) -y; \
-	else if [ -x $(YACC) ]; then echo $(YACC); \
-	else \
-		echo "Bison/(b)yacc needs to be installed to compile gradm."; \
-		exit 1; \
-	fi;fi;fi)
-
-USE_LEX = $(shell if [ -x $(FLEX) ]; then echo $(FLEX); \
-	else if [ -x $(LEX) ]; then echo $(LEX); \
-	else \
-		echo "(f)Lex needs to be installed to compile gradm."; \
-		exit 1; \
-	fi;fi)
+all: $(GRADM_BIN) grlearn
 
 $(GRADM_BIN): $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $(OBJECTS) $(LIBS) $(LDFLAGS)
@@ -67,40 +53,40 @@ grlearn: grlearn.c gradm_lib.c
 
 
 grlearn_config.tab.c: grlearn_config.y
-	$(USE_YACC) -b grlearn_config -p grlearn_config -d ./grlearn_config.y
+	$(YACC) -b grlearn_config -p grlearn_config -d ./grlearn_config.y
 
 lex.grlearn_config.c: grlearn_config.l
-	$(USE_LEX) $(LEXFLAGS) -Pgrlearn_config ./grlearn_config.l
+	$(LEX) $(LEXFLAGS) -Pgrlearn_config ./grlearn_config.l
 
 gradm.tab.c: gradm.y
-	$(USE_YACC) -b gradm -p gradm -d ./gradm.y
+	$(YACC) -b gradm -p gradm -d ./gradm.y
 
 lex.gradm.c: gradm.l
-	$(USE_LEX) $(LEXFLAGS) -Pgradm ./gradm.l
+	$(LEX) $(LEXFLAGS) -Pgradm ./gradm.l
 
 fulllearn_pass1.tab.c: gradm_fulllearn_pass1.y
-	$(USE_YACC) -b fulllearn_pass1 -p fulllearn_pass1 -d ./gradm_fulllearn_pass1.y
+	$(YACC) -b fulllearn_pass1 -p fulllearn_pass1 -d ./gradm_fulllearn_pass1.y
 fulllearn_pass2.tab.c: gradm_fulllearn_pass2.y
-	$(USE_YACC) -b fulllearn_pass2 -p fulllearn_pass2 -d ./gradm_fulllearn_pass2.y
+	$(YACC) -b fulllearn_pass2 -p fulllearn_pass2 -d ./gradm_fulllearn_pass2.y
 fulllearn_pass3.tab.c: gradm_fulllearn_pass3.y
-	$(USE_YACC) -b fulllearn_pass3 -p fulllearn_pass3 -d ./gradm_fulllearn_pass3.y
+	$(YACC) -b fulllearn_pass3 -p fulllearn_pass3 -d ./gradm_fulllearn_pass3.y
 
 lex.fulllearn_pass1.c: gradm_fulllearn_pass1.l
-	$(USE_LEX) $(LEXFLAGS) -Pfulllearn_pass1 ./gradm_fulllearn_pass1.l
+	$(LEX) $(LEXFLAGS) -Pfulllearn_pass1 ./gradm_fulllearn_pass1.l
 lex.fulllearn_pass2.c: gradm_fulllearn_pass2.l
-	$(USE_LEX) $(LEXFLAGS) -Pfulllearn_pass2 ./gradm_fulllearn_pass2.l
+	$(LEX) $(LEXFLAGS) -Pfulllearn_pass2 ./gradm_fulllearn_pass2.l
 lex.fulllearn_pass3.c: gradm_fulllearn_pass3.l
-	$(USE_LEX) $(LEXFLAGS) -Pfulllearn_pass3 ./gradm_fulllearn_pass3.l
+	$(LEX) $(LEXFLAGS) -Pfulllearn_pass3 ./gradm_fulllearn_pass3.l
 
 learn_pass1.tab.c: gradm_learn_pass1.y
-	$(USE_YACC) -b learn_pass1 -p learn_pass1 -d ./gradm_learn_pass1.y
+	$(YACC) -b learn_pass1 -p learn_pass1 -d ./gradm_learn_pass1.y
 learn_pass2.tab.c: gradm_learn_pass2.y
-	$(USE_YACC) -b learn_pass2 -p learn_pass2 -d ./gradm_learn_pass2.y
+	$(YACC) -b learn_pass2 -p learn_pass2 -d ./gradm_learn_pass2.y
 
 lex.learn_pass1.c: gradm_learn_pass1.l
-	$(USE_LEX) $(LEXFLAGS) -Plearn_pass1 ./gradm_learn_pass1.l
+	$(LEX) $(LEXFLAGS) -Plearn_pass1 ./gradm_learn_pass1.l
 lex.learn_pass2.c: gradm_learn_pass2.l
-	$(USE_LEX) $(LEXFLAGS) -Plearn_pass2 ./gradm_learn_pass2.l
+	$(LEX) $(LEXFLAGS) -Plearn_pass2 ./gradm_learn_pass2.l
 
 install: $(GRADM_BIN) gradm.8 policy grlearn
 	mkdir -p $(DESTDIR)/sbin
