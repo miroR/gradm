@@ -431,7 +431,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 		char buf[PATH_MAX];
 		memset(&buf, 0, sizeof (buf));
 		realpath(filename, buf);
-		if (!add_proc_object_acl(subject, strdup(buf), mode, type))
+		if (!add_proc_object_acl(subject, strdup(buf), mode, type | GR_SYMLINK))
 			return 0;
 	}
 
@@ -470,6 +470,8 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 			}
 		}
 	} else if ((p2 = is_proc_object_dupe(*filp, p))) {
+		if (type & GR_SYMLINK)
+			return 0;
 		fprintf(stderr, "Duplicate ACL entry found for \"%s\""
 			" on line %lu of %s.\n"
 			"\"%s\" references the same object as the following object(s):\n",

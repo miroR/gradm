@@ -18,6 +18,7 @@
 #define GR_FFAKE		0x2
 #define GR_FLEARN		0x4
 #define GR_GLOB			0x8
+#define GR_SYMLINK		0x10
 
 #define CHK_FILE		0
 #define CHK_CAP			1
