@@ -548,7 +548,7 @@ __u32 proc_subject_mode_conv(const char * mode)
 				retmode |= GR_VIEW;
 				break;
 			case 'd':
-				retmode |= GR_PROTPROCPID;
+				retmode |= GR_PROTPROCFD;
 				break;
 			case 'b':
 				retmode |= GR_PROCACCT;

@@ -39,7 +39,7 @@ static struct subj_mode_name_table {
 	{ GR_KILLPROC, 'K' },
 	{ GR_KILLIPPROC, 'C' },
 	{ GR_NOTROJAN, 'T' },
-	{ GR_PROTPROCPID, 'd' },
+	{ GR_PROTPROCFD, 'd' },
 	( GR_PROCACCT, 'b' }
 };
 	
