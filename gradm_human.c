@@ -67,7 +67,8 @@ static struct subj_mode_name_table {
 	GR_PROTPROCFD, 'd'}, {
 	GR_PROCACCT, 'b'}, {
 	GR_RELAXPTRACE, 'r'}, {
-	GR_INHERITLEARN, 'i'}
+	GR_INHERITLEARN, 'i'}, {
+	GR_POVERRIDE, 't'}
 };
 
 void

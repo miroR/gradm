@@ -847,11 +847,14 @@ proc_subject_mode_conv(const char *mode)
 		case 'o':
 			retmode |= GR_OVERRIDE;
 			break;
+		case 't':
+			retmode |= GR_POVERRIDE;
+			break;
 		case 'l':
 			retmode |= GR_LEARN;
 			break;
 		case 'h':
-			retmode &= ~GR_FIND;
+			retmode &= ~GR_PROCFIND;
 			break;
 		case 'p':
 			retmode |= GR_PROTECTED;

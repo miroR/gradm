@@ -72,6 +72,8 @@
 #	 link cannot have any greater permission than the source file)
 # L -> audit link creation
 # new subject modes:
+# O -> disable "writable library" restrictions for this task
+# t -> allow this process to ptrace any process (use with caution)
 # r -> relax ptrace restrictions (allows process to ptrace processes
 #      other than its own descendants)
 # i -> enable inheritance-based learning for this subject, causing
