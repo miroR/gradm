@@ -203,6 +203,8 @@ subject /usr/sbin/sshd dpo
 	/bin/bash	x
 	/dev		h
 	/dev/log	rw
+	/dev/random	r
+	/dev/urandom	r
 	/dev/null	r
 	/dev/ptmx	rw
 	/dev/pts	rw
@@ -217,6 +219,7 @@ subject /usr/sbin/sshd dpo
 	/proc/kcore	h
 	/proc/sys	h
 	/usr/lib	rx
+	/usr/share/zoneinfo r
 	/var/log
 	/var/mail
 	/var/log/lastlog	rw
