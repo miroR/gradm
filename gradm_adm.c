@@ -143,6 +143,8 @@ void add_fulllearn_acl(void)
 {
 	struct ip_acl ip;
 
+	add_kernel_acl();
+
 	add_role_acl(&current_role, strdup("default"), role_mode_conv("A"), 0);
 
 	add_proc_subject_acl(current_role, "/", proc_subject_mode_conv("ol"), 0);
@@ -156,7 +158,6 @@ void add_fulllearn_acl(void)
 	add_ip_acl(current_subject, GR_IP_BIND, &ip);
 
 	add_gradm_acl(current_role);
-	add_kernel_acl();
 
 	grlearn_configin = fopen(GR_LEARN_CONFIG_PATH, "r");
 	if (grlearn_configin == NULL) {
