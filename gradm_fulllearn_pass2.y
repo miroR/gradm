@@ -105,7 +105,7 @@ learn_log:
 				insert_learn_group_subject(group, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
 			}
 
-			free($9);
+			free(filename);
 		}
 	| ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' id_type ':' NUM ':' NUM ':' NUM ':' IPADDR
 	{
@@ -141,7 +141,7 @@ learn_log:
 				insert_learn_group_subject(group, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
 			}
 
-			free($9);
+			free(filename);
 	}
 	;
 %%
