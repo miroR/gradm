@@ -26,6 +26,7 @@
 #include <asm/posix_types.h>
 #include <linux/elf.h>
 #include <linux/capability.h>
+#include <linux/limits.h>
 #include <linux/threads.h>
 
 #include "gradm_defs.h"
