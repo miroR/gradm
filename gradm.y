@@ -20,6 +20,8 @@ int current_nest_depth = 0;
 %token <string> RES_NAME RES_SOFTHARD CONNECT BIND IPADDR IPPORT IPTYPE
 %token <string> IPPROTO OBJ_MODE SUBJ_MODE IPNETMASK CAP_NAME ROLE_ALLOW_IP
 %token <string> ROLE_TRANSITION VARIABLE DEFINE DEFINE_NAME DISABLED
+%token <string> ID_NAME USER_TRANS_ALLOW GROUP_TRANS_ALLOW 
+%token <string> USER_TRANS_DENY GROUP_TRANS_DENY
 %type <long_int> subj_mode obj_mode ip_netmask
 %type <mode> role_type
 %type <var> variable_expression
@@ -37,6 +39,10 @@ various_acls:			role_label
 	|			role_allow_ip
 	|			role_transitions
 	|			subject_label
+	|			user_allow_label
+	|			user_deny_label
+	|			group_allow_label
+	|			group_deny_label
 	|			variable_object
 	|			variable_expression
 				{
@@ -148,6 +154,66 @@ nested_subjs:			':' SUBJ_NAME
 					}
 					nested[current_nest_depth] = $3;
 					current_nest_depth++;
+				}
+	;
+
+user_allow_ids:			ID_NAME
+				{
+					add_id_transition(current_subject, $1, GR_ID_USER, GR_ID_ALLOW);
+				}
+	|
+				user_allow_ids ID_NAME
+				{
+					add_id_transition(current_subject, $2, GR_ID_USER, GR_ID_ALLOW);
+				}
+	;
+user_allow_label:		USER_TRANS_ALLOW user_allow_ids
+				{
+				}
+	;
+
+user_deny_ids:			ID_NAME
+				{
+					add_id_transition(current_subject, $1, GR_ID_USER, GR_ID_DENY);
+				}
+	|
+				user_deny_ids ID_NAME
+				{
+					add_id_transition(current_subject, $2, GR_ID_USER, GR_ID_DENY);
+				}
+	;
+user_deny_label:		USER_TRANS_DENY user_deny_ids
+				{
+				}
+	;
+
+group_allow_ids:		ID_NAME
+				{
+					add_id_transition(current_subject, $1, GR_ID_GROUP, GR_ID_ALLOW);
+				}
+	|
+				group_allow_ids ID_NAME
+				{
+					add_id_transition(current_subject, $2, GR_ID_GROUP, GR_ID_ALLOW);
+				}
+	;
+group_allow_label:		GROUP_TRANS_ALLOW group_allow_ids
+				{
+				}
+	;
+
+group_deny_ids:			ID_NAME
+				{
+					add_id_transition(current_subject, $1, GR_ID_GROUP, GR_ID_DENY);
+				}
+	|
+				group_deny_ids ID_NAME
+				{
+					add_id_transition(current_subject, $2, GR_ID_GROUP, GR_ID_DENY);
+				}
+	;
+group_deny_label:		GROUP_TRANS_DENY group_deny_ids
+				{
 				}
 	;
 

@@ -6,7 +6,7 @@
 #define GR_ACL_PATH 		GRSEC_DIR "/acl"
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
 
-#define GR_VERSION		"2.0-rc5"
+#define GR_VERSION		"2.0"
 
 #define GR_PWONLY		0
 #define GR_PWANDSUM		1
@@ -35,18 +35,28 @@
 #define GR_NLIMITS	(RLIM_NLIMITS + 1)
 
 enum {
-	GRADM_DISABLE = 0,
-	GRADM_ENABLE = 1,
-	GRADM_SPROLE = 2,
-	GRADM_RELOAD = 3,
-	GRADM_MODSEGV = 4,
-	GRADM_STATUS = 5,
-	GRADM_UNSPROLE = 6
+	GRADM_DISABLE 	= 0,
+	GRADM_ENABLE 	= 1,
+	GRADM_SPROLE 	= 2,
+	GRADM_RELOAD 	= 3,
+	GRADM_MODSEGV 	= 4,
+	GRADM_STATUS 	= 5,
+	GRADM_UNSPROLE 	= 6
 };
 
 enum {
-	GR_IP_BIND = 0x01,
-	GR_IP_CONNECT = 0x02,
+	GR_IP_BIND 	= 0x01,
+	GR_IP_CONNECT 	= 0x02,
+};
+
+enum {
+	GR_ID_USER 	= 0x01,
+	GR_ID_GROUP 	= 0x02,
+};
+
+enum {
+	GR_ID_ALLOW	= 0x01,
+	GR_ID_DENY	= 0x02,
 };
 
 enum {
@@ -211,6 +221,13 @@ struct proc_acl {
 
 	struct rlimit res[GR_NLIMITS];
 	__u16 resmask;
+
+	__u8 user_trans_type;
+	__u8 group_trans_type;
+	uid_t *user_transitions;
+	gid_t *group_transitions;
+	__u16 user_trans_num;
+	__u16 group_trans_num;
 
 	__u32 ip_proto[8];
 	__u32 ip_type;

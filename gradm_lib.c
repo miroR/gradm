@@ -7,7 +7,7 @@
 		    filenames (4k), then hand out one at a time until 
 		    there are none left.
    gr_dyn_alloc() : addresses that need constant resizing
-		    here we allocate 128 times the amount requested,
+		    here we allocate 16 times the amount requested,
 		    once this is full, we redirect to the real realloc,
 		    and then update our internal structures.
 */

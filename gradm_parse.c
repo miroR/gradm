@@ -4,6 +4,89 @@ extern FILE *gradmin;
 extern int gradmparse(void);
 
 void
+add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int allowdeny)
+{
+	struct passwd *pwd;
+	struct group *grp;
+	uid_t *uidlist;
+	gid_t *gidlist;
+
+	if (usergroup == GR_ID_USER) {
+		if (allowdeny == GR_ID_ALLOW) {
+			if (subject->user_trans_type & GR_ID_DENY) {
+				fprintf(stderr, "Error on line %lu of %s.  You cannot use "
+					"both user_transition_allow and user_transition_deny.\n"
+					"The RBAC system will not be allowed to be enabled until "
+					"this error is fixed.\n", lineno, current_acl_file);
+				exit(EXIT_FAILURE);
+			}
+			subject->user_trans_type |= GR_ID_ALLOW;
+		} else if (allowdeny == GR_ID_DENY) {
+			if (subject->user_trans_type & GR_ID_ALLOW) {
+				fprintf(stderr, "Error on line %lu of %s.  You cannot use "
+					"both user_transition_allow and user_transition_deny.\n"
+					"The RBAC system will not be allowed to be enabled until "
+					"this error is fixed.\n", lineno, current_acl_file);
+				exit(EXIT_FAILURE);
+			}
+			subject->user_trans_type |= GR_ID_DENY;
+		}
+
+		pwd = getpwnam(idname);
+
+		if (!pwd) {
+			fprintf(stderr, "User %s on line %lu of %s "
+				"does not exist.\nThe RBAC system will "
+				"not be allowed to be enabled until "
+				"this error is fixed.\n", idname,
+				lineno, current_acl_file);
+			return 0;
+		}
+
+		subject->user_trans_num++;
+		subject->user_transitions = gr_dyn_realloc(subject->user_transitions, subject->user_trans_num);
+		*(subject->user_transitions + subject->user_trans_num - 1) = pwd->pw_uid;
+	else if (usergroup == GR_ID_GROUP) {
+		if (allowdeny == GR_ID_ALLOW) {
+			if (subject->group_trans_type & GR_ID_DENY) {
+				fprintf(stderr, "Error on line %lu of %s.  You cannot use "
+					"both group_transition_allow and group_transition_deny.\n"
+					"The RBAC system will not be allowed to be enabled until "
+					"this error is fixed.\n", lineno, current_acl_file);
+				exit(EXIT_FAILURE);
+			}
+			subject->group_trans_type |= GR_ID_ALLOW;
+		} else if (allowdeny == GR_ID_DENY) {
+			if (subject->group_trans_type & GR_ID_ALLOW) {
+				fprintf(stderr, "Error on line %lu of %s.  You cannot use "
+					"both group_transition_allow and group_transition_deny.\n"
+					"The RBAC system will not be allowed to be enabled until "
+					"this error is fixed.\n", lineno, current_acl_file);
+				exit(EXIT_FAILURE);
+			}
+			subject->group_trans_type |= GR_ID_DENY;
+		}
+
+		grp = getgrnam(idname);
+
+		if (!grp) {
+			fprintf(stderr, "Group %s on line %lu of %s "
+				"does not exist.\nThe RBAC system will "
+				"not be allowed to be enabled until "
+				"this error is fixed.\n", idname,
+				lineno, current_acl_file);
+			return 0;
+		}
+
+		subject->group_trans_num++;
+		subject->group_transitions = gr_dyn_realloc(subject->group_transitions, subject->group_trans_num);
+		*(subject->group_transitions + subject->group_trans_num - 1) = grp->gr_gid;
+	}
+
+	return;
+}
+
+void
 add_role_transition(struct role_acl *role, char *rolename)
 {
 	struct role_transition **roletpp;

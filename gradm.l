@@ -26,7 +26,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
 %x ROLE_STATE SUBJECT_STATE IP_STATE RES_STATE COMMENT_STATE ROLETYPE_STATE
 %x INCLUDE_STATE IPNETMASK_STATE IPPORT_STATE ROLETRANS_STATE
-%x VAR_STATE VAR_OBJ_STATE
+%x VAR_STATE VAR_OBJ_STATE IDTRANS_STATE
 
 %%
 
@@ -160,6 +160,26 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 <VAR_OBJ_STATE>[rwxahitmFRWXAIMdDcCso]+	{
 					  gradmlval.string = strdup(yytext);
 					  return OBJ_MODE;
+					}
+<IDTRANS_STATE>[_a-zA-Z0-9-]{1,30}	{
+					  gradmlval.string = strdup(yytext);
+					  return ID_NAME;
+					}
+"user_transition_allow"			{
+					  BEGIN(IDTRANS_STATE);
+					  return USER_TRANS_ALLOW;
+					}
+"user_transition_deny"			{
+					  BEGIN(IDTRANS_STATE);
+					  return USER_TRANS_DENY;
+					}
+"group_transition_allow"		{
+					  BEGIN(IDTRANS_STATE);
+					  return GROUP_TRANS_ALLOW;
+					}
+"group_transition_deny"			{
+					  BEGIN(IDTRANS_STATE);
+					  return GROUP_TRANS_DENY;
 					}
 "role"					{
 					  BEGIN(ROLE_STATE);
