@@ -10,7 +10,8 @@ extern struct gr_learn_group_node **role_list;
 	unsigned long num;
 }
 
-%token <num> NUM IPADDR FILENAME ROLENAME filename
+%token <num> NUM IPADDR FILENAME ROLENAME
+%type <num> filename
 
 %%
 
