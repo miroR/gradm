@@ -6,7 +6,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <signal.h>
 #include <getopt.h>
+#include <sched.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <sys/stat.h>
@@ -23,6 +25,7 @@
 #include <asm/posix_types.h>
 #include <linux/elf.h>
 #include <linux/capability.h>
+#include <linux/threads.h>
 
 #include "gradm_defs.h"
 #include "gradm_func.h"

@@ -1,19 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <string.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#include <sys/poll.h>
-#include <unistd.h>
-#include <errno.h>
-#include <signal.h>
-#include <sys/mman.h>
-#include <sched.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <linux/threads.h>
-
+#include "gradm.h"
 
 #define GR_LEARN_PID_PATH "/etc/grsec/.grlearn.pid"
 #define LEARN_BUFFER_SLOTS 256
