@@ -18,10 +18,10 @@ static int check_permission(struct role_acl * role, struct proc_acl * def_acl, c
 			&& ((chk->u_modes == 0xffff) || !(tmpf->mode & chk->u_modes))) {
 		      free(tmpname);
 		      return 1;
+		     } else {
+		      free(tmpname);
+		      return 0;
 		     }
-		    } else {
-		     free(tmpname);
-		     return 0;
 		    }
 		  } while(parent_dir(filename, &tmpname));
 
