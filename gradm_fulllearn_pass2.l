@@ -25,6 +25,7 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 "g"					{
 					  fulllearn_pass2lval.num = GROUP;
 					  return GROUP;
+					}
 {NUM}					{
 					  fulllearn_pass2lval.num = atol(yytext);
 					  return NUM;

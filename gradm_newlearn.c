@@ -1719,7 +1719,40 @@ find_learn_role(struct gr_learn_role_entry **role_list, char *rolename)
 	return NULL;
 }
 
-void insert_learn_id_transition(unsigned int **list, int real, int eff, int fs)
+void insert_learn_id_transition(unsigned int ***list, int real, int eff, int fs)
 {
+	unsigned int ids[] = { real, eff, fs };
+	unsigned int check[] = { -1, real, eff, fs };
+	int i, x, good, num;
+	unsigned int **p;
 
+	if (*list == NULL)
+		*list = (unsigned int **)gr_dyn_alloc(2 * sizeof(unsigned int));
+
+
+	for (x = 0; x < sizeof(ids)/sizeof(ids[0]); x++) {
+		good = 1;
+		for (i = 0; i < sizeof(check)/sizeof(check[0]); i++) {
+			if (((i - 1) != x && check[i] == ids[x]) || ids[x] == -1)
+				good = 0;
+		}
+		for (p = *list; *p; p++) {
+			if (ids[x] == **p)
+				good = 0;
+		}
+		if (good) {
+			p = *list;
+			num = 0;
+			while (*p) {
+				p++;
+				num++;
+			}
+			*list = (unsigned int **)gr_dyn_realloc(*list, (num + 1) * sizeof(unsigned int));
+			memset(*list + num, 0, 2 * sizeof(unsigned int *));
+			*(*list + num) = (unsigned int *)gr_stat_alloc(sizeof(unsigned int));
+			**(*list + num) = ids[x];
+		}
+	}
+
+	return;
 }

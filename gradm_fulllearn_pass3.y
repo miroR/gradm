@@ -145,6 +145,7 @@ learn_log:
 			free(filename);
 		}
 	| ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' id_type ':' NUM ':' NUM ':' NUM ':' IPADDR
+		{
 			struct gr_learn_group_node *group = NULL;
 			struct gr_learn_user_node *user = NULL;
 			struct gr_learn_file_node *subjlist = NULL;
@@ -174,21 +175,22 @@ learn_log:
 			    (current_learn_rolemode == GR_ROLE_USER && user && !strcmp(user->rolename, current_learn_rolename)))
 			{
 
-			if (user)
-				subjlist = user->subject_list;
-			else if (group)
-				subjlist = group->subject_list;
+				if (user)
+					subjlist = user->subject_list;
+				else if (group)
+					subjlist = group->subject_list;
 
-			if (subjlist)
-				subject = match_file_node(subjlist, filename);
-			/* only learn objects for current subject in memory */
-			if (subject && !strcmp(subject->filename, current_learn_subject)) {
-			if (subject && $13 == USER)
-				insert_learn_id_transition(&(subject->user_trans_list), real, eff, fs);
-			else if (subject && $13 == GROUP)
-				insert_learn_id_transition(&(subject->group_trans_list), real, eff, fs);
-			}
+				if (subjlist)
+					subject = match_file_node(subjlist, filename);
+				/* only learn objects for current subject in memory */
+				if (subject && !strcmp(subject->filename, current_learn_subject)) {
+					if (subject && $13 == USER)
+						insert_learn_id_transition(&(subject->user_trans_list), real, eff, fs);
+					else if (subject && $13 == GROUP)
+						insert_learn_id_transition(&(subject->group_trans_list), real, eff, fs);
+				}
 			}
 			free(filename);
+		}
 	;
 %%

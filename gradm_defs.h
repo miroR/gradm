@@ -314,8 +314,8 @@ struct gr_learn_file_node {
 	struct gr_learn_file_node *object_list;
 	struct gr_learn_ip_node *connect_list;
 	struct gr_learn_ip_node *bind_list;
-	uid_t *user_transition_list;
-	gid_t *group_transition_list;
+	unsigned int **user_trans_list;
+	unsigned int **group_trans_list;
 	struct gr_learn_subject_node *subject;
 	unsigned char dont_display:1;
 };

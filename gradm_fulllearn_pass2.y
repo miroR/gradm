@@ -114,7 +114,7 @@ learn_log:
 			uid_t uid;
 			gid_t gid;
 			unsigned long res1, res2;
-			__u32 addr;
+			u_int32_t addr;
 			char *filename = $9;
 
 			/* check if we have an inherited learning subject */
