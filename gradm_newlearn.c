@@ -1038,20 +1038,20 @@ show_ips:
 		conv_mode_to_str(node->mode, modes, sizeof(modes));
 		i = strlen(node->filename);
 		if (strchr(node->filename, ' ')) {
-				if (i <= 5)
+				if (i < 10)
 					fprintf(stream, "\t\"%s\"\t\t\t\t%s\n", node->filename, modes);
-				else if (i <= 15)
+				else if (i < 15)
 					fprintf(stream, "\t\"%s\"\t\t\t%s\n", node->filename, modes);
-				else if (i <= 25)
+				else if (i < 25)
 					fprintf(stream, "\t\"%s\"\t\t%s\n", node->filename, modes);
 				else
 					fprintf(stream, "\t\"%s\"\t%s\n", node->filename, modes);
 		} else {
-			if (i <= 5)
+			if (i < 10)
 				fprintf(stream, "\t%s\t\t\t\t%s\n", node->filename, modes);
-			else if (i <= 15)
+			else if (i < 15)
 				fprintf(stream, "\t%s\t\t\t%s\n", node->filename, modes);
-			else if (i <= 25)
+			else if (i < 25)
 				fprintf(stream, "\t%s\t\t%s\n", node->filename, modes);
 			else
 				fprintf(stream, "\t%s\t%s\n", node->filename, modes);
