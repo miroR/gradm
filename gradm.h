@@ -16,12 +16,12 @@
 #include <sys/poll.h>
 #include <asm/param.h>
 #include <asm/ioctls.h>
-#include <glob.h>
 #include <dirent.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <pwd.h>
 #include <grp.h>
+#include <fnmatch.h>
 #include <sys/resource.h>
 #include <sys/mman.h>
 #include <asm/posix_types.h>
@@ -56,6 +56,8 @@
 #define for_each_transition(x, y) \
 	for(x = y; x; x = (x)->prev)
 
+#define for_each_globbed(x, y) \
+	for(x = (y)->globbed; x; x = (x)->next)
 
 #define MAJOR(dev)	((dev)>>8)
 #define MINOR(dev)	((dev) & 0xff)

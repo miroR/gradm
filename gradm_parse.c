@@ -204,176 +204,59 @@ static int
 add_globbing_file(struct proc_acl *subject, char *filename,
 		  __u32 mode, int type)
 {
-	char tmp[PATH_MAX] = { 0 };
-	unsigned int len = strlen(filename);
-	unsigned long i;
-	char *last;
-	glob_t pglob;
-	int err;
-	struct file_acl ftmp, ftmp2;
-	struct stat fstat;
+	char *basepoint = strdup(filename);
+	char *p, *p2;
+	struct file_acl *anchor;
+	struct file_acl *glob, *glob2;
 
-	while (len--) {
-		switch (*(filename + len)) {
-		case '*':
-		case '?':
-		case '/':
-			goto out;
-		}
+	if (!basepoint)
+		failure("strdup");
+
+	/* calculate basepoint, eg basepoint of /home/ * /test is /home */
+	p = p2 = basepoint;
+	while (*p != '\0') {
+		if (*p == '/')
+			p2 = p;
+		if (*p == '?' || *p == '*')
+			break;
+		p++;
 	}
-      out:
-	/* this means the globbing was done before the last path component
-	   therefore we want to add objects even if they don't exist
-	   eg: /home/ * /test would match /home/user1/test, /home/user2/test,
-	   /home/user3/test....etc even if the "test" file did not exist
-	   in their homedirs
-	 */
-	if (*(filename + len) == '/') {
-		len = strlen(filename);
-		while (len--) {
-			switch (*(filename + len)) {
-			case '*':
-			case '?':
-				goto out2;
-			}
-		}
-	      out2:
-		last = strchr(filename + len, '/');
-		*last = '\0';
-		last++;
+	/* if base is / */
+	if (p2 == basepoint)
+		*(p2 + 1) = '\0';
+	else
+		*p2 = '\0';
 
-		err = glob(filename, GLOB_PERIOD | GLOB_ONLYDIR, NULL, &pglob);
+	for_each_object(anchor, subject->proc_object) {
+		if (!strcmp(anchor->filename, basepoint))
+			break;
+	}
 
-		if (err) {
-			fprintf(stderr, "glob() error \"%s\" encountered"
-				" on line %lu of %s.\n"
-				"The RBAC system will not load until this"
-				" error is fixed.\n", strerror(errno), lineno,
-				current_acl_file);
-			exit(EXIT_FAILURE);
-		}
+	if (!anchor) {
+		fprintf(stderr, "Error on line %lu of %s:\n"
+			"Object %s needs to be specified before globbed object %s\n",
+			lineno, current_acl_file, basepoint, filename);
+		exit(EXIT_FAILURE);
+	}
 
-		for (i = 0; i < pglob.gl_pathc; i++) {
-			len = strlen(*(pglob.gl_pathv + i));
-
-			if (len > 3) {
-				char *p;
-				p = (*(pglob.gl_pathv + i) + len - 3);
-				if (!strcmp(p, "/.."))
-					continue;
-				p++;
-				if (!strcmp(p, "/."))
-					continue;
-			}
-
-			snprintf(tmp, sizeof (tmp), "%s/%s",
-				 *(pglob.gl_pathv + i), last);
-
-			ftmp.filename = tmp;
-
-			if (!lstat(ftmp.filename, &fstat)) {
-				ftmp.inode = fstat.st_ino;
-				ftmp.dev =
-				    MKDEV(MAJOR(fstat.st_dev),
-					  MINOR(fstat.st_dev));
-
-				if (S_ISLNK(fstat.st_mode)) {
-					char buf[PATH_MAX];
-					memset(&buf, 0, sizeof (buf));
-					realpath(ftmp.filename, buf);
-					ftmp2.filename = buf;
-
-					if (!stat(ftmp2.filename, &fstat)) {
-						ftmp2.inode = fstat.st_ino;
-						ftmp2.dev =
-						    MKDEV(MAJOR(fstat.st_dev),
-							  MINOR(fstat.st_dev));
-						if (is_proc_object_dupe
-						    (subject->proc_object,
-						     &ftmp2))
-							goto add_link1;
-						if (!add_proc_object_acl
-						    (subject, strdup(buf), mode,
-						     type | GR_GLOB))
-							return 0;
-					}
-				}
-add_link1:
-				if (is_proc_object_dupe
-				    (subject->proc_object, &ftmp))
-					continue;
-				if (!add_proc_object_acl
-				    (subject, strdup(tmp), mode, type))
-					return 0;
-			}
-
-		}
-		globfree(&pglob);
+	if (anchor->globbed) {
+		glob = anchor->globbed;
+		while (glob->next)
+			glob = glob->next;
+		glob2 = calloc(1, sizeof(struct file_acl));
+		if (!glob2)
+			failure("calloc");
+		glob2->filename = filename;
+		glob2->mode = mode;
+		glob2->prev = glob;
+		glob->next = glob2;
 	} else {
-		err = glob(filename, GLOB_PERIOD, NULL, &pglob);
-
-		if (err) {
-			fprintf(stderr, "glob() error \"%s\" encountered"
-				" on line %lu of %s.\n"
-				"The RBAC system will not load until this"
-				" error is fixed.\n", strerror(errno), lineno,
-				current_acl_file);
-			exit(EXIT_FAILURE);
-		}
-
-		for (i = 0; i < pglob.gl_pathc; i++) {
-			len = strlen(*(pglob.gl_pathv + i));
-
-			if (len > 3) {
-				char *p;
-				p = (*(pglob.gl_pathv + i) + len - 3);
-				if (!strcmp(p, "/.."))
-					continue;
-				p++;
-				if (!strcmp(p, "/."))
-					continue;
-			}
-
-			ftmp.filename = *(pglob.gl_pathv + i);
-
-			if (!lstat(ftmp.filename, &fstat)) {
-				ftmp.inode = fstat.st_ino;
-				ftmp.dev =
-				    MKDEV(MAJOR(fstat.st_dev),
-					  MINOR(fstat.st_dev));
-
-				if (S_ISLNK(fstat.st_mode)) {
-					char buf[PATH_MAX];
-					memset(&buf, 0, sizeof (buf));
-					realpath(ftmp.filename, buf);
-					ftmp2.filename = buf;
-
-					if (!stat(ftmp2.filename, &fstat)) {
-						ftmp2.inode = fstat.st_ino;
-						ftmp2.dev =
-						    MKDEV(MAJOR(fstat.st_dev),
-							  MINOR(fstat.st_dev));
-
-						if (is_proc_object_dupe
-						    (subject->proc_object,
-						     &ftmp2))
-							goto add_link2;
-						if (!add_proc_object_acl
-						    (subject, strdup(buf), mode,
-						     type | GR_GLOB))
-							return 0;
-					}
-				}
-add_link2:
-				if (is_proc_object_dupe
-				    (subject->proc_object, &ftmp))
-					continue;
-				if (!add_proc_object_acl
-				    (subject, *(pglob.gl_pathv + i), mode,
-				     type))
-					return 0;
-			}
-		}
+		glob2 = calloc(1, sizeof(struct file_acl));
+		if (!glob2)
+			failure("calloc");
+		glob2->filename = filename;
+		glob2->mode = mode;
+		anchor->globbed = glob2;
 	}
 
 	return 1;
@@ -431,7 +314,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 		fstat.st_ino = dfile->ino;
 		fstat.st_dev = 0;
 		mode |= GR_DELETED;
-	} else if (S_ISLNK(fstat.st_mode) && !(type & GR_GLOB)) {
+	} else if (S_ISLNK(fstat.st_mode)) {
 		char buf[PATH_MAX];
 		memset(&buf, 0, sizeof (buf));
 		realpath(filename, buf);
@@ -868,6 +751,7 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 	struct role_acl *rtmp = NULL;
 	struct proc_acl *tmp = NULL;
 	struct file_acl *tmpf = NULL;
+	struct file_acl *tmpg = NULL;
 	struct role_allowed_ip *atmp = NULL;
 	struct role_transition *trtmp = NULL;
 	struct ip_acl *tmpi = NULL;
@@ -875,6 +759,7 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 	struct role_acl **r_tmp = NULL;
 	struct ip_acl **i_table = NULL;
 	unsigned long facls = 0;
+	unsigned long gacls = 0;
 	unsigned long tpacls = 0;
 	unsigned long racls = 0;
 	unsigned long iacls = 0;
@@ -901,8 +786,11 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 			tpacls++;
 			for_each_object(tmpi, tmp->ip_object)
 			    tiacls++;
-			for_each_object(tmpf, tmp->proc_object)
+			for_each_object(tmpf, tmp->proc_object) {
 			    facls++;
+			    for_each_globbed(tmpg, tmpf)
+				gacls++;
+			}
 		}
 	}
 
@@ -943,6 +831,7 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 	role_db->s_entries = tpacls;
 	role_db->i_entries = tiacls;
 	role_db->o_entries = facls;
+	role_db->g_entries = gacls;
 	role_db->a_entries = aacls;
 	role_db->t_entries = tracls;
 

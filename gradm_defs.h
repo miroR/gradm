@@ -20,8 +20,7 @@
 #define GR_FEXIST		0x1
 #define GR_FFAKE		0x2
 #define GR_FLEARN		0x4
-#define GR_GLOB			0x8
-#define GR_SYMLINK		0x10
+#define GR_SYMLINK		0x8
 
 #define CHK_FILE		0
 #define CHK_CAP			1
@@ -160,6 +159,7 @@ struct file_acl {
 	__u32 mode;
 
 	struct proc_acl *nested;
+	struct file_acl *globbed;
 
 	struct file_acl *prev;
 	struct file_acl *next;
@@ -327,6 +327,7 @@ struct user_acl_role_db {
 	__u32 s_entries;	/* total number of subject acls */
 	__u32 i_entries;	/* total number of ip acls */
 	__u32 o_entries;	/* Total number of object acls */
+	__u32 g_entries;	/* total number of globbed objects */
 	__u32 a_entries;	/* total number of allowed role ips */
 	__u32 t_entries;	/* total number of transitions */
 };

@@ -6,6 +6,7 @@ check_permission(struct role_acl *role, struct proc_acl *def_acl,
 {
 	struct file_acl *tmpf = NULL;
 	struct proc_acl *tmpp = def_acl;
+	struct file_acl *tmpg = NULL;
 	char *tmpname;
 	__u32 cap_raised = 0, old_r = 0;
 	__u32 cap_lowered = 0, old_l = 0;
@@ -23,6 +24,21 @@ check_permission(struct role_acl *role, struct proc_acl *def_acl,
 			do {
 				for_each_object(tmpf, tmpp->proc_object)
 				    if (!strcmp(tmpf->filename, tmpname)) {
+					/* check globbed objects */
+					for_each_globbed(tmpg, tmpf) {
+						if (!fnmatch(tmpg->filename, filename)) {
+							if (((chk->w_modes == 0xffff)
+							     || (tmpg->mode & chk->w_modes))
+							    && ((chk->u_modes == 0xffff)
+								|| !(tmpg->mode & chk->u_modes))) {
+								free(tmpname);
+								return 1;
+							} else {
+								free(tmpname);
+								return 0;
+							}
+						}
+					}
 					if (((chk->w_modes == 0xffff)
 					     || (tmpf->mode & chk->w_modes))
 					    && ((chk->u_modes == 0xffff)
