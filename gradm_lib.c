@@ -2,7 +2,7 @@
 
 /* anticipatory memory allocator */
 
-/* gr_page_alloc(): for groups of allocations that need to be done quickly
+/* gr_stat_alloc(): for groups of allocations that need to be done quickly
 		    allocate several more of larger size, fit for use as
 		    filenames (4k), then hand out one at a time until 
 		    there are none left.
@@ -28,7 +28,7 @@ static struct mem_entry **stat_alloc = NULL;
 static unsigned long stat_alloc_num = 0;
 static unsigned long stat_alloc_start = 0;
 
-void gr_page_free_all(void)
+void gr_stat_free_all(void)
 {
 	unsigned long i;
 
@@ -40,7 +40,7 @@ void gr_page_free_all(void)
 	stat_alloc = NULL;
 }
 
-void * gr_page_alloc(unsigned long len)
+void * gr_stat_alloc(unsigned long len)
 {
 	unsigned long i, j;
 	void *ret = NULL;
