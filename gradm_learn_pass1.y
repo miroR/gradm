@@ -73,9 +73,9 @@ learn_log:
 			if (rolemode & GR_ROLE_LEARN) {
 				insert_ip(&(role->allowed_ips), addr, 0, 0, 0);
 				if ((!strcmp($17, "") && strlen($9) > 1 && !res1 && !res2) || is_protected_path($17, $19))
-					insert_learn_role_subject(role, conv_filename_to_struct($9, GR_FIND | GR_OVERRIDE));
+					insert_learn_role_subject(role, conv_filename_to_struct($9, GR_PROCFIND | GR_OVERRIDE));
 			} else if (strlen($9) > 1)
-				insert_learn_role_subject(role, conv_filename_to_struct($11, GR_FIND | GR_OVERRIDE));
+				insert_learn_role_subject(role, conv_filename_to_struct($11, GR_PROCFIND | GR_OVERRIDE));
 
 			free($9);
 			free($11);
@@ -111,9 +111,9 @@ learn_log:
 
 			if (rolemode & GR_ROLE_LEARN) {
 				insert_ip(&(role->allowed_ips), addr, 0, 0, 0);
-				insert_learn_role_subject(role, conv_filename_to_struct($9, GR_FIND | GR_OVERRIDE));
+				insert_learn_role_subject(role, conv_filename_to_struct($9, GR_PROCFIND | GR_OVERRIDE));
 			} else if (strlen($9) > 1)
-				insert_learn_role_subject(role, conv_filename_to_struct($11, GR_FIND | GR_OVERRIDE));
+				insert_learn_role_subject(role, conv_filename_to_struct($11, GR_PROCFIND | GR_OVERRIDE));
 
 			free($9);
 			free($11);
@@ -146,9 +146,9 @@ learn_log:
 
 			if (rolemode & GR_ROLE_LEARN) {
 				insert_ip(&(role->allowed_ips), addr, 0, 0, 0);
-				insert_learn_role_subject(role, conv_filename_to_struct($9, GR_FIND | GR_OVERRIDE));
+				insert_learn_role_subject(role, conv_filename_to_struct($9, GR_PROCFIND | GR_OVERRIDE));
 			} else if (strlen($9) > 1)
-				insert_learn_role_subject(role, conv_filename_to_struct($11, GR_FIND | GR_OVERRIDE));
+				insert_learn_role_subject(role, conv_filename_to_struct($11, GR_PROCFIND | GR_OVERRIDE));
 
 			free($1);
 			free($9);

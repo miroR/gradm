@@ -36,7 +36,7 @@ int full_reduce_subjects(struct gr_learn_group_node *group,
 		printf("Beginning full learning subject reduction for user %s...", user->rolename);
 		fflush(stdout);
 		if (!user->hash)
-			insert_file(&(user->subject_list), "/", GR_FIND, 1);
+			insert_file(&(user->subject_list), "/", GR_PROCFIND, 1);
 		else {
 			sort_file_list(user->hash);
 			tmptable = (struct gr_learn_file_tmp_node **)user->hash->table;
@@ -53,7 +53,7 @@ int full_reduce_subjects(struct gr_learn_group_node *group,
 		printf("Beginning full learning subject reduction for group %s...", group->rolename);
 		fflush(stdout);
 		if (!group->hash)
-			insert_file(&(group->subject_list), "/", GR_FIND, 1);
+			insert_file(&(group->subject_list), "/", GR_PROCFIND, 1);
 		else {
 			sort_file_list(group->hash);
 			tmptable = (struct gr_learn_file_tmp_node **)group->hash->table;

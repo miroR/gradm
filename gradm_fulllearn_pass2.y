@@ -67,9 +67,9 @@ learn_log:
 				insert_ip(&(group->allowed_ips), addr, 0, 0, 0);
 				
 			if (user && ((!strcmp($17, "")  && strlen(filename) > 1 && !res1 && !res2) || is_protected_path($17, $19)))
-				insert_learn_user_subject(user, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
+				insert_learn_user_subject(user, conv_filename_to_struct(filename, GR_PROCFIND | GR_OVERRIDE));
 			else if (group && ((!strcmp($17, "") && strlen(filename) > 1 && !res1 && !res2) || is_protected_path($17, $19)))
-				insert_learn_group_subject(group, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
+				insert_learn_group_subject(group, conv_filename_to_struct(filename, GR_PROCFIND | GR_OVERRIDE));
 
 			free(filename);
 			free($17);
@@ -99,10 +99,10 @@ learn_log:
 
 			if (user) {
 				insert_ip(&(user->allowed_ips), addr, 0, 0, 0);
-				insert_learn_user_subject(user, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
+				insert_learn_user_subject(user, conv_filename_to_struct(filename, GR_PROCFIND | GR_OVERRIDE));
 			} else if (group) {
 				insert_ip(&(group->allowed_ips), addr, 0, 0, 0);
-				insert_learn_group_subject(group, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
+				insert_learn_group_subject(group, conv_filename_to_struct(filename, GR_PROCFIND | GR_OVERRIDE));
 			}
 
 			free(filename);
