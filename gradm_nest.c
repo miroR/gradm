@@ -80,10 +80,8 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 	current_subject->parent_subject = stmp;
 	current_subject->mode |= GR_NESTED;
 
-	if (!stat(nestednames[i - 1], &fstat) && S_ISREG(fstat.st_mode)) {
-		if (!add_proc_object_acl(current_subject, nestednames[i - 1], proc_object_mode_conv("rx"), GR_FLEARN))
-			exit(EXIT_FAILURE);
-	}
+	if (!stat(nestednames[i - 1], &fstat) && S_ISREG(fstat.st_mode))
+		add_proc_object_acl(current_subject, nestednames[i - 1], proc_object_mode_conv("rx"), GR_FLEARN);
 
 	return;
 }

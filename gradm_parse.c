@@ -295,7 +295,7 @@ add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 			"of %s.\nThe RBAC system will not be allowed to be "
 			"enabled until this error is fixed.\n", rolename,
 			lineno, current_acl_file);
-		return 0;
+		exit(EXIT_FAILURE);
 	}
 
 	if (is_role_dupe(*role, rtmp->rolename, rtmp->roletype)) {
@@ -303,7 +303,7 @@ add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 			"The RBAC system will not be allowed to be "
 			"enabled until this error is fixed.\n",
 			lineno, current_acl_file);
-		return 0;
+		exit(EXIT_FAILURE);
 	}
 
 	if (ignore)
@@ -318,7 +318,7 @@ add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 					"not be allowed to be enabled until "
 					"this error is fixed.\n", rolename,
 					lineno, current_acl_file);
-				return 0;
+				exit(EXIT_FAILURE);
 			}
 
 			rtmp->uidgid = pwd->pw_uid;
@@ -331,7 +331,7 @@ add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 					"not be allowed to be enabled until "
 					"this error is fixed.\n", rolename,
 					lineno, current_acl_file);
-				return 0;
+				exit(EXIT_FAILURE);
 			}
 
 			rtmp->uidgid = grp->gr_gid;
@@ -526,7 +526,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 			"add an object without a subject declaration.\n"
 			"The RBAC system will not load until this "
 			"error is fixed.\n", lineno, current_acl_file);
-		return 0;
+		exit(EXIT_FAILURE);
 	}
 
 	if (!filename) {
@@ -569,7 +569,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 		char buf[PATH_MAX];
 		memset(&buf, 0, sizeof (buf));
 		realpath(filename, buf);
-		if (!add_proc_object_acl(subject, strdup(buf), mode, type | GR_SYMLINK))
+		if(!add_proc_object_acl(subject, strdup(buf), mode, type | GR_SYMLINK))
 			return 0;
 	}
 
@@ -617,7 +617,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 		fprintf(stderr, "specified on an earlier line."
 			"The RBAC system will not load until this"
 			" error is fixed.\n");
-		return 0;
+		exit(EXIT_FAILURE);
 	}
 
 	insert_acl_object(subject, p);
@@ -643,7 +643,7 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 			"add a subject without a role declaration.\n"
 			"The RBAC system will not load until this "
 			"error is fixed.\n", lineno, current_acl_file);
-		return 0;
+		exit(EXIT_FAILURE);
 	}
 
 	if (!filename) {
@@ -702,7 +702,7 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 			" error is fixed.\n", p->filename, 
 			role->rolename, lineno,
 			current_acl_file, p->filename, p2->filename);
-		return 0;
+		exit(EXIT_FAILURE);
 	}
 
 	/* don't insert nested subjects into main hash */

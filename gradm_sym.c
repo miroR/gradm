@@ -11,8 +11,7 @@ static unsigned int symtab_size = 0;
 void interpret_variable(struct var_object *var)
 {
 	for (; var; var = var->prev) {
-		if (!add_proc_object_acl(current_subject, var->filename, var->mode, GR_FEXIST))
-			exit(EXIT_FAILURE);
+		add_proc_object_acl(current_subject, var->filename, var->mode, GR_FEXIST);
 	}
 
 	return;

@@ -108,8 +108,7 @@ var_object_list:		OBJ_NAME obj_mode
 
 domain_label:			DOMAIN ROLE_NAME DOMAIN_TYPE 
 				{
-				 if (!add_role_acl(&current_role, $2, GR_ROLE_DOMAIN | role_mode_conv($3), 1))
-					exit(EXIT_FAILURE);
+				 add_role_acl(&current_role, $2, GR_ROLE_DOMAIN | role_mode_conv($3), 1);
 				}
 				domain_user_list
 	;
@@ -126,8 +125,7 @@ domain_user_list:		ROLE_NAME
 
 role_label: 			ROLE ROLE_NAME role_type
 				{
-				 if (!add_role_acl(&current_role, $2, $3, 0))
-					exit(EXIT_FAILURE);
+				 add_role_acl(&current_role, $2, $3, 0);
 				}
 	;
 
@@ -148,8 +146,7 @@ subject_label:			SUBJECT SUBJ_NAME subj_mode
 					exit(EXIT_FAILURE);
 				 }
 
-				 if (!add_proc_subject_acl(current_role, $2, $3, 0))
-					exit(EXIT_FAILURE);
+				 add_proc_subject_acl(current_role, $2, $3, 0);
 				}
 	;
 
@@ -240,8 +237,7 @@ group_deny_label:		GROUP_TRANS_DENY group_deny_ids
 
 object_file_label:		OBJ_NAME obj_mode
 				{
-				 if (!add_proc_object_acl(current_subject, $1, $2, GR_FEXIST))
-					exit(EXIT_FAILURE);
+				 add_proc_object_acl(current_subject, $1, $2, GR_FEXIST);
 				}
 	;
 

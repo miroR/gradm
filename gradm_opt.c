@@ -30,8 +30,7 @@ expand_acls(void)
 	for_each_role(role, current_role) {
 		for_each_subject(proc, role) {
 			if (!stat(proc->filename, &fstat) && S_ISREG(fstat.st_mode)) {
-				if (!add_proc_object_acl(proc, proc->filename, proc_object_mode_conv("rx"), GR_FLEARN))
-					exit(EXIT_FAILURE);
+				add_proc_object_acl(proc, proc->filename, proc_object_mode_conv("rx"), GR_FLEARN);
 			}
 			/* if we're not nested and not /, set parent subject */
 			if (!(proc->mode & GR_OVERRIDE) && !(proc->mode & GR_NESTED) && strcmp(proc->filename, "/"))
