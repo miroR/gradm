@@ -309,12 +309,12 @@ struct deleted_file {
 	struct deleted_file *next;
 } *deleted_files;
 
-unsigned long lineno;
+unsigned long lineno = 0;
 
-struct role_acl *current_role;
-struct proc_acl *current_subject;
+struct role_acl *current_role = NULL;
+struct proc_acl *current_subject = NULL;
 
-char *current_acl_file;
+char *current_acl_file = NULL;
 
 struct user_acl_role_db {
 	struct role_acl **r_table;
