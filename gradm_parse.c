@@ -373,7 +373,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	struct file_acl *p2;
 	struct stat fstat;
 	struct deleted_file *dfile;
-	unsigned int file_len = strlen(filename) + 1;
+	unsigned int file_len;
 
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "
@@ -387,6 +387,11 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 		fprintf(stderr, "Out of memory.\n");
 		exit(EXIT_FAILURE);
 	}
+
+	if (!strncmp(filename, "$HOME", 5))
+		filename = parse_homedir(filename);
+
+	file_len = strlen(filename) + 1;
 
 	if (strchr(filename, '?') || strchr(filename, '*'))
 		return add_globbing_file(subject, filename, mode, type);
@@ -456,6 +461,42 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	return 1;
 }
 
+static char *
+parse_homedir(char *filename)
+{
+	struct passwd *pwd;
+	unsigned int newlen;
+	char *newfilename;
+
+	if (!(current_role->roletyle & GR_ROLE_USER)) {
+		fprintf(stderr, "Error on line %lu of %s.  $HOME "
+				"is supported only on user roles.\n",
+				lineno, current_acl_file);
+		exit(EXIT_FAILURE);
+	}
+
+	pwd = getpwuid(current_role->uidgid);
+
+	if (pwd == NULL) {
+		fprintf(stderr, "Error: /etc/passwd was modified during parsing.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	newlen = strlen(pwd->pw_dir) + strlen(filename) - 5 + 1;
+		
+	newfilename = calloc(1, newlen);
+
+	if (!newfilename) {
+		fprintf(stderr, "Out of memory.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	strcpy(newfilename, pwd->pw_dir);
+	strcat(newfilename, (filename + 5));
+
+	return newfilename;
+}
+
 int
 add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag)
 {
@@ -477,6 +518,9 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 		fprintf(stderr, "Out of memory.\n");
 		exit(EXIT_FAILURE);
 	}
+
+	if (!strncmp(filename, "$HOME", 5))
+		filename = parse_homedir(filename);
 
 	file_len = strlen(filename) + 1;
 
