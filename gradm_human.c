@@ -10,7 +10,8 @@ static struct role_name_table {
 	GR_ROLE_SPECIAL, 's'}, {
 	GR_ROLE_AUTH, 'G'}, {
 	GR_ROLE_NOPW, 'N'}, {
-	GR_ROLE_GOD, 'A'}
+	GR_ROLE_GOD, 'A'}, {
+	GR_ROLE_TPE, 'T'}
 };
 
 static struct mode_name_table {

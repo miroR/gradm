@@ -605,6 +605,9 @@ role_mode_conv(const char *mode)
 		case 'A':
 			retmode |= GR_ROLE_GOD;
 			break;
+		case 'T':
+			retmode |= GR_ROLE_TPE;
+			break;
 		}
 	}
 
