@@ -18,6 +18,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <sys/resource.h>
+#include <sys/mman.h>
 #include <linux/elf.h>
 #include <linux/capability.h>
 
