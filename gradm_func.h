@@ -35,6 +35,7 @@ void modify_caps(struct proc_acl *proc, int cap);
 void modify_res(struct proc_acl *proc, int res, unsigned long cur,
 		unsigned long max);
 void add_ip_acl(struct proc_acl *subject, u_int8_t mode, struct ip_acl *tmp);
+void add_host_acl(struct proc_acl *subject, u_int8_t mode, char *host, struct ip_acl *tmp);
 int read_saltandpass(char *rolename, unsigned char *salt, unsigned char *pass);
 void add_kernel_acl(void);
 int add_role_acl(struct role_acl **role, char *rolename, u_int16_t type,
@@ -43,6 +44,7 @@ u_int16_t role_mode_conv(const char *mode);
 u_int32_t get_ip(char *p);
 void conv_name_to_type(struct ip_acl *ip, char *name);
 void add_role_allowed_ip(struct role_acl *role, u_int32_t addr, u_int32_t netmask);
+void add_role_allowed_host(struct role_acl *role, char *host, u_int32_t netmask);
 void add_role_transition(struct role_acl *role, char *rolename);
 void add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int allowdeny);
 void add_proc_nested_acl(struct role_acl *role, char *mainsubjname, char **nestednames, int nestlen, u_int32_t nestmode);

@@ -126,6 +126,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 <IP_STATE>"disabled"			{
 					  return DISABLED;
 					}
+<IP_STATE>[-0-9a-zA-Z.]*[a-zA-Z][-0-9a-zA-Z.]*		{
+					  gradmlval.string = gr_strdup(yytext);
+					  return HOSTNAME;
+					}
 <IP_STATE>{IP}				{
 					  gradmlval.num = get_ip(yytext);
 					  return IPADDR;

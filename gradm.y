@@ -16,7 +16,7 @@ int current_nest_depth = 0;
 	struct var_object * var;
 }
 
-%token <string> ROLE ROLE_NAME SUBJECT SUBJ_NAME OBJ_NAME 
+%token <string> ROLE ROLE_NAME SUBJECT SUBJ_NAME OBJ_NAME HOSTNAME
 %token <string> RES_NAME RES_SOFTHARD CONNECT BIND IPTYPE
 %token <string> IPPROTO CAP_NAME ROLE_ALLOW_IP
 %token <string> ROLE_TRANSITION VARIABLE DEFINE DEFINE_NAME DISABLED
@@ -288,6 +288,10 @@ role_allow_ip:			ROLE_ALLOW_IP IPADDR ip_netmask
 				{
 					add_role_allowed_ip(current_role, $2, $3);
 				}
+	|			ROLE_ALLOW_IP HOSTNAME ip_netmask
+				{
+					add_role_allowed_host(current_role, $2, $3);
+				}
 	;
 
 object_connect_ip_label:	CONNECT IPADDR ip_netmask ip_ports ip_typeproto
@@ -296,6 +300,13 @@ object_connect_ip_label:	CONNECT IPADDR ip_netmask ip_ports ip_typeproto
 				 ip.netmask = $3;
 				 add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
 				 memset(&ip, 0, sizeof(ip));
+				}
+	|			CONNECT HOSTNAME ip_netmask ip_ports ip_typeproto
+				{
+				 ip.netmask = $3;
+				 add_host_acl(current_subject, GR_IP_CONNECT, $2, &ip);
+				 memset(&ip, 0, sizeof(ip));
+				 free($2);
 				}
 	|
 				CONNECT DISABLED
@@ -310,6 +321,13 @@ object_bind_ip_label:		BIND IPADDR ip_netmask ip_ports ip_typeproto
 				 ip.netmask = $3;
 				 add_ip_acl(current_subject, GR_IP_BIND, &ip);
 				 memset(&ip, 0, sizeof(ip));
+				}
+	|			BIND HOSTNAME ip_netmask ip_ports ip_typeproto
+				{
+				 ip.netmask = $3;
+				 add_host_acl(current_subject, GR_IP_BIND, $2, &ip);
+				 memset(&ip, 0, sizeof(ip));
+				 free($2);
 				}
 	|
 				BIND DISABLED

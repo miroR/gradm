@@ -1,6 +1,30 @@
 #include "gradm.h"
 
 void
+add_role_allowed_host(struct role_acl *role, char *host, u_int32_t netmask)
+{
+	struct hostent *he;
+	char **p;
+
+	he = gethostbyname(host);
+	if (he == NULL) {
+		fprintf(stderr, "Error resolving hostname %s, on line %lu of %s\n", host, lineno, current_acl_file);
+		exit(EXIT_FAILURE);
+	}
+	if (he->h_addrtype != AF_INET) {
+		fprintf(stderr, "Hostname %s on line %lu of %s does not resolve to an IPv4 address.\n", host, lineno, current_acl_file);
+		exit(EXIT_FAILURE);
+	}
+	p = he->h_addr_list;
+	while (*p) {
+		add_role_allowed_ip(role, (u_int32_t)*p, netmask);
+		p++;
+	}
+
+	return;
+}
+
+void
 add_role_allowed_ip(struct role_acl *role, u_int32_t addr, u_int32_t netmask)
 {
 	struct role_allowed_ip **roleipp;
@@ -25,6 +49,30 @@ add_role_allowed_ip(struct role_acl *role, u_int32_t addr, u_int32_t netmask)
 	roleip->netmask = netmask;
 
 	*roleipp = roleip;
+
+	return;
+}
+
+void add_host_acl(struct proc_acl *subject, u_int8_t mode, char *host, struct ip_acl *acl_tmp)
+{
+	struct hostent *he;
+	char **p;
+
+	he = gethostbyname(host);
+	if (he == NULL) {
+		fprintf(stderr, "Error resolving hostname %s, on line %lu of %s\n", host, lineno, current_acl_file);
+		exit(EXIT_FAILURE);
+	}
+	if (he->h_addrtype != AF_INET) {
+		fprintf(stderr, "Hostname %s on line %lu of %s does not resolve to an IPv4 address.\n", host, lineno, current_acl_file);
+		exit(EXIT_FAILURE);
+	}
+	p = he->h_addr_list;
+	while (*p) {
+		memcpy(&(acl_tmp->addr), *p, sizeof(acl_tmp->addr));
+		add_ip_acl(subject, mode, acl_tmp);
+		p++;
+	}
 
 	return;
 }
