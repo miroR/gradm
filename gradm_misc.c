@@ -57,6 +57,17 @@ transmit_to_kernel(struct gr_arg *buf)
 	}
 
 	close(fd);
+	if (buf->mode != GRADM_DISABLE) {
+		memset(buf, 0, sizeof(struct gr_arg));
+		if (err)
+			exit(EXIT_FAILURE);
+	} else {
+		memset(buf, 0, sizeof(struct gr_arg));
+		if (err)
+			exit(EXIT_FAILURE);
+		else
+			stop_grlearn();
+	}
 
 	return err;
 }

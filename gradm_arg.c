@@ -142,7 +142,6 @@ parse_args(int argc, char *argv[])
 			check_acl_status(entry.mode);
 			grarg = conv_user_to_kernel(&entry);
 			transmit_to_kernel(grarg);
-			memset(grarg, 0, sizeof (struct gr_arg));
 			break;
 		case 'R':
 			if (argc > 2)
@@ -157,7 +156,6 @@ parse_args(int argc, char *argv[])
 			read_saltandpass(entry.rolename, grarg->salt,
 					 grarg->sum);
 			transmit_to_kernel(grarg);
-			memset(grarg, 0, sizeof (struct gr_arg));
 			break;
 		case 'M':
 			if ((argc != 3) || (optind > argc)
@@ -174,7 +172,6 @@ parse_args(int argc, char *argv[])
 						 &entry.segv_inode);
 			grarg = conv_user_to_kernel(&entry);
 			transmit_to_kernel(grarg);
-			memset(grarg, 0, sizeof (struct gr_arg));
 			exit(EXIT_SUCCESS);
 			break;
 		case 'D':
@@ -184,12 +181,7 @@ parse_args(int argc, char *argv[])
 			check_acl_status(entry.mode);
 			get_user_passwd(&entry, GR_PWONLY);
 			grarg = conv_user_to_kernel(&entry);
-			if (transmit_to_kernel(grarg))
-				memset(grarg, 0, sizeof (struct gr_arg));
-			else {
-				memset(grarg, 0, sizeof (struct gr_arg));
-				stop_grlearn();
-			}
+			transmit_to_kernel(grarg);
 			exit(EXIT_SUCCESS);
 			break;
 		case 'L':
@@ -246,7 +238,6 @@ parse_args(int argc, char *argv[])
 			get_user_passwd(&entry, GR_PWONLY);
 			grarg = conv_user_to_kernel(&entry);
 			transmit_to_kernel(grarg);
-			memset(grarg, 0, sizeof (struct gr_arg));
 			exit(EXIT_SUCCESS);
 			break;
 		case 'n':
@@ -258,7 +249,6 @@ parse_args(int argc, char *argv[])
 			check_acl_status(entry.mode);
 			grarg = conv_user_to_kernel(&entry);
 			transmit_to_kernel(grarg);
-			memset(grarg, 0, sizeof (struct gr_arg));
 			exit(EXIT_SUCCESS);
 			break;
 		case 'v':
@@ -298,7 +288,6 @@ parse_args(int argc, char *argv[])
 		read_saltandpass(entry.rolename, grarg->salt,
 				 grarg->sum);
 		transmit_to_kernel(grarg);
-		memset(grarg, 0, sizeof (struct gr_arg));
 	} else if (gr_learn && gr_output) {
 		FILE *stream;
 
