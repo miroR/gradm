@@ -117,7 +117,7 @@ void check_acl_status(u_int16_t reqmode)
 	switch (reqmode) {
 	case GRADM_PASSSET:
 		if (retval == 3) {
-			printf("Your terminal is being sniffed.\n");
+			printf("The terminal you are using is unsafe for this operation.  Use another terminal.\n");
 			ioctl(0, TIOCNXCL);
 			exit(EXIT_FAILURE);
 		}
@@ -131,7 +131,7 @@ void check_acl_status(u_int16_t reqmode)
 			printf("The RBAC system is currently disabled.\n");
 			exit(1);
 		} else if (retval == 3) {
-			printf("Your terminal is being sniffed.\n");
+			printf("The terminal you are using is unsafe for this operation.  Use another terminal.\n");
 			exit(2);
 		}
 		break;
@@ -154,7 +154,7 @@ void check_acl_status(u_int16_t reqmode)
 			ioctl(0, TIOCNXCL);
 			exit(EXIT_FAILURE);
 		} else if (retval == 3) {
-			printf("Your terminal is being sniffed.  Please logout and take whatever measures necessary.\n");
+			printf("The terminal you are using is unsafe for this operation.  Use another terminal.\n");
 			ioctl(0, TIOCNXCL);
 			exit(EXIT_FAILURE);
 		}
