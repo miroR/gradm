@@ -11,7 +11,9 @@ extern int fulllearn_pass3parse(void);
 void fulllearn_pass1(FILE *stream)
 {
 	fulllearn_pass1in = stream;
+	printf("Beginning full learning 1st pass...");
 	fulllearn_pass1parse();
+	printf("done.\n");
 	printf("Beginning full learning role reduction...");
 	reduce_roles(&role_list);
 	printf("done.\n");
@@ -76,7 +78,9 @@ int full_reduce_allowed_ips(struct gr_learn_group_node *group,
 void fulllearn_pass2(FILE *stream)
 {
 	fulllearn_pass2in = stream;
+	printf("Beginning full learning 2nd pass...");
 	fulllearn_pass2parse();
+	printf("done.\n");
 	traverse_roles(role_list, &full_reduce_subjects, NULL);
 	traverse_roles(role_list, &full_reduce_allowed_ips, NULL);
 
@@ -168,7 +172,9 @@ int full_reduce_ips(struct gr_learn_group_node *group,
 void fulllearn_pass3(FILE *stream)
 {
 	fulllearn_pass3in = stream;
+	printf("Beginning full learning 3rd pass...");
 	fulllearn_pass3parse();
+	printf("done.\n");
 	traverse_roles(role_list, &full_reduce_objects, NULL);
 	traverse_roles(role_list, &full_reduce_ips, NULL);
 
