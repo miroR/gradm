@@ -391,7 +391,7 @@ int is_eof(void)
 	current_stack->sp--;
 	if (current_stack->sp < 0) {
 		if (!current_stack->prev || !current_stack->prev->prev) {
-			if (current_stack->parent->name == NULL) {
+			if (current_stack->parent == NULL || current_stack->parent->name == NULL) {
 				current_stack->sp = 0;
 				lineno = 1;
 				return 1;
