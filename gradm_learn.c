@@ -165,6 +165,7 @@ void learn_pass2(FILE *stream)
 		subjects = default_role_entry->subject_list;
 		traverse_file_tree(subjects, &full_reduce_object_node, NULL, NULL);
 		traverse_file_tree(subjects, &full_reduce_ip_node, NULL, NULL);
+		traverse_file_tree(subjects, &ensure_subject_security, NULL, NULL);
 	}
 
 	tmp = group_role_list;
@@ -172,6 +173,7 @@ void learn_pass2(FILE *stream)
 		subjects = (*tmp)->subject_list;
 		traverse_file_tree(subjects, &full_reduce_object_node, NULL, NULL);
 		traverse_file_tree(subjects, &full_reduce_ip_node, NULL, NULL);
+		traverse_file_tree(subjects, &ensure_subject_security, NULL, NULL);
 		tmp++;
 	}
 
@@ -180,6 +182,7 @@ void learn_pass2(FILE *stream)
 		subjects = (*tmp)->subject_list;
 		traverse_file_tree(subjects, &full_reduce_object_node, NULL, NULL);
 		traverse_file_tree(subjects, &full_reduce_ip_node, NULL, NULL);
+		traverse_file_tree(subjects, &ensure_subject_security, NULL, NULL);
 		tmp++;
 	}
 
@@ -188,6 +191,7 @@ void learn_pass2(FILE *stream)
 		subjects = (*tmp)->subject_list;
 		traverse_file_tree(subjects, &full_reduce_object_node, NULL, NULL);
 		traverse_file_tree(subjects, &full_reduce_ip_node, NULL, NULL);
+		traverse_file_tree(subjects, &ensure_subject_security, NULL, NULL);
 		tmp++;
 	}
 

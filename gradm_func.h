@@ -103,3 +103,7 @@ void display_tree(struct gr_learn_file_node *base, FILE *stream);
 void enforce_high_protected_paths(struct gr_learn_file_node *subject);
 void insert_user(struct gr_learn_group_node ***grouplist, char *username, char *groupname, uid_t uid, gid_t gid);
 void add_rolelearn_acl(void);
+int ensure_role_security(struct gr_learn_group_node *group,
+			struct gr_learn_user_node *user,
+			FILE *unused);
+
