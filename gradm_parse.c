@@ -277,6 +277,8 @@ add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 
 	*role = rtmp;
 
+	add_role_transition(*role,rolename);
+
 	if (type & GR_ROLE_AUTH)
 		add_gradm_acl(*role);
 	if (!(type & GR_ROLE_SPECIAL))
