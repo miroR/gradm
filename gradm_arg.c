@@ -113,7 +113,7 @@ parse_args(int argc, char *argv[])
 			check_acl_status(GRADM_STATUS);
 			break;
 		case 'E':
-			if (argc > 5)
+			if (argc > 4)
 				show_help();
 			entry.mode = GRADM_ENABLE;
 			check_acl_status(entry.mode);
