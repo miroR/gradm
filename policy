@@ -240,3 +240,6 @@ subject /usr/bin/ssh
 
 subject /sbin/klogd
 	+CAP_SYS_ADMIN
+
+subject /usr/sbin/cron
+	/dev/log rw
