@@ -21,10 +21,35 @@ void transmit_to_kernel(void * buf, unsigned long len)
 		failure("open");
         }
                  
-        if(write(fd, buf, len) != len) {
-                fprintf(stderr, "Error writing to %s\n", GR_SYSCTL_PATH);
-		failure("write");
-        }
+	if (write(fd, buf, len) != len) {
+		switch (errno) {
+		case EFAULT:
+			fprintf(stderr, "Error copying structures to the "
+				"kernel.\n");
+			break;
+		case ENOMEM:
+			fprintf(stderr, "Out of memory.\n");
+			break;
+		case EBUSY:
+			fprintf(stderr, "You have attempted to authenticate "
+				"while authentication was locked, try "
+				"again later.\n");
+			break;
+		case EAGAIN:
+			fprintf(stderr, "Your request was ignored, "
+				"please check the kernel logs for more "
+				"info.\n");
+		case EPERM:
+			fprintf(stderr, "Invalid password.\n");
+			break;
+		case EINVAL:
+		default:
+			fprintf(stderr, "You are using incompatible "
+				"versions of gradm and grsecurity.\n"
+				"Please update both versions to the "
+				"ones available on the website.\n");
+		}
+	}
 
 	close(fd);
 
