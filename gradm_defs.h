@@ -171,6 +171,14 @@ struct file_acl {
 	struct file_acl *next;
 };
 
+struct var_object {
+	char *filename;
+	__u32 mode;
+
+	struct var_object *prev;
+	struct var_object *next;
+};
+
 struct role_transition {
 	char *rolename;
 

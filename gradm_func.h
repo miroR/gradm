@@ -53,3 +53,7 @@ void add_role_transition(struct role_acl *role, char *rolename);
 void add_proc_nested_acl(struct role_acl *role, char *mainsubjname, char **nestednames, int nestlen, __u32 nestmode);
 void start_grlearn(char *logfile);
 void stop_grlearn(void);
+void sym_store(char *symname, struct var_object *object);
+struct var_object *sym_retrieve(char *symname);
+void add_var_object(struct var_object **object, char *name, __u32 mode);
+void interpret_variable(char *variable);

@@ -4,6 +4,7 @@
 
 unsigned long lineno;
 char *gr_line;
+unsigned int old_state;
 
 int gradmerror(char *s);
 int gradmwrap(void);
@@ -24,12 +25,14 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
 %x ROLE_STATE SUBJECT_STATE IP_STATE RES_STATE COMMENT_STATE ROLETYPE_STATE
 %x INCLUDE_STATE IPNETMASK_STATE IPPORT_STATE ROLETRANS_STATE
+%x VAR_STATE VAR_OBJ_STATE
 
 %%
 
 <*>"\n"					{
 					  lineno++;
-					  BEGIN(INITIAL);
+					  if (YYSTATE != VAR_STATE && YYSTATE != VAR_OBJ_STATE)
+						  BEGIN(INITIAL);
 					}
 <*>"#"					{ BEGIN(COMMENT_STATE); }
 <*>[ \t]+				;
@@ -109,6 +112,44 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return IPPORT;
 					}
 
+"define"				{
+					  old_state = YYSTATE;
+					  BEGIN(VAR_STATE);
+					  return DEFINE;
+					}
+[$][a-zA-Z0-9_]+			{
+					  gr_line = yytext;
+					  gr_line++;
+					  gradmlval.string = strdup(gr_line);
+					  return VARIABLE;
+					}
+<VAR_STATE>[a-zA-Z0-9_]+		{
+					  gradmlval.string = strdup(yytext);
+					  return DEFINE_NAME;
+					}
+<VAR_STATE>"{"				{
+					  BEGIN(VAR_OBJ_STATE);
+					  return '{';
+					}
+<VAR_OBJ_STATE>"}"			{
+					  BEGIN(old_state);
+					  return '}';
+					}
+<VAR_OBJ_STATE>[/][^ \t\n]*		{
+					  gradmlval.string = strdup(yytext);
+					  return OBJ_NAME;
+					}
+<VAR_OBJ_STATE>["][/].*["]		{
+					  gr_line = yytext;
+					  gr_line++;
+					  *(gr_line + strlen(gr_line) - 1) = '\0';
+					  gradmlval.string = strdup(gr_line);
+					  return OBJ_NAME;
+					}
+<VAR_OBJ_STATE>[rwxahitFRWXAIso]+	{
+					  gradmlval.string = strdup(yytext);
+					  return OBJ_MODE;
+					}
 "role"					{
 					  BEGIN(ROLE_STATE);
 					  return ROLE;

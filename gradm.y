@@ -4,6 +4,7 @@
 extern int gradmlex(void);
 
 struct ip_acl ip;
+struct var_object *var_obj = NULL;
 char *nested[MAX_NEST_DEPTH];
 int current_nest_depth = 0;
 %}
@@ -17,7 +18,7 @@ int current_nest_depth = 0;
 %token <string> ROLE ROLE_NAME ROLE_TYPE SUBJECT SUBJ_NAME OBJ_NAME 
 %token <string> RES_NAME RES_SOFTHARD CONNECT BIND IPADDR IPPORT IPTYPE
 %token <string> IPPROTO OBJ_MODE SUBJ_MODE IPNETMASK CAP_NAME ROLE_ALLOW_IP
-%token <string> ROLE_TRANSITION
+%token <string> ROLE_TRANSITION VARIABLE DEFINE DEFINE_NAME
 %type <long_int> subj_mode obj_mode ip_netmask
 %type <mode> role_type
 
@@ -31,12 +32,35 @@ various_acls:			role_label
 	|			role_allow_ip
 	|			role_transitions
 	|			subject_label
+	|			variable_object
+	|			variable_object_use
 	|			nested_label
 	|			object_file_label
 	|			object_cap_label
 	|			object_res_label
 	|			object_connect_ip_label
 	|			object_bind_ip_label
+	;
+
+variable_object:		DEFINE DEFINE_NAME '{' var_object_list '}'
+				{
+				  if (sym_retrieve($1)) {
+					fprintf(stderr, "Duplicate variable \"%s\" defined on line %lu of %s.\n", $1, lineno, current_acl_file);
+					exit(EXIT_FAILURE);
+				  }
+				  sym_store($2, var_obj);
+				  var_obj = NULL;
+				}
+	;
+
+var_object_list:		OBJ_NAME obj_mode
+				{
+				  add_var_object(&var_obj, $1, $2);
+				}
+	|			var_object_list OBJ_NAME obj_mode
+				{
+				  add_var_object(&var_obj, $2, $3);
+				}
 	;
 
 role_label: 			ROLE ROLE_NAME role_type
@@ -93,6 +117,16 @@ nested_subjs:			':' SUBJ_NAME
 					}
 					nested[current_nest_depth] = $3;
 					current_nest_depth++;
+				}
+	;
+
+variable_object_use:		VARIABLE
+				{
+					if (!sym_retrieve($1)) {
+						fprintf(stderr, "Variable \"%s\" not defined on line %lu of %s.\n", $1, lineno, current_acl_file);
+						exit(EXIT_FAILURE);
+					}
+					interpret_variable($1);
 				}
 	;
 
