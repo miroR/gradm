@@ -310,3 +310,5 @@ unsigned long ip_learn_num;
 
 struct capability_set capability_list[30];
 struct rlimconv rlim_table[12];
+
+uid_t special_role_uid;

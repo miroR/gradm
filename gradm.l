@@ -183,6 +183,8 @@ int main(int argc, char *argv[])
 	extern struct rlimconv rlim_table[];
 	int i;
 #endif
+	special_role_uid = 0;
+	
 	no_coredump();
 
 	init_variables();

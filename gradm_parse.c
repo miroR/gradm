@@ -48,12 +48,12 @@ static struct deleted_file * add_deleted_file(char *filename)
 	return deleted_files;
 }
 
-static int is_role_dupe(struct role_acl *role, const uid_t uidgid, const __u8 type)
+static int is_role_dupe(struct role_acl *role, const char *rolename, const __u8 type)
 {
 	struct role_acl *tmp;
 
 	for_each_role(tmp, role)
-		if ((tmp->roletype == type) && (tmp->uidgid == uidgid))
+		if ((tmp->roletype == type) && !strcmp(tmp->rolename, rolename))
 			return 1;
 
 	return 0;
@@ -92,7 +92,7 @@ int add_role_acl(struct role_acl **role, char *rolename, __u8 type)
 		exit(EXIT_FAILURE);
 	}
 
-	if ((rtmp = (struct role_acl *) calloc(1, sizeof(struct role_acl))) = NULL)
+	if ((rtmp = (struct role_acl *) calloc(1, sizeof(struct role_acl))) == NULL)
 		failure("calloc");
 
 	rtmp->roletype = type;
@@ -106,7 +106,15 @@ int add_role_acl(struct role_acl **role, char *rolename, __u8 type)
 		return 0;
 	}
 
-	if (strcmp(rolename, "default") || ((type != GR_ROLE_DEFAULT)) {
+	if (is_role_dupe(*role, rtmp->rolename, rtmp->roletype)) {
+		fprintf(stderr, "Duplicate role on line %lu of %s.\n"  
+			"The ACL system will not be allowed to be "
+			"enabled until this error is fixed.\n",
+			lineno, current_acl_file);
+		return 0;
+	}
+
+	if (strcmp(rolename, "default") || (type != GR_ROLE_DEFAULT)) {
 		if (type == GR_ROLE_USER) {
 			pwd = getpwnam(rolename);
 
@@ -134,15 +142,8 @@ int add_role_acl(struct role_acl **role, char *rolename, __u8 type)
 
 			rtmp->uidgid = grp->gr_gid;
 		} else if (type == GR_ROLE_SPECIAL) {
-			rtmp->uidgid = 
-	}
-
-	if (is_role_dupe(*role, rtmp->uidgid, rtmp->roletype)) {
-		fprintf(stderr, "Duplicate role on line %lu of %s.\n"  
-			"The ACL system will not be allowed to be "
-			"enabled until this error is fixed.\n",
-			lineno, current_acl_file);
-		return 0;
+			rtmp->uidgid = special_role_uid++;
+		}
 	}
 
 	if (*role)
@@ -156,7 +157,7 @@ int add_role_acl(struct role_acl **role, char *rolename, __u8 type)
   }
 
 
-static int add_globbing_file(struct file_acl ** filp, char * filename, 
+static int add_globbing_file(struct proc_acl *subject, char * filename, 
 				__u32 mode, int type)
 {
 	char tmp[PATH_MAX] = {0};
@@ -216,7 +217,7 @@ out2:
 			snprintf(tmp, sizeof(tmp), "%s/%s",
 				*(pglob.gl_pathv + i),
 				last);
-			if (!add_proc_object_acl(filp, strdup(tmp), mode, type))
+			if (!add_proc_object_acl(subject, strdup(tmp), mode, type))
 				return 0;
 		}
 		globfree(&pglob);
@@ -238,7 +239,7 @@ out2:
 					continue;
 			}
 
-			if (!add_proc_object_acl(filp, *(pglob.gl_pathv + i), mode, type))
+			if (!add_proc_object_acl(subject, *(pglob.gl_pathv + i), mode, type))
 				return 0;
 		}
 	}
@@ -272,7 +273,7 @@ int add_proc_object_acl(struct proc_acl * subject, char * filename,
 	}
 
 	if (strchr(filename, '?') || strchr(filename, '*'))
-		return add_globbing_file(filp, filename, mode, type);
+		return add_globbing_file(subject, filename, mode, type);
 
 	if(type == GR_LEARN) {
 	        struct file_acl *tmp = *filp;
