@@ -1,6 +1,9 @@
 #sample default process acl for grsecurity
+role admin sA
+subject /
+	/ rwxi
 
-role G default
+role default G
 subject /
 	/		r
 	/opt		rx
