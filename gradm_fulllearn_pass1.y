@@ -10,8 +10,7 @@ extern struct gr_learn_group_node **role_list;
 	unsigned long num;
 }
 
-%token <notype> FILENAME ROLENAME
-%token <num> NUM IPADDR
+%token <num> NUM IPADDR FILENAME ROLENAME
 
 %%
 
@@ -19,8 +18,8 @@ learn_logs:	learn_log
 	|	learn_logs learn_log
 	;
 
-filename:	/*empty*/
-	|	FILENAME
+filename:	/*empty*/	{ $$ = 1; }
+	|	FILENAME	{ $$ = 1; }
 	;
 
 learn_log:
