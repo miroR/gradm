@@ -118,6 +118,9 @@ void * gr_dyn_realloc(void *addr, unsigned long len)
 	void *ret = NULL;
 	struct resize_entry *resent;
 
+	if (addr == NULL)
+		return gr_dyn_alloc(len);
+
 	resent = addr - sizeof(struct resize_entry);
 	if (len < resent->max)
 		return addr;
