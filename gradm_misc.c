@@ -19,8 +19,8 @@ transmit_to_kernel(void *buf, unsigned long len)
 	int fd;
 	int err = 0;
 
-	if ((fd = open("/dev/grsec", O_WRONLY)) < 0) {
-		fprintf(stderr, "Could not open /dev/grsec.\n");
+	if ((fd = open(GRDEV_PATH, O_WRONLY)) < 0) {
+		fprintf(stderr, "Could not open %s.\n", GRDEV_PATH);
 		failure("open");
 	}
 
@@ -68,8 +68,8 @@ void check_acl_status(__u16 reqmode)
 
 	arg.mode = GRADM_STATUS;
 
-	if ((fd = open("/dev/grsec", O_WRONLY)) < 0) {
-		fprintf(stderr, "Could not open /dev/grsec\n");
+	if ((fd = open(GRDEV_PATH, O_WRONLY)) < 0) {
+		fprintf(stderr, "Could not open %s.\n", GRDEV_PATH);
 		failure("open");
 	}
 

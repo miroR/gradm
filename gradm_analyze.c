@@ -5,7 +5,11 @@ check_permission(struct role_acl *role, struct proc_acl *def_acl,
 		 const char *filename, struct chk_perm *chk)
 {
 	struct file_acl *tmpf = NULL;
+	struct proc_acl *tmpp = def_acl;
 	char *tmpname;
+	__u32 cap_raised = 0, old_r = 0;
+	__u32 cap_lowered = 0, old_l = 0;
+	__u32 cap_same;
 
 	if (chk->type == CHK_FILE) {
 		if ((tmpname =
@@ -15,27 +19,42 @@ check_permission(struct role_acl *role, struct proc_acl *def_acl,
 		strcpy(tmpname, filename);
 
 		do {
-			for_each_object(tmpf, def_acl->proc_object)
-			    if (!strcmp(tmpf->filename, tmpname)) {
-				if (((chk->w_modes == 0xffff)
-				     || (tmpf->mode & chk->w_modes))
-				    && ((chk->u_modes == 0xffff)
-					|| !(tmpf->mode & chk->u_modes))) {
-					free(tmpname);
-					return 1;
-				} else {
-					free(tmpname);
-					return 0;
+			tmpp = def_acl;
+			do {
+				for_each_object(tmpf, tmpp->proc_object)
+				    if (!strcmp(tmpf->filename, tmpname)) {
+					if (((chk->w_modes == 0xffff)
+					     || (tmpf->mode & chk->w_modes))
+					    && ((chk->u_modes == 0xffff)
+						|| !(tmpf->mode & chk->u_modes))) {
+						free(tmpname);
+						return 1;
+					} else {
+						free(tmpname);
+						return 0;
+					}
 				}
-			}
+			} while ((tmpp = tmpp->parent_subject));
 		} while (parent_dir(filename, &tmpname));
 
 		free(tmpname);
 	} else if (chk->type == CHK_CAP) {
+		do {
+			cap_lowered = tmpp->cap_drop;
+			cap_raised = tmpp->cap_raise;
+			cap_raised &= ~old_l;
+			cap_lowered &= ~old_r;
+			old_l = cap_lowered;
+			old_r = cap_raised;
+		} while ((tmpp = tmpp->parent_subject));
+
+		cap_same = cap_raised & cap_lowered;
+		cap_lowered &= ~cap_same;
+		cap_raised &= ~cap_same;
 		if (((chk->w_caps == 0xffffffff)
-		     || !(def_acl->cap_drop & chk->w_caps))
+		     || !(cap_lowered & chk->w_caps))
 		    && ((chk->u_caps == 0xffffffff)
-			|| (def_acl->cap_drop & chk->u_caps)))
+			|| (cap_lowered & chk->u_caps)))
 			return 1;
 	}
 
@@ -77,6 +96,9 @@ check_default_objects(struct role_acl *role)
 	struct file_acl *tmpf;
 
 	for_each_subject(tmp, role) {
+		/* skip all inherited subjects */
+		if (tmp->parent_subject != NULL)
+			continue;
 		for_each_object(tmpf, tmp->proc_object)
 		    if (!strcmp(tmpf->filename, "/"))
 			def_notfound = 0;
@@ -344,11 +366,11 @@ analyze_acls(void)
 		chk.u_modes = GR_FIND;
 		chk.w_modes = 0xffff;
 
-		if (!check_permission(role, def_acl, "/dev/grsec", &chk)) {
+		if (!check_permission(role, def_acl, GRDEV_PATH, &chk)) {
 			fprintf(stderr,
-				"Viewing access is allowed by role %s to /dev/grsec.\n"
+				"Viewing access is allowed by role %s to %s.\n"
 				"If you want this role to be able to authenticate to the kernel, add G to its role mode.\n\n",
-				role->rolename);
+				role->rolename, GRDEV_PATH);
 			errs_found++;
 		}
 

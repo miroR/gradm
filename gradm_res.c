@@ -4,6 +4,9 @@
 #ifndef RLIMIT_LOCKS
 #define RLIMIT_LOCKS 10
 #endif
+#ifndef NR_OPEN
+#define NR_OPEN 1024
+#endif
 
 struct rlimconv rlim_table[] = {
 	{"RES_CPU", RLIMIT_CPU},

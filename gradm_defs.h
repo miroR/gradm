@@ -2,6 +2,7 @@
 #define GRSEC_DIR		"/etc/grsec"
 #endif
 #define GRLEARN_PATH		"/sbin/grlearn"
+#define GRDEV_PATH		"/dev/grsec"
 #define GR_ACL_PATH 		GRSEC_DIR "/acl"
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
 
@@ -106,7 +107,10 @@ enum {
 	GR_KILLIPPROC 	= 0x00100000,
 	GR_NOTROJAN 	= 0x00200000,
 	GR_PROTPROCFD 	= 0x00400000,
-	GR_PROCACCT 	= 0x00800000
+	GR_PROCACCT 	= 0x00800000,
+	GR_NOPTRACE	= 0x01000000,
+	GR_RELAXPTRACE  = 0x02000000,
+	GR_NESTED	= 0x04000000
 };
 
 /* internal use only.  not to be modified */

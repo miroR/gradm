@@ -180,7 +180,7 @@ int ensure_subject_security(struct gr_learn_file_node *subject,
 	enforce_hidden_file(subject, "/dev/port");
 	enforce_hidden_file(subject, "/proc/kcore");
 	enforce_hidden_file(subject, GRSEC_DIR);
-	enforce_hidden_file(subject, "/dev/grsec");
+	enforce_hidden_file(subject, GRDEV_PATH);
 
 	return 0;
 }

@@ -56,4 +56,9 @@
 #define for_each_transition(x, y) \
 	for(x = y; x; x = (x)->prev)
 
+
+#define MAJOR(dev)	((dev)>>8)
+#define MINOR(dev)	((dev) & 0xff)
+#define MKDEV(ma,mi)	((ma)<<8 | (mi))
+
 #endif

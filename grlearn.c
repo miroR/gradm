@@ -163,11 +163,11 @@ int main(int argc, char *argv[])
 	schedulerparam.sched_priority = sched_get_priority_max(SCHED_FIFO);
 	sched_setscheduler(0, SCHED_FIFO, &schedulerparam);
 
-	fd = open("/dev/grsec", O_RDONLY);
+	fd = open(GRDEV_PATH, O_RDONLY);
 
 	if (fd < 0) {
-		fprintf(stderr, "Error opening /dev/grsec:\n"
-			"%s\n", strerror(errno));
+		fprintf(stderr, "Error opening %s:\n"
+			"%s\n", GRDEV_PATH, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 

@@ -48,7 +48,7 @@ char *protected_paths[] = {
 char *high_protected_paths[] = {
 				"/etc/ssh",
 				GRSEC_DIR,
-				"/dev/grsec",
+				GRDEV_PATH,
 				"/proc/kcore",
 				"/proc/sys",
 				"/etc/shadow",
