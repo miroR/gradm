@@ -424,7 +424,6 @@ repeat:
 		}
 	}
 
-regular:
 	change_current_acl_file(current_stack->stack[current_stack->sp]->name);
 	yy_delete_buffer(YY_CURRENT_BUFFER);
 	lineno = current_stack->stack[current_stack->sp]->lineno;

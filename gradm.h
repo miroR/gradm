@@ -24,6 +24,7 @@
 #include <sys/types.h>
 #include <sys/resource.h>
 #include <sys/mman.h>
+#include <sys/ioctl.h>
 #include <asm/param.h>
 #include <asm/ioctls.h>
 

@@ -115,7 +115,7 @@ install: $(GRADM_BIN) gradm.8 policy grlearn
 	fi
 	mkdir -p $(DESTDIR)$(MANDIR)/man8
 	$(INSTALL) -m 0644 gradm.8 $(DESTDIR)$(MANDIR)/man8/$(GRADM_BIN).8
-	@if [ -x $(DESTDIR)/sbin/$(GRADM_BIN) ] ; then \
+	@if [ -z $(DESTDIR) -a -x $(DESTDIR)/sbin/$(GRADM_BIN) ] ; then \
 		$(FIND) $(DESTDIR)$(GRSEC_DIR) -type f -name pw -size 48c -exec rm -f $(DESTDIR)$(GRSEC_DIR)/pw \; ; \
 		if [ ! -f $(DESTDIR)$(GRSEC_DIR)/pw ] ; then \
 			$(DESTDIR)/sbin/$(GRADM_BIN) -P ; \
