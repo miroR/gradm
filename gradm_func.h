@@ -130,10 +130,6 @@ struct gr_arg * conv_user_to_kernel(struct gr_pw_entry * entry);
 //Post: allocates memory roughly the size of all the process subjects and
 //	objects, and fills in the gr_arg structure
 
-void add_include(const char * filename);
-//Pre: filename to add to include list
-//Post: adds filename to include list, to be parsed later
-
 int parent_dir(const char * filename, char * parent_dirent[]);
 //Pre: filename to check for /'s, parent_dir to store parent directory in
 //	parent_dir must contain a copy of filename before being called

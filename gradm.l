@@ -2,11 +2,21 @@
 #include "gradm.h"
 #include "gradm.tab.h"
 
-unsigned long lineno = 1;
+unsigned long lineno;
 char *gr_line;
 
 int gradmerror(char *s);
 int gradmwrap(void);
+int is_eof(void);
+void add_include(char *includename);
+
+#define MAX_INCLUDE_DEPTH 10
+int include_stack_ptr = 0;
+unsigned long lineno_stack[MAX_INCLUDE_DEPTH];
+YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
+FILE *include_in[MAX_INCLUDE_DEPTH];
+char *current_acl[MAX_INCLUDE_DEPTH];
+
 %}
 
 IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
@@ -36,7 +46,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return ROLE_NAME;
 					}
 
-<SUBJECT_STATE>[/][^ \t\n]*		{
+<SUBJECT_STATE>[/][^ \t\n]*		{ 
 					  gradmlval.string = strdup(yytext);
 					  return SUBJ_NAME;
 					}
@@ -97,8 +107,8 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = strdup(gr_line);
-					  return INCLUDE_NAME;
+					  add_include(gr_line);					  
+					  BEGIN(INITIAL);
 					}
 
 "role"					{
@@ -119,7 +129,6 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 "include"				{
 					  BEGIN(INCLUDE_STATE);
-					  return INCLUDE;
 					}
 [+-]"CAP_"[_A-Z]+			{
 					  gradmlval.string = strdup(yytext);
@@ -146,8 +155,60 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(yytext);
 					  return OBJ_MODE;
 					}
-
+<<EOF>>					{
+					  if (is_eof())
+						yyterminate();
+					}
 %%
+
+void add_include(char *includename)
+{
+	FILE *tmpfile;
+
+	if (include_stack_ptr >= MAX_INCLUDE_DEPTH) {
+		fprintf(stderr, "Includes too deep while trying to process "
+				"%s\n", includename);
+		exit(EXIT_FAILURE);
+	}
+
+	tmpfile = fopen(includename, "r");
+
+	if (!tmpfile) {
+		fprintf(stderr, "Unable to open included file: %s\n",
+			includename);
+		exit(EXIT_FAILURE);
+	}
+
+	lineno_stack[include_stack_ptr] = lineno;
+	lineno = 1;
+	include_in[include_stack_ptr] = yyin;
+	current_acl[include_stack_ptr] = current_acl_file;
+	change_current_acl_file(includename);
+	include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
+	yyin = tmpfile;
+	yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
+
+	return;
+}
+
+int is_eof(void)
+{
+	if (include_stack_ptr)
+		fclose(yyin);
+	if (--include_stack_ptr < 0)
+	{
+		include_stack_ptr = 0;
+		lineno = 1;
+		return 1;
+	}
+
+	change_current_acl_file(current_acl[include_stack_ptr]);
+	yy_delete_buffer(YY_CURRENT_BUFFER);
+	lineno = lineno_stack[include_stack_ptr];
+	yyin = include_in[include_stack_ptr];
+	yy_switch_to_buffer(include_stack[include_stack_ptr]);
+	return 0;
+}
 
 int gradmwrap(void)
 {

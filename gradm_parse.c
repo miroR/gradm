@@ -710,60 +710,6 @@ __u32 proc_object_mode_conv(const char * mode)
 	return retmode;
 }
 
-void add_include(const char * filename)
-{
-	int n;
-	struct stat fstat;
-	char * dir;
-	FILE *yin;
-	char *curraclfile;
-
-	if(filename[0] == '/') {
-		if((dir = (char *)calloc(strlen(filename) + 1, sizeof(char))) == NULL)
-			failure("calloc");
-		strncpy(dir, filename, strlen(filename));
-	} else {
-		fprintf(stderr, "Only absolute paths are supported for include.\n"
-				"The include of %s is therefore invalid.\n", filename);
-		exit(EXIT_FAILURE);
-	}
-
-	if(stat(dir, &fstat) < 0) {
-		fprintf(stderr, "Unable to stat include \"%s\".\n"
-				"Error: %s\n", dir, strerror(errno));
-		exit(EXIT_FAILURE);
-	}
-
-	if(S_ISDIR(fstat.st_mode)) {
-		struct dirent **namelist;
-		char path[PATH_MAX];
-
-		n = scandir(dir, &namelist, 0, alphasort);
-		if(n >= 0) {
-			while(n--) {
-				if(strcmp(namelist[n]->d_name, ".") && strcmp(namelist[n]->d_name, "..")) {
-					memset(&path, 0, sizeof(path));
-					snprintf(path, PATH_MAX - 1, "%s/%s", dir, namelist[n]->d_name);
-					add_include(path);
-				}
-			}
-		}
-		free(dir);
-		return;
-	}
-
-	curraclfile = current_acl_file;
-	yin = gradmin;
-	gradmin = open_acl_file(dir);
-	change_current_acl_file(dir);
-	gradmparse();
-	gradmin = yin;
-	change_current_acl_file(curraclfile);
-	gradmparse();
-
-	return;
-}
-
 void parse_acls(void)
 {
 	if(chdir(GRSEC_DIR) < 0) {

@@ -1,6 +1,7 @@
 #sample default process acl for grsecurity
 
-/ {
+role default
+subject /
 	/		r
 	/opt		rx
 	/home		rwx
@@ -62,29 +63,4 @@
 	-CAP_MKNOD
 	-CAP_SYS_RAWIO
 	-CAP_SYS_MODULE
-}
-
-/sbin/syslogd {
-	/dev/log rw
-	/var/log w
-}
-
-/sbin/klogd {
-	/dev/log rw
-}
-
-/usr/sbin/cron {
-	/dev/log rw
-}
-
-/bin/login {
-	/dev/log rw
-}
-
-/usr/sbin/sshd {
-	/dev/log rw
-}
-
-/usr/sbin/tcpd {
-	/dev/log rw
-}
+include </etc/grsec/otherstuff>

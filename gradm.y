@@ -15,7 +15,6 @@ struct ip_acl ip;
 %token <string> ROLE ROLE_NAME ROLE_TYPE SUBJECT SUBJ_NAME OBJ_NAME 
 %token <string> RES_NAME RES_SOFTHARD CONNECT BIND IPADDR IPPORT IPTYPE
 %token <string> IPPROTO OBJ_MODE SUBJ_MODE IPNETMASK CAP_NAME
-%token <string> INCLUDE INCLUDE_NAME
 %type <long_int> subj_mode obj_mode
 %type <mode> role_type
 
@@ -32,13 +31,6 @@ various_acls:			role_label
 	|			object_res_label
 	|			object_connect_ip_label
 	|			object_bind_ip_label
-	|			include_label
-	;
-
-include_label:			INCLUDE INCLUDE_NAME
-				{
-				 add_include($2);
-				}
 	;
 
 role_label: 			ROLE ROLE_NAME role_type

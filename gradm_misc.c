@@ -50,8 +50,6 @@ void change_current_acl_file(const char * filename)
 {
 	char * p;
 
-	free(current_acl_file);
-
 	if((p = (char *) calloc(strlen(filename) + 1, sizeof(char))) == NULL)
 		failure("calloc");
 		
