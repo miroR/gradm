@@ -136,7 +136,7 @@ void merge_acl_rules()
 						matchsubj->subject->res[i].rlim_max = subject->res[i].rlim_max;
 				}
 				for_each_object(object, subject) {
-					insert_learn_object(matchsubj, conv_filename_to_kernel(object->filename, object->mode));
+					insert_learn_object(matchsubj, conv_filename_to_struct(object->filename, object->mode));
 				}
 				for (ipp = subject->ip_object; ipp; ipp = ipp->prev) {
 					if (ipp->mode == GR_IP_CONNECT) {

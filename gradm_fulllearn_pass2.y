@@ -55,9 +55,9 @@ learn_log:
 				insert_ip(&(group->allowed_ips), addr, 0, 0, 0);
 				
 			if (user && ((!strcmp($17, "")  && strlen($9) > 1 && !res1 && !res2) || is_protected_path($17, atoi($19))))
-				insert_learn_user_subject(user, conv_filename_to_kernel($9, GR_FIND | GR_OVERRIDE));
+				insert_learn_user_subject(user, conv_filename_to_struct($9, GR_FIND | GR_OVERRIDE));
 			else if (group && ((!strcmp($17, "") && strlen($9) > 1 && !res1 && !res2) || is_protected_path($17, atoi($19))))
-				insert_learn_group_subject(group, conv_filename_to_kernel($9, GR_FIND | GR_OVERRIDE));
+				insert_learn_group_subject(group, conv_filename_to_struct($9, GR_FIND | GR_OVERRIDE));
 		}		
 	|	ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' IPADDR ':' NUM ':' NUM ':' NUM ':' NUM ':' IPADDR
 		{
@@ -83,9 +83,9 @@ learn_log:
 				insert_ip(&(group->allowed_ips), addr, 0, 0, 0);
 
 			if (user)
-				insert_learn_user_subject(user, conv_filename_to_kernel($9, GR_FIND | GR_OVERRIDE));
+				insert_learn_user_subject(user, conv_filename_to_struct($9, GR_FIND | GR_OVERRIDE));
 			else if (group)
-				insert_learn_group_subject(group, conv_filename_to_kernel($9, GR_FIND | GR_OVERRIDE));
+				insert_learn_group_subject(group, conv_filename_to_struct($9, GR_FIND | GR_OVERRIDE));
 		}
 	;
 %%
