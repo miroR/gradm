@@ -17,7 +17,7 @@ add_role_allowed_host(struct role_acl *role, char *host, u_int32_t netmask)
 	}
 	p = he->h_addr_list;
 	while (*p) {
-		add_role_allowed_ip(role, (u_int32_t)*p, netmask);
+		add_role_allowed_ip(role, (u_int32_t)**p, netmask);
 		p++;
 	}
 
