@@ -16,18 +16,10 @@ int stop_daemon(void)
 	int fd;
 	pid_t learn_pid;
 
-	if (stat(GR_LEARN_PID_PATH, &fstat)) {
-		fprintf(stderr, "Unable to stat %s.\n", GR_LEARN_PID_PATH);
-		exit(EXIT_FAILURE);
-	}
-
 	fd = open(GR_LEARN_PID_PATH, O_RDONLY);
 
-	if (fd < 0) {
-		fprintf(stderr, "Unable to open %s:\n"
-			"%s\n", GR_LEARN_PID_PATH, strerror(errno));
+	if (fd < 0)
 		exit(EXIT_FAILURE);
-	}
 
 	read(fd, &learn_pid, sizeof(learn_pid));
 

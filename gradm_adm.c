@@ -145,6 +145,8 @@ void start_grlearn(char *logfile)
 
 	if (!pid) {
 		execl(GRLEARN_PATH, GRLEARN_PATH, logfile, NULL);
+	} else if (pid > 0) {
+		wait(NULL);
 	}
 
 	return;
