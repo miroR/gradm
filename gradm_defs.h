@@ -190,7 +190,7 @@ struct role_acl {
 	struct role_acl *prev;
         struct role_acl *next;
 
-	struct role_allowed_ip **allowed_ips;
+	struct role_allowed_ip *allowed_ips;
 
 	struct proc_acl **subj_hash;
 	__u32 subj_hash_size;
