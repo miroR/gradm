@@ -100,6 +100,8 @@ obj_mode: /* empty */
 	;
 
 role_transitions:		ROLE_TRANSITION role_names
+				{
+				}
 	;
 
 role_names:			ROLE_NAME
