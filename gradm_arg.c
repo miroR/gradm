@@ -100,7 +100,7 @@ void verbose_stats(void)
 			if (!(stmp->mode & GR_PROTECTED))
 				ksubjs++;
 			if (!(stmp->mode & GR_PROTSHM))
-				shmsubjs++;
+				smsubjs++;
 
 			for_each_object(otmp, stmp) {
 				tobjs++;

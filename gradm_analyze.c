@@ -513,7 +513,7 @@ analyze_acls(void)
 		if (!check_permission(role, def_acl, "", &chk)) {
 			fprintf(stderr, "CAP_SYS_BOOT is not "
 				"removed in role %s.  This would allow an "
-				"attacker to reboot the system.\n\n"
+				"attacker to reboot the system.\n\n",
 				role->rolename);
 			errs_found++;
 		}
