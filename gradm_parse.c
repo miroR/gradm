@@ -737,6 +737,9 @@ proc_object_mode_conv(const char *mode)
 		case 's':
 			retmode |= GR_SUPPRESS;
 			break;
+		case 'S':
+			retmode |= GR_SETID;
+			break;
 		default:
 			fprintf(stderr, "Invalid proc object mode "
 				"\'%c\' found on line %lu "

@@ -18,6 +18,7 @@ static struct mode_name_table {
 	GR_AUDIT_APPEND, 'A'}, {
 	GR_AUDIT_INHERIT, 'I'}, {
 	GR_SUPPRESS, 's'}, {
+	GR_SETID, 'S'}, {
 	GR_FIND, 'h'}
 };
 

@@ -153,7 +153,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(gr_line);
 					  return OBJ_NAME;
 					}
-<VAR_OBJ_STATE>[rwxahitFRWXAIso]+	{
+<VAR_OBJ_STATE>[rwxahitFRWXAISso]+	{
 					  gradmlval.string = strdup(yytext);
 					  return OBJ_MODE;
 					}
@@ -207,7 +207,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(gr_line);
 					  return OBJ_NAME;
 					}
-[rwxahitFRWXAIso]+			{
+[rwxahitFRWXAISso]+			{
 					  gradmlval.string = strdup(yytext);
 					  return OBJ_MODE;
 					}
