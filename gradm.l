@@ -12,11 +12,20 @@ int gradmwrap(void);
 int is_eof(void);
 void add_include(char *includename);
 
-int include_stack_ptr = 0;
-unsigned long lineno_stack[MAX_INCLUDE_DEPTH];
-YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
-FILE *include_in[MAX_INCLUDE_DEPTH];
-char *current_acl[MAX_INCLUDE_DEPTH];
+struct include_entry {
+	unsigned long lineno;
+	YY_BUFFER_STATE buffer;
+	FILE *file;
+	char *name;
+	struct include_entry *prev;
+	struct include_entry *next;
+	struct include_entry *parent;
+	struct include_entry **stack;
+	int sp;
+};
+
+struct include_entry include_stack;
+struct include_entry *current_stack;
 
 %}
 
@@ -293,42 +302,68 @@ void add_include(char *includename)
 	struct stat fstat;
 	FILE *tmpfile;
 
-	if (include_stack_ptr >= MAX_INCLUDE_DEPTH) {
+	if (current_stack->sp >= MAX_INCLUDE_DEPTH) {
 		fprintf(stderr, "Includes too deep while trying to process "
 				"%s\n", includename);
 		exit(EXIT_FAILURE);
 	}
 
+	current_stack->stack = realloc(current_stack->stack, (1 + current_stack->sp) * sizeof(struct include_entry *));
+	if (current_stack->stack == NULL)
+		failure("realloc");
+	current_stack->stack[current_stack->sp] = calloc(1, sizeof(struct include_entry));
+	if (current_stack->stack[current_stack->sp] == NULL)
+		failure("calloc");
+	current_stack->stack[current_stack->sp]->lineno = lineno;
+	lineno = 1;
+	current_stack->stack[current_stack->sp]->file = yyin;
+	current_stack->stack[current_stack->sp]->name = current_acl_file;
+	current_stack->stack[current_stack->sp]->buffer = YY_CURRENT_BUFFER;
+	current_stack->stack[current_stack->sp]->parent = current_stack;
+
 	if (!stat(includename, &fstat)) {
 		if (S_ISDIR(fstat.st_mode)) {
 			struct dirent **namelist;
-			char path[PATH_MAX];
+			struct include_entry *last = current_stack->stack[current_stack->sp];
+			struct include_entry *tmp;
+			char *path;
 			int n;
 
 			n = scandir(includename, &namelist, 0, alphasort);
-			if (n >= 0) {
+			if (n >= 3) {
 				while (n--) {
-					if (strcmp(namelist[n]->d_name, ".") && strcmp(namelist[n]->d_name, "..")) {
-						memset(&path, 0, sizeof(path));
-						snprintf(path, PATH_MAX - 1, "%s/%s", includename, namelist[n]->d_name);
-						tmpfile = fopen(path, "r");
+					if (!strcmp(namelist[n]->d_name, ".") || !strcmp(namelist[n]->d_name, ".."))
+						continue;
+					tmp = calloc(1, sizeof(struct include_entry));
+					if (tmp == NULL)
+						failure("calloc");
+					
+					path = calloc(1, strlen(includename) + strlen(namelist[n]->d_name + 2));
+					if (path == NULL)
+						failure("calloc");
 
-						if (!tmpfile) {
-							fprintf(stderr, "Unable to open included file: %s\n",
-								path);
-							exit(EXIT_FAILURE);
-						}
+					sprintf(path, "%s/%s", includename, namelist[n]->d_name);
 
-						lineno_stack[include_stack_ptr] = lineno;
-						lineno = 1;
-						include_in[include_stack_ptr] = yyin;
-						current_acl[include_stack_ptr] = current_acl_file;
-						change_current_acl_file(path);
-						include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
-						yyin = tmpfile;
-						yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
-					}
+					tmp->name = path;
+					tmp->lineno = 1;
+					tmp->parent = current_stack;
+
+					last->next = tmp;
+					tmp->prev = last;
+					last = tmp;
 				}
+				change_current_acl_file(tmp->name);
+				tmpfile = fopen(tmp->name, "r");
+
+				if (!tmpfile) {
+					fprintf(stderr, "Unable to open included file: %s\n", tmp->name);
+					exit(EXIT_FAILURE);
+				}
+
+				yyin = tmpfile;
+				current_stack = tmp;
+				yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
+				return;
 			}
 			return;
 		}
@@ -341,12 +376,8 @@ void add_include(char *includename)
 		exit(EXIT_FAILURE);
 	}
 
-	lineno_stack[include_stack_ptr] = lineno;
-	lineno = 1;
-	include_in[include_stack_ptr] = yyin;
-	current_acl[include_stack_ptr] = current_acl_file;
 	change_current_acl_file(includename);
-	include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
+	current_stack->sp++;
 	yyin = tmpfile;
 	yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
 
@@ -355,20 +386,39 @@ void add_include(char *includename)
 
 int is_eof(void)
 {
-	if (include_stack_ptr)
+	if (current_stack->sp)
 		fclose(yyin);
-	if (--include_stack_ptr < 0)
-	{
-		include_stack_ptr = 0;
-		lineno = 1;
-		return 1;
+	current_stack->sp--;
+	if (current_stack->sp < 0) {
+		if (!current_stack->prev || !current_stack->prev->prev) {
+			if (current_stack->parent->name == NULL) {
+				current_stack->sp = 0;
+				lineno = 1;
+				return 1;
+			} else {
+				current_stack = current_stack->parent;
+				goto regular;
+			}
+		} else {
+			current_stack = current_stack->prev;
+			lineno = 1;
+			yyin = fopen(current_stack->name, "r");
+			if (yyin == NULL) {
+				fprintf(stderr, "Unable to open included file: %s\n", current_stack->name);
+				exit(EXIT_FAILURE);
+			}
+			yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
+			return 0;
+		}
 	}
 
-	change_current_acl_file(current_acl[include_stack_ptr]);
+regular:
+	change_current_acl_file(current_stack->name);
 	yy_delete_buffer(YY_CURRENT_BUFFER);
-	lineno = lineno_stack[include_stack_ptr];
-	yyin = include_in[include_stack_ptr];
-	yy_switch_to_buffer(include_stack[include_stack_ptr]);
+	lineno = current_stack->stack[current_stack->sp]->lineno;
+	yyin = current_stack->stack[current_stack->sp]->file;
+	yy_switch_to_buffer(current_stack->stack[current_stack->sp]->buffer);
+
 	return 0;
 }
 
@@ -442,7 +492,9 @@ int main(int argc, char *argv[])
 
 	special_role_uid = 0;
 	
-	no_coredump();
+	//no_coredump();
+
+	current_stack = &include_stack;
 
 	init_variables();
 
@@ -453,3 +505,4 @@ int main(int argc, char *argv[])
 #endif
 	return 0;
 }
+
