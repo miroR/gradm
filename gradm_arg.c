@@ -69,8 +69,8 @@ void verbose_stats(void)
 	struct role_acl *rtmp;
 	struct proc_acl *stmp;
 	struct file_acl *otmp;
-	unsigned int uroles=0, groles=0, saroles=0, snroles=0, troles=0;
-	unsigned int usubjs=0, gsubjs=0, sasubjs=0, snsubjs=0, ksubjs=0, smsubjs=0, tsubjs=0, nsubjs=0;
+	unsigned int uroles=0, groles=0, saroles=0, snroles=0, aroles=0, troles=0;
+	unsigned int ksubjs=0, smsubjs=0, tsubjs=0, nsubjs=0, ussubjs=0;
 	unsigned int chsobjs=0, tobjs=0;
 
 	for_each_role(rtmp, current_role) {
@@ -80,6 +80,8 @@ void verbose_stats(void)
 				snroles++;
 			else
 				saroles++;
+			if (rtmp->roletype & GR_ROLE_GOD)
+				aroles++;
 		} else if (rtmp->roletype & GR_ROLE_USER)
 			uroles++;
 		else if (rtmp->roletype & GR_ROLE_GROUP)
@@ -87,20 +89,13 @@ void verbose_stats(void)
 		
 		for_each_subject(stmp, rtmp) {
 			tsubjs++;
-			if (rtmp->roletype & GR_ROLE_SPECIAL) {
-				if (rtmp->roletype & GR_ROLE_NOPW)
-					snsubjs++;
-				else
-					sasubjs++;
-			} else if (rtmp->roletype & GR_ROLE_USER)
-				usubjs++;
-			else if (rtmp->roletype & GR_ROLE_GROUP)
-				gsubjs++;
 
 			if (!(stmp->mode & GR_PROTECTED))
 				ksubjs++;
 			if (!(stmp->mode & GR_PROTSHM))
 				smsubjs++;
+			if (!(stmp->ips))
+				ussubjs++;
 
 			for_each_object(otmp, stmp) {
 				tobjs++;
@@ -117,15 +112,13 @@ void verbose_stats(void)
 	printf("\t%d group roles\n", groles);
 	printf("\t%d special roles with authentication\n", saroles);
 	printf("\t%d special roles without authentication\n", snroles);
+	printf("\t%d admin roles\n", aroles);
 	printf("\t%d total roles\n\n", troles);
 	printf("Subject summary:\n");
-	printf("\t%d subjects in user roles\n", usubjs);
-	printf("\t%d subjects in group roles\n", gsubjs);
-	printf("\t%d subjects in special roles with authentication\n", sasubjs);
-	printf("\t%d subjects in special roles without authentication\n", snsubjs);
 	printf("\t%d nested subjects\n", nsubjs);
 	printf("\t%d subjects can be killed by outside processes\n", ksubjs);
 	printf("\t%d subjects have unprotected shared memory\n", smsubjs);
+	printf("\t%d subjects with unrestricted sockets\n", ussubjs);
 	printf("\t%d total subjects\n\n", tsubjs);
 	printf("Object summary:\n");
 	printf("\t%d objects in non-admin roles allow chmod +s\n", chsobjs);
