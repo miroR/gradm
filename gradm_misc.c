@@ -96,6 +96,7 @@ void check_acl_status(__u16 reqmode)
 	case GRADM_RELOAD:
 	case GRADM_DISABLE:
 	case GRADM_SPROLE:
+	case GRADM_UNSPROLE:
 	case GRADM_MODSEGV:
 		if (retval == 2) {
 			printf("The operation you requested cannot be performed "

@@ -35,6 +35,7 @@ show_help(void)
 	       "			Remove a ban on a specific file or UID\n"
 	       "	-a <rolename> , --auth\n"
 	       "			Authenticates to a special role that requires auth\n"
+	       "	-u, --unauth    Remove yourself from your current special role\n"
 	       "	-n <rolename> , --noauth\n"
 	       "			Authenticates to a special role that doesn't require auth\n"
 	       "	-h, --help	Display this help\n"
@@ -76,7 +77,7 @@ parse_args(int argc, char *argv[])
 	struct gr_pw_entry entry;
 	struct gr_arg *grarg;
 	char cwd[PATH_MAX];
-	const char *const short_opts = "SEFDP::RL:O:M:a:n:hv";
+	const char *const short_opts = "SEFuDP::RL:O:M:a:n:hv";
 	const struct option long_opts[] = {
 		{"help", 0, NULL, 'h'},
 		{"version", 0, NULL, 'v'},
@@ -91,6 +92,7 @@ parse_args(int argc, char *argv[])
 		{"learn", 1, NULL, 'L'},
 		{"fulllearn", 0, NULL, 'F'},
 		{"output", 1, NULL, 'O'},
+		{"unauth", 0, NULL, 'u'},
 		{NULL, 0, NULL, 0}
 	};
 
@@ -132,6 +134,18 @@ parse_args(int argc, char *argv[])
 			check_acl_status(entry.mode);
 			gr_fulllearn = 1;
 			gr_enable = 1;
+			break;
+		case 'u':
+			if (argc > 2)
+				show_help();
+			entry.mode = GRADM_UNSPROLE;
+			check_acl_status(entry.mode);
+			get_user_passwd(&entry, GR_PWONLY);
+			grarg = conv_user_to_kernel(&entry);
+			read_saltandpass(entry.rolename, grarg->salt,
+					 grarg->sum);
+			transmit_to_kernel(grarg, sizeof (struct gr_arg));
+			memset(grarg, 0, sizeof (struct gr_arg));
 			break;
 		case 'R':
 			if (argc > 2)
