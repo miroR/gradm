@@ -246,7 +246,7 @@ struct gr_learn_role_entry {
 	char *rolename;
 	__u16 rolemode;
 	unsigned int id;
-	struct gr_learn_file_tmp_node **tmp_subject_list;
+	struct gr_hash_struct *hash;
 	struct gr_learn_file_node *subject_list;
 	struct gr_learn_ip_node *allowed_ips;
 };	
@@ -255,7 +255,7 @@ struct gr_learn_group_node {
 	char *rolename;
 	gid_t gid;
 	struct gr_learn_user_node **users;
-	struct gr_learn_file_tmp_node ** tmp_subject_list;
+	struct gr_hash_struct *hash;
 	struct gr_learn_file_node *subject_list;
 	struct gr_learn_ip_node *allowed_ips;
 };
@@ -269,7 +269,7 @@ struct gr_learn_user_node {
 	char *rolename;
 	uid_t uid;
 	struct gr_learn_group_node *group;
-	struct gr_learn_file_tmp_node ** tmp_subject_list;
+	struct gr_hash_struct *hash;
 	struct gr_learn_file_node *subject_list;
 	struct gr_learn_ip_node *allowed_ips;
 };
@@ -286,7 +286,7 @@ struct gr_learn_file_node {
 	unsigned char dont_display:1;
 	struct gr_learn_file_node **leaves;
 	struct gr_learn_file_node *parent;
-	struct gr_learn_file_tmp_node ** tmp_object_list;
+	struct gr_hash_struct *hash;
 	struct gr_learn_file_node *object_list;
 	struct gr_learn_ip_node *connect_list;
 	struct gr_learn_ip_node *bind_list;

@@ -20,28 +20,34 @@ void fulllearn_pass1(FILE *stream)
 int full_reduce_subjects(struct gr_learn_group_node *group,
 			 struct gr_learn_user_node *user, FILE *unused)
 {
-	struct gr_learn_file_tmp_node **tmp;
+	struct gr_learn_file_tmp_node **tmptable;
+	unsigned long i;
+	__u32 table_size;
 
 	if (user) {
-		if (!user->tmp_subject_list)
+		if (!user->hash)
 			insert_file(&(user->subject_list), "/", GR_FIND, 1);
 		else {
-			sort_file_list(user->tmp_subject_list);
-			tmp = user->tmp_subject_list;
-			while (*tmp) {
-				insert_file(&(user->subject_list), (*tmp)->filename, (*tmp)->mode, 1);
-				tmp++;
+			sort_file_list(user->hash);
+			tmptable = user->hash->table;
+			table_size = user->hash->table_size;
+			for (i = 0; i < table_size; i++) {
+				if (tmptable[i] == NULL)
+					continue;
+				insert_file(&(user->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
 			}
 		}
 	} else {
-		if (!group->tmp_subject_list)
+		if (!group->hash)
 			insert_file(&(group->subject_list), "/", GR_FIND, 1);
 		else {
-			sort_file_list(group->tmp_subject_list);
-			tmp = group->tmp_subject_list;
-			while (*tmp) {
-				insert_file(&(group->subject_list), (*tmp)->filename, (*tmp)->mode, 1);
-				tmp++;
+			sort_file_list(group->hash);
+			tmptable = group->hash->table;
+			table_size = group->hash->table_size;
+			for (i = 0; i < table_size; i++) {
+				if (tmptable[i] == NULL)
+					continue;
+				insert_file(&(group->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
 			}
 		}
 	}
@@ -75,13 +81,19 @@ int full_reduce_object_node(struct gr_learn_file_node *subject,
 			    struct gr_learn_file_node *unused1,
 			    FILE *unused2)
 {
-	struct gr_learn_file_tmp_node **tmp = subject->tmp_object_list;
-	if (!tmp)
+	struct gr_learn_file_tmp_node **tmptable;
+	unsigned long i;
+	__u32 table_size;
+
+	if (subject->hash == NULL)
 		return 0;
-	sort_file_list(tmp);
-	while (*tmp) {
-		insert_file(&(subject->object_list), (*tmp)->filename, (*tmp)->mode, 0);
-		tmp++;
+	sort_file_list(subject->hash);
+	tmptable = subject->hash->table;
+	table_size = subject->hash->table_size;
+	for (i = 0; i < table_size; i++) {
+		if (tmptable[i] == NULL)
+			continue;
+		insert_file(&(subject->object_list), tmptable[i]->filename, tmptable[i]->mode, 0);
 	}
 
 	first_stage_reduce_tree(subject->object_list);

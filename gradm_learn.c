@@ -13,20 +13,24 @@ extern int learn_pass2parse(void);
 void learn_pass1(FILE *stream)
 {
 	struct gr_learn_role_entry **tmp;
-	struct gr_learn_file_tmp_node **tmp2;
+	struct gr_learn_file_tmp_node **tmptable;
+	unsigned long i;
+	__u32 table_size;
 
 	learn_pass1in = stream;
 	learn_pass1parse();
 
 	if (default_role_entry) {
-		sort_file_list(default_role_entry->tmp_subject_list);
-		tmp2 = default_role_entry->tmp_subject_list;
-		while (*tmp2) {
+		tmptable = default_role_entry->hash->table;
+		table_size = default_role_entry->hash->table_size;
+		sort_file_list(default_role_entry->hash);
+		for (i = 0; i < table_size; i++) {
+			if (tmptable[i] == NULL)
+				continue;
 			if (default_role_entry->rolemode & GR_ROLE_LEARN)
-				insert_file(&(default_role_entry->subject_list), (*tmp2)->filename, (*tmp2)->mode, 1);
+				insert_file(&(default_role_entry->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
 			else
-				insert_file(&(default_role_entry->subject_list), (*tmp2)->filename, (*tmp2)->mode, 2);
-			tmp2++;
+				insert_file(&(default_role_entry->subject_list), tmptable[i]->filename, tmptable[i]->mode, 2);
 		}
 		if (default_role_entry->rolemode & GR_ROLE_LEARN)
 			reduce_ip_tree(default_role_entry->allowed_ips);
@@ -34,14 +38,16 @@ void learn_pass1(FILE *stream)
 
 	tmp = group_role_list;
 	while (tmp && *tmp) {
-		sort_file_list((*tmp)->tmp_subject_list);
-		tmp2 = (*tmp)->tmp_subject_list;
-		while (*tmp2) {
+		tmptable = (*tmp)->hash->table;
+		table_size = (*tmp)->hash->table_size;
+		sort_file_list((*tmp)->hash);
+		for (i = 0; i < table_size; i++) {
+			if (tmptable[i] == NULL)
+				continue;
 			if ((*tmp)->rolemode & GR_ROLE_LEARN)
-				insert_file(&((*tmp)->subject_list), (*tmp2)->filename, (*tmp2)->mode, 1);
+				insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
 			else
-				insert_file(&((*tmp)->subject_list), (*tmp2)->filename, (*tmp2)->mode, 2);
-			tmp2++;
+				insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 2);
 		}
 		if ((*tmp)->rolemode & GR_ROLE_LEARN)
 			reduce_ip_tree((*tmp)->allowed_ips);
@@ -50,14 +56,16 @@ void learn_pass1(FILE *stream)
 
 	tmp = user_role_list;
 	while (tmp && *tmp) {
-		sort_file_list((*tmp)->tmp_subject_list);
-		tmp2 = (*tmp)->tmp_subject_list;
-		while (*tmp2) {
+		tmptable = (*tmp)->hash->table;
+		table_size = (*tmp)->hash->table_size;
+		sort_file_list((*tmp)->hash);
+		for (i = 0; i < table_size; i++) {
+			if (tmptable[i] == NULL)
+				continue;
 			if ((*tmp)->rolemode & GR_ROLE_LEARN)
-				insert_file(&((*tmp)->subject_list), (*tmp2)->filename, (*tmp2)->mode, 1);
+				insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
 			else
-				insert_file(&((*tmp)->subject_list), (*tmp2)->filename, (*tmp2)->mode, 2);
-			tmp2++;
+				insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 2);
 		}
 		if ((*tmp)->rolemode & GR_ROLE_LEARN)
 			reduce_ip_tree((*tmp)->allowed_ips);
@@ -66,14 +74,16 @@ void learn_pass1(FILE *stream)
 
 	tmp = special_role_list;
 	while (tmp && *tmp) {
-		sort_file_list((*tmp)->tmp_subject_list);
-		tmp2 = (*tmp)->tmp_subject_list;
-		while (*tmp2) {
+		tmptable = (*tmp)->hash->table;
+		table_size = (*tmp)->hash->table_size;
+		sort_file_list((*tmp)->hash);
+		for (i = 0; i < table_size; i++) {
+			if (tmptable[i] == NULL)
+				continue;
 			if ((*tmp)->rolemode & GR_ROLE_LEARN)
-				insert_file(&((*tmp)->subject_list), (*tmp2)->filename, (*tmp2)->mode, 1);
+				insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
 			else
-				insert_file(&((*tmp)->subject_list), (*tmp2)->filename, (*tmp2)->mode, 2);
-			tmp2++;
+				insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 2);
 		}
 		if ((*tmp)->rolemode & GR_ROLE_LEARN)
 			reduce_ip_tree((*tmp)->allowed_ips);
@@ -126,7 +136,7 @@ void merge_acl_rules()
 						matchsubj->subject->res[i].rlim_max = subject->res[i].rlim_max;
 				}
 				for_each_object(object, subject) {
-					insert_temp_file(&(matchsubj->tmp_object_list), object->filename, object->mode);
+					insert_learn_object(matchsubj, conv_filename_to_kernel(object->filename, object->mode));
 				}
 				for (ipp = subject->ip_object; ipp; ipp = ipp->prev) {
 					if (ipp->mode == GR_IP_CONNECT) {

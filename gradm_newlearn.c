@@ -83,23 +83,26 @@ int is_protected_path(char *filename, __u32 mode)
 
 void enforce_high_protected_paths(struct gr_learn_file_node *subject)
 {
-	struct gr_learn_file_tmp_node **tmpfile;
+	struct gr_learn_file_tmp_node **tmptable;
 	char **tmp;
 	unsigned int len;
+	unsigned long i;
 
 	tmp = high_protected_paths;
+	tmptable = subject->hash->table;
+
 	while (*tmp) {
 		len = strlen(*tmp);
-		tmpfile = subject->tmp_object_list;
-		while (tmpfile && *tmpfile) {
-			if (!(*tmpfile)->mode) {
+		for (i = 0; i < subject->hash->table_size; i++) {
+			if (tmptable[i] == NULL)
+				continue;
+			if (!tmptable[i]->mode) {
 				tmpfile++;
 				continue;
 			}
-			if (!strncmp((*tmpfile)->filename, *tmp, len) &&
-			    ((*tmpfile)->filename[len] == '\0' || (*tmpfile)->filename[len] == '/'))
+			if (!strncmp(tmptable[i]->filename, *tmp, len) &&
+			    (tmptable[i]->filename[len] == '\0' || tmptable[i]->filename[len] == '/'))
 				goto next;
-			tmpfile++;
 		}
 		insert_file(&(subject->object_list), *tmp, 0, 0);
 next:
@@ -1525,52 +1528,43 @@ static int strcompare(const void *x, const void *y)
         struct gr_learn_file_tmp_node *x1 = *(struct gr_learn_file_tmp_node **) x;
         struct gr_learn_file_tmp_node *y1 = *(struct gr_learn_file_tmp_node **) y;
 
+	if (x1 == NULL && y1 == NULL)
+		return 0;
+	if (x1 == NULL && y1 != NULL)
+		return 1;
+	if (x1 != NULL && y1 == NULL)
+		return -1;
         return strcmp(x1->filename, y1->filename);
 }
 
-void sort_file_list(struct gr_learn_file_tmp_node **file_list)
+/* use this function to operate on a hash table, thus we need to handle
+   null entries in the table.  we modify strcompare above to make null
+   pointers lexicographically greater than all filenames, effectively
+   pushing them to the end of the table
+*/
+
+void sort_file_list(struct gr_hash_struct *hash)
 {
 	struct gr_learn_file_tmp_node **tmp;
-	unsigned long num = 0;
+	unsigned long num;
 
-	tmp = file_list;
-	if (!tmp)
+	if (hash == NULL)
 		return;
-	while (*tmp) {
-		num++;
-		tmp++;
-	}
+
+	num = hash->used_size;
 
 	return qsort(file_list, num, sizeof (struct gr_learn_file_tmp_node *), strcompare);
 }
 
-void insert_temp_file(struct gr_learn_file_tmp_node ***file_list, char *filename, __u32 mode)
+struct gr_learn_file_tmp_node *conv_filename_to_struct(char *filename, __u32 mode)
 {
-	unsigned long num = 0;
+	struct gr_learn_file_tmp_node *node;
 
-	if (!(*file_list)) {
-		*file_list = (struct gr_learn_file_tmp_node **)gr_dyn_alloc(2 * sizeof(struct gr_learn_file_tmp_node *));
-	} else {
-		struct gr_learn_file_tmp_node **tmp;
+	node = (struct gr_learn_file_tmp_node *)gr_stat_alloc(sizeof(struct gr_learn_file_tmp_node));
+	node->filename = filename;
+	node->mode = mode;
 
-		tmp = *file_list;
-		while(*tmp) {
-			if (!strcmp((*tmp)->filename, filename)) {
-				(*tmp)->mode |= mode;
-				return;
-			}
-			num++;
-			tmp++;
-		}
-		*file_list = (struct gr_learn_file_tmp_node **)gr_dyn_realloc(*file_list, (2 + num) * sizeof(struct gr_learn_file_tmp_node *));
-		memset(*file_list + num, 0, 2 * sizeof(struct gr_learn_file_tmp_node *));
-	}
-
-	(*((*file_list) + num)) = (struct gr_learn_file_tmp_node *)gr_stat_alloc(sizeof(struct gr_learn_file_tmp_node));
-	(*((*file_list) + num))->filename = filename;
-	(*((*file_list) + num))->mode = mode;
-	
-	return;
+	return node;
 }
 
 struct gr_learn_role_entry *

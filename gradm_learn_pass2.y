@@ -64,7 +64,7 @@ learn_log:
 				subject = match_file_node(subjlist, $11);
 				
 			if (strcmp($17, ""))
-				insert_temp_file(&(subject->tmp_object_list), $17, mode | GR_FIND);
+				insert_learn_object(subject, conv_filename_to_struct($17, mode | GR_FIND));
 			else if ((strlen($9) > 1) && !res1 && !res2) {
 				if (subject->subject == NULL) {
 					subject->subject = calloc(1, sizeof(struct gr_learn_subject_node));

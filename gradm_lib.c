@@ -215,9 +215,11 @@ void resize_hash_table(struct gr_hash_struct *hash)
 	if (newhash.table == NULL)
 		failure("calloc");
 
-	newhash.nametable = calloc(newhash.table_size, sizeof(void *));
-	if (newhash.nametable == NULL)
-		failure("calloc");
+	if (hash->type != GR_HASH_FILENAME) {
+		newhash.nametable = calloc(newhash.table_size, sizeof(void *));
+		if (newhash.nametable == NULL)
+			failure("calloc");
+	}
 
 	newhash.used_size = 0;
 	newhash.type = hash->type;
@@ -230,7 +232,8 @@ void resize_hash_table(struct gr_hash_struct *hash)
 		}
 
 	free(hash->table);
-	free(hash->nametable);
+	if (hash->nametable)
+		free(hash->nametable);
 	memcpy(hash, &newhash, sizeof(newhash));
 
 	return;
@@ -253,10 +256,7 @@ void *lookup_name_entry(struct gr_hash_struct *hash, char *name)
 			i = (i + 1) % 32;
 		}
 
-		if (match && !strcmp(match->filename, name))
-			return match;
-		else
-			return NULL;
+		return match;
 	} else if (hash->type == GR_HASH_SUBJECT) {
 		unsigned long index = nhash(name, hash->table_size);
 		struct proc_acl *match;
@@ -270,10 +270,7 @@ void *lookup_name_entry(struct gr_hash_struct *hash, char *name)
 			i = (i + 1) % 32;
 		}
 
-		if (match && !strcmp(match->filename, name))
-			return match;
-		else
-			return NULL;
+		return match;
 	}
 	return NULL;
 }
@@ -308,11 +305,7 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 			i = (i + 1) % 32;
 		}
 
-		if (match && (match->inode == object->inode &&
-			      match->dev == object->dev))
-			return match;
-		else
-			return NULL;
+		return match;
 	} else if (hash->type == GR_HASH_SUBJECT) {
 		struct proc_acl *subject = (struct proc_acl *)entry;
 		unsigned long index = fhash(subject->inode, subject->dev, hash->table_size);
@@ -328,11 +321,22 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 			i = (i + 1) % 32;
 		}
 
-		if (match && (match->inode == subject->inode &&
-			      match->dev == subject->dev))
-			return match;
-		else
-			return NULL;
+		return match;
+	} else if (hash->type == GR_HASH_FILENAME) {
+		char *filename = (char *)entry;
+		unsigned long index = nhash(filename, hash->table_size);
+		struct gr_learn_file_tmp_node *match;
+		unsigned char i = 0;
+
+		match = (struct gr_learn_file_tmp_node *)hash->table[index];
+
+		while (match && strcmp(match->filename, filename)) {
+			index = (index + (1 << i)) % hash->table_size;
+			match = (struct gr_learn_file_tmp_node *)hash->table[index];
+			i = (i + 1) % 32;
+		}
+
+		return match;
 	}
 	return NULL;
 }
@@ -340,6 +344,26 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 struct file_acl *lookup_acl_object(struct proc_acl *subject, struct file_acl *object)
 {
 	return (struct file_acl *)lookup_hash_entry(subject->hash, object);
+}
+
+struct gr_learn_file_tmp_node *lookup_learn_object(struct gr_learn_file_tmp_node *subject, char *filename);
+{
+	return (struct gr_learn_file_tmp_node *)lookup_hash_entry(subject->hash, filename);
+}
+
+struct gr_learn_file_tmp_node *lookup_learn_role_subject(struct gr_learn_role_entry *role, char *filename)
+{
+	return (struct gr_learn_file_tmp_node *)lookup_hash_entry(role->hash, filename);
+}
+
+struct gr_learn_file_tmp_node *lookup_learn_group_subject(struct gr_learn_group_node *role, char *filename)
+{
+	return (struct gr_learn_file_tmp_node *)lookup_hash_entry(role->hash, filename);
+}
+
+struct gr_learn_file_tmp_node *lookup_learn_user_subject(struct gr_learn_user_node *role, char *filename)
+{
+	return (struct gr_learn_file_tmp_node *)lookup_hash_entry(role->hash, filename);
 }
 
 struct proc_acl *lookup_acl_subject(struct role_acl *role, struct proc_acl *subject)
@@ -380,7 +404,7 @@ void insert_name_entry(struct gr_hash_struct *hash, void *entry)
 		}
 
 		*curr = (struct proc_acl *)entry;
-	}
+	}		
 }
 
 void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
@@ -423,6 +447,26 @@ void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
 		*curr = (struct proc_acl *)entry;
 		insert_name_entry(hash, *curr);
 		hash->used_size++;
+	} else if (hash->type == GR_HASH_FILENAME) {
+		struct gr_learn_file_tmp_node *node = (struct gr_learn_file_tmp_node *)entry;
+		unsigned long index = nhash(node->filename, hash->table_size);
+		struct gr_learn_file_tmp_node **curr;
+		unsigned char i = 0;
+
+		curr = (struct gr_learn_file_tmp_node **)&hash->table[index];
+
+		while (*curr && !strcmp(node->filename, (*curr)->filename)) {
+			index = (index + (1 << i)) % hash->table_size;
+			curr = (struct gr_learn_file_tmp_node **)&hash->table[index];
+			i = (i + 1) % 32;
+		}
+
+		if (*curr)
+			(*curr)->mode |= node->mode;
+		else {
+			*curr = (struct gr_learn_file_tmp_node *)entry;
+			hash->used_size++;
+		}
 	}
 }
 
@@ -436,13 +480,43 @@ struct gr_hash_struct *create_hash_table(int type)
 	hash->table = calloc(table_sizes[0], sizeof(void *));
 	if (hash->table == NULL)
 		failure("calloc");
-	hash->nametable = calloc(table_sizes[0], sizeof(void *));
-	if (hash->nametable == NULL)
-		failure("calloc");
+	if (type != GR_HASH_FILENAME) {
+		hash->nametable = calloc(table_sizes[0], sizeof(void *));
+		if (hash->nametable == NULL)
+			failure("calloc");
+	}
 	hash->table_size = table_sizes[0];
 	hash->type = type;
 
 	return hash;
+}
+
+void insert_learn_object(struct gr_learn_file_tmp_node *subject, struct gr_learn_file_tmp_node *object);
+{
+	if (subject->hash == NULL)
+		subject->hash = create_hash_table(GR_HASH_FILENAME);
+	insert_hash_entry(subject->hash, object);
+}
+
+void insert_learn_role_subject(struct gr_learn_role_entry *role, struct gr_learn_file_tmp_node *subject)
+{
+	if (role->hash == NULL)
+		role->hash = create_hash_table(GR_HASH_FILENAME);
+	insert_hash_entry(role->hash, subject);
+}
+
+void insert_learn_group_subject(struct gr_learn_group_node *role, struct gr_learn_file_tmp_node *subject)
+{
+	if (role->hash == NULL)
+		role->hash = create_hash_table(GR_HASH_FILENAME);
+	insert_hash_entry(role->hash, subject);
+}
+
+void insert_learn_user_subject(struct gr_learn_user_node *role, struct gr_learn_file_tmp_node *subject)
+{
+	if (role->hash == NULL)
+		role->hash = create_hash_table(GR_HASH_FILENAME);
+	insert_hash_entry(role->hash, subject);
 }
 
 void insert_acl_object(struct proc_acl *subject, struct file_acl *object)

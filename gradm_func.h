@@ -54,7 +54,6 @@ struct var_object *union_objects(struct var_object *var1, struct var_object *var
 struct var_object *intersect_objects(struct var_object *var1, struct var_object *var2);
 struct var_object *differentiate_objects(struct var_object *var1, struct var_object *var2);
 void sort_file_list(struct gr_learn_file_tmp_node **file_list);
-void insert_temp_file(struct gr_learn_file_tmp_node ***file_list, char *filename, __u32 mode);
 struct gr_learn_file_node *match_file_node(struct gr_learn_file_node *base, const char *filename);
 void match_role(struct gr_learn_group_node **grouplist, uid_t uid, gid_t gid, struct gr_learn_group_node **group, struct gr_learn_user_node **user);
 struct gr_learn_ip_node ** find_insert_ip(struct gr_learn_ip_node **base, __u32 ip, struct gr_learn_ip_node **parent);
