@@ -45,6 +45,9 @@
 #high-protected-path specifies a path that should be hidden from
 #all processes but those that access it directly.  It is recommended
 #to use highly sensitive files for this command.
+#
+#regular expressions are not supported for pathnames in this config file
+
 
 high-reduce-path /tmp
 high-reduce-path /dev/pts
