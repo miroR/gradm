@@ -175,7 +175,7 @@ void read_saltandpass(char *salt, char *pass);
 
 void add_kernel_acl(void);
 
-int add_role_acl(struct role_acl **role, char *rolename, __u8 type);
+int add_role_acl(struct role_acl **role, char *rolename, __u8 type, int ignore);
 
 __u8 role_mode_conv(const char *mode);
 

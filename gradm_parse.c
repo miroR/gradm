@@ -83,7 +83,7 @@ static struct proc_acl * is_proc_subject_dupe(struct role_acl *role, struct proc
         return NULL;
 }
 
-int add_role_acl(struct role_acl **role, char *rolename, __u8 type)
+int add_role_acl(struct role_acl **role, char *rolename, __u8 type, int ignore)
 {
 	struct role_acl *rtmp;
 	struct passwd *pwd;
@@ -116,7 +116,9 @@ int add_role_acl(struct role_acl **role, char *rolename, __u8 type)
 		return 0;
 	}
 
-	if (strcmp(rolename, "default") || !(type & GR_ROLE_DEFAULT)) {
+	if (ignore)
+		rtmp->uidgid = special_role_uid++;
+	else if (strcmp(rolename, "default") || !(type & GR_ROLE_DEFAULT)) {
 		if (type & GR_ROLE_USER) {
 			pwd = getpwnam(rolename);
 

@@ -101,7 +101,7 @@ void parse_args(int argc, char *argv[])
 				analyze_acls();
 				grarg = conv_user_to_kernel(&entry);
 				read_saltandpass(grarg->salt, grarg->sum);
-				//transmit_to_kernel(grarg, sizeof(struct gr_arg));
+				transmit_to_kernel(grarg, sizeof(struct gr_arg));
 				memset(grarg, 0, sizeof(struct gr_arg));
 				break;
 			case 'R':
