@@ -243,6 +243,7 @@ struct proc_acl {
 \************************************************************************/
 
 struct gr_pw_entry {
+	unsigned char rolename[GR_SPROLE_LEN];
 	unsigned char passwd[GR_PW_LEN];
 	unsigned char sum[GR_SHA_SUM_SIZE];
 	unsigned char salt[GR_SALT_SIZE]; 

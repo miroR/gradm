@@ -23,7 +23,9 @@ static void show_help(void)
 		"Options:\n"
 		"	-E, --enable	Enable the grsecurity ACL system\n"
 		"	-D, --disable	Disable the grsecurity ACL system\n"
-		"	-P, --passwd	Create password for ACL administration\n"
+		"	-P [rolename], --passwd\n
+		"			Create password for ACL administration\n"
+		"			or a special role\n"
 		"	-R, --reload	Reload the ACL system while in admin mode\n"
 		"	-L [filename], --learn\n"
 		"			Compute new ACLs from learning log\n"
@@ -71,7 +73,7 @@ void parse_args(int argc, char *argv[])
 		{ "version",	0,	NULL,	'v'	},
 		{ "enable",	0,	NULL,	'E'	},
 		{ "disable",	0,	NULL,	'D'	},
-		{ "passwd",	0,	NULL,	'P'	},
+		{ "passwd",	2,	NULL,	'P'	},
 		{ "admin",	0,	NULL,	'a'	},
 		{ "reload",	0,	NULL,	'R'	},
 		{ "modsegv",	1,	NULL,	'M'	},
@@ -155,9 +157,14 @@ void parse_args(int argc, char *argv[])
 					output_log = strdup(optarg);
 				break;
 			case 'P':
-				if(argc > 2)
+				if(argc > 3)
 					show_help();
-				printf("Setting up grsecurity ACL password\n");
+				if (argc == 3) {
+					strncpy(entry.rolename, argv[2], GR_SPROLE_LEN);
+					entry.rolename[GR_SPROLE_LEN - 1] = '\0';
+					printf("Setting up password for role %s\n", entry.rolename);
+				} else
+					printf("Setting up grsecurity ACL password\n");
 				get_user_passwd(&entry, GR_PWANDSUM);
 				generate_salt(&entry);
 				generate_hash(&entry);

@@ -3,6 +3,9 @@
 void write_user_passwd(struct gr_pw_entry * entry)
 {
 	int fd;
+	int len;
+	off_t offset;
+	unsigned char total[GR_SPROLE_LEN + GR_SHA_SUM_SIZE + GR_SALT_SIZE];
 
 	if((access(GR_PW_PATH, F_OK)) != 0) {
 		if((fd = open(GR_PW_PATH, O_EXCL | O_CREAT, S_IRUSR|S_IWUSR)) < 0) {
@@ -13,9 +16,22 @@ void write_user_passwd(struct gr_pw_entry * entry)
 		close(fd);
 	}
 
-	if((fd = open(GR_PW_PATH, O_WRONLY)) < 0) {
+	if((fd = open(GR_PW_PATH, O_RDWR)) < 0) {
 		fprintf(stderr, "Could not open %s\n", GR_PW_PATH);
 		failure("open");
+	}
+
+	while((len = read(fd, total, sizeof(total))) == sizeof(total)) {
+		if (!memcmp(&total, entry.rolename, GR_SPROLE_LEN)) {
+			if ((offset = lseek(fd, -GR_SPROLE_LEN, SEEK_CUR)) == (off_t)-1) {
+				failure("lseek");
+			break;
+		}
+	}
+
+	if(write(fd, entry->rolename, GR_SPROLE_LEN) != GR_SPROLE_LEN) {
+		fprintf(stderr, "Error writing to %s\n", GR_PW_PATH);
+		failure("write");
 	}
 
 	if(write(fd, entry->salt, GR_SALT_SIZE) != GR_SALT_SIZE) {
@@ -126,7 +142,12 @@ void generate_salt(struct gr_pw_entry * entry)
 void read_saltandpass(char *salt, char *pass)
 {
 	int fd;
-	unsigned char total[GR_SHA_SUM_SIZE + GR_SALT_SIZE];
+	int len;
+	int found = 0;
+	unsigned char cmp[GR_SPROLE_LEN];
+	unsigned char total[GR_SPROLE_LEN + GR_SHA_SUM_SIZE + GR_SALT_SIZE];
+
+	memset(&cmp, 0, sizeof(cmp));
 
 	fd = open(GR_PW_PATH, O_RDONLY);	
 	if (fd < 0) {
@@ -135,14 +156,21 @@ void read_saltandpass(char *salt, char *pass)
 		exit(EXIT_FAILURE);
 	}
 
-	if (read(fd, total, sizeof(total)) != sizeof(total)) {
+	while((len = read(fd, total, sizeof(total))) == sizeof(total)) {
+		if (!memcmp(&total, cmp, GR_SPROLE_LEN)) {
+			found = 1;
+			break;
+		}
+	}
+		
+	if (!found) {
 		fprintf(stderr, "Your password file is not set up correctly.\n"
-				"Run gradm -P to set a password.\n");
-		exit(EXIT_FAILURE);
+			"Run gradm -P to set a password.\n");
+			exit(EXIT_FAILURE);
 	}
 
-	memcpy(salt, total, GR_SALT_SIZE);
-	memcpy(pass, total + GR_SALT_SIZE, GR_SHA_SUM_SIZE);
+	memcpy(salt, total + GR_SPROLE_LEN, GR_SALT_SIZE);
+	memcpy(pass, total + GR_SPROLE_LEN + GR_SALT_SIZE, GR_SHA_SUM_SIZE);
 
 	return;
 }
