@@ -53,7 +53,7 @@ static int is_role_dupe(struct role_acl *role, const char *rolename, const __u8 
 	struct role_acl *tmp;
 
 	for_each_role(tmp, role)
-		if ((tmp->roletype == type) && !strcmp(tmp->rolename, rolename))
+		if ((tmp->roletype & type) && !strcmp(tmp->rolename, rolename))
 			return 1;
 
 	return 0;
