@@ -215,6 +215,7 @@ void resize_hash_table(struct gr_hash_struct *hash)
 	if (newhash.table == NULL)
 		failure("calloc");
 
+	newhash.nametable = NULL;
 	if (hash->type != GR_HASH_FILENAME) {
 		newhash.nametable = calloc(newhash.table_size, sizeof(void *));
 		if (newhash.nametable == NULL)
