@@ -751,6 +751,40 @@ void parse_acls(void)
 	return;
 }
 
+static void setup_special_roles(struct gr_arg *grarg)
+{
+	struct role_acl *rtmp = NULL;
+	struct gr_pw_entry entry;
+	int err;
+	__u16 i;
+
+	memset(&entry, 0, sizeof(struct gr_pw_entry));
+
+	err = mlock(&entry, sizeof(struct gr_pw_entry));
+	if (err)
+		fprintf(stderr, "Warning, unable to lock authentication "
+			"structure in physical memory.\n");
+
+	for_each_role(rtmp, current_role) {
+		if (rtmp->roletype & GR_ROLE_SPECIAL && !(rtmp->roletype & GR_ROLE_NOPW)) {
+			strncpy(entry.rolename, rtmp->rolename, GR_SPROLE_LEN);
+			entry.rolename[GR_SPROLE_LEN - 1] = '\0';
+			if(!read_saltandpass(entry.rolename, &entry.salt, &entry.sum)) {
+				fprintf(stderr, "No password exists for special "
+					"role %s.\n  Run gradm -P %s to set up a password "
+					"for the role.\n", rtmp->rolename, rtmp->rolename);
+				exit(EXIT_FAILURE);
+			}
+			memcpy(grarg->sprole_pws + (i * sizeof(struct sprole_pw)), entry.rolename, GR_SPROLE_LEN);
+			memcpy(grarg->sprole_pws + (i * sizeof(struct sprole_pw)) + GR_SPROLE_LEN, entry.salt, GR_SALT_SIZE);
+			memcpy(grarg->sprole_pws + (i * sizeof(struct sprole_pw)) + GR_SPROLE_LEN + GR_SALT_SIZE, entry.sum, GR_SHA_SUM_SIZE);
+			i++;
+		}
+	}
+
+	return;
+}
+
 struct gr_arg * conv_user_to_kernel(struct gr_pw_entry * entry)
 {
 	struct gr_arg *retarg;
@@ -770,10 +804,14 @@ struct gr_arg * conv_user_to_kernel(struct gr_pw_entry * entry)
 	unsigned long tiacls = 0;
 	unsigned long aacls = 0;
 	unsigned long i = 0;
+	__u16 sproles = 0;
 	int err;
 
 	for_each_role(rtmp, current_role) {
 		racls++;
+		if (rtmp->roletype & GR_ROLE_SPECIAL && !(rtmp->roletype & GR_ROLE_NOPW))
+			sproles++;
+
 		for_each_allowed_ip(atmp, rtmp->allowed_ips)
 			aacls++;
 
@@ -796,6 +834,13 @@ struct gr_arg * conv_user_to_kernel(struct gr_pw_entry * entry)
 
 	if(!racls && !tpacls && !facls)  // we are disabling, don't want to calloc 0
 		goto set_pw;
+
+	if((retarg->sprole_pws = (struct sprole_pw *) calloc(sproles, sizeof(struct sprole_pw))) == NULL)
+		failure("calloc");
+
+	setup_special_roles(retarg);
+
+	retarg->num_sprole_pws = sproles;
 
 	if((role_db = (struct user_acl_role_db *) calloc(1, sizeof(struct user_acl_role_db))) == NULL)
 		failure("calloc");

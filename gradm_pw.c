@@ -139,7 +139,7 @@ void generate_salt(struct gr_pw_entry * entry)
 	return;
 }
 
-void read_saltandpass(char *salt, char *pass)
+int read_saltandpass(char *rolename, char *salt, char *pass)
 {
 	int fd;
 	int len;
@@ -157,20 +157,21 @@ void read_saltandpass(char *salt, char *pass)
 	}
 
 	while((len = read(fd, total, sizeof(total))) == sizeof(total)) {
-		if (!memcmp(&total, cmp, GR_SPROLE_LEN)) {
+		if (!memcmp(&total, rolename, GR_SPROLE_LEN)) {
 			found = 1;
 			break;
 		}
 	}
 		
-	if (!found) {
+	if (!found && !memcmp(rolename, &cmp, GR_SPROLE_LEN))
 		fprintf(stderr, "Your password file is not set up correctly.\n"
 			"Run gradm -P to set a password.\n");
 			exit(EXIT_FAILURE);
-	}
+	} else if (!found)
+		return 0;
 
 	memcpy(salt, total + GR_SPROLE_LEN, GR_SALT_SIZE);
 	memcpy(pass, total + GR_SPROLE_LEN + GR_SALT_SIZE, GR_SHA_SUM_SIZE);
 
-	return;
+	return 1;
 }

@@ -166,7 +166,7 @@ void add_learn_ip_info(char *rolename, __u8 roletype, char *subjname,
 void add_learn_file_info(char *rolename, __u8 roletype, char *subjname,
                         unsigned long res_cur, unsigned long res_max,
                         char * obj_name, __u32 mode);
-void read_saltandpass(char *salt, char *pass);
+int read_saltandpass(char *salt, char *pass);
 
 void add_kernel_acl(void);
 
