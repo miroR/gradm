@@ -129,7 +129,7 @@ void verbose_stats(void)
 	printf("\t%d total subjects\n\n", tsubjs);
 	printf("\tObject summary:\n");
 	printf("\t%d objects in non-admin roles allow chmod +s\n", chsobjs);
-	printf("\t%d total objects\n\n", tobjs);
+	printf("\t%d total objects\n", tobjs);
 
 	return;
 }
