@@ -107,7 +107,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(yytext);
 					  return IPTYPE;
 					}
-<IP_STATE>[a-z]+			{
+<IP_STATE>[a-z-]+			{
 					  gradmlval.string = strdup(yytext);
 					  return IPPROTO;
 					}
