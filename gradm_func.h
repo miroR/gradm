@@ -28,7 +28,6 @@ int test_perm(const char *obj, const char *subj);
 void add_res_acl(struct proc_acl *subject, const char *name,
 		 const char *soft, const char *hard);
 void pass_struct_to_human(FILE * stream);
-void syslog_lookup_log(char **learnlog);
 int is_valid_elf_binary(const char *filename);
 void handle_learn_logs(const char *logfile, FILE * stream);
 void modify_caps(struct proc_acl *proc, int cap);
