@@ -1,5 +1,20 @@
 #include "gradm.h"
 
+extern FILE *grlearn_configin;
+extern int grlearn_configparse(void);
+
+void parse_learn_config(void)
+{
+	grlearn_configin = fopen(GR_LEARN_CONFIG_PATH, "r");
+	if (grlearn_configin == NULL) {
+		fprintf(stderr, "Unable to open %s: %s\n", GR_LEARN_CONFIG_PATH, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+	grlearn_configparse();
+	return;
+}
+
+
 FILE *
 open_acl_file(const char *filename)
 {

@@ -380,6 +380,11 @@ parse_args(int argc, char *argv[])
 			}
 		}
 
+
+		add_to_string_array(&high_protected_paths, GRSEC_DIR);
+		add_to_string_array(&high_protected_paths, GRDEV_PATH);
+		parse_learn_config();
+
 		if (gr_fulllearn)
 			generate_full_learned_acls(learn_log, stream);
 		else

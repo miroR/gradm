@@ -148,9 +148,6 @@ add_grlearn_acl(struct role_acl *role)
 	return;
 }
 
-extern FILE *grlearn_configin;
-extern int grlearn_configparse(void);
-
 void add_fulllearn_acl(void)
 {
 	struct ip_acl ip;
@@ -171,12 +168,7 @@ void add_fulllearn_acl(void)
 
 	add_gradm_acl(current_role);
 
-	grlearn_configin = fopen(GR_LEARN_CONFIG_PATH, "r");
-	if (grlearn_configin == NULL) {
-		fprintf(stderr, "Unable to open %s: %s\n", GR_LEARN_CONFIG_PATH, strerror(errno));
-		exit(EXIT_FAILURE);
-	}
-	grlearn_configparse();
+	parse_learn_config();
 
 	expand_acls();
 	return;

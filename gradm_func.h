@@ -141,3 +141,4 @@ int display_leaf(struct gr_learn_file_node *node, struct gr_learn_file_node *unu
 
 void insert_learn_id_transition(unsigned int ***list, int real, int eff, int fs);
 void add_to_string_array(char ***array, char *str);
+void parse_learn_config(void);
