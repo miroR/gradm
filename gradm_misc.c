@@ -18,8 +18,8 @@ transmit_to_kernel(void *buf, unsigned long len)
 {
 	int fd;
 
-	if ((fd = open(GR_SYSCTL_PATH, O_WRONLY)) < 0) {
-		fprintf(stderr, "Could not open %s\n", GR_SYSCTL_PATH);
+	if ((fd = open("/dev/grsec", O_WRONLY)) < 0) {
+		fprintf(stderr, "Could not open /dev/grsec.\n");
 		failure("open");
 	}
 

@@ -55,15 +55,15 @@ add_gradm_acl(struct role_acl *role)
 				  proc_subject_mode_conv("do"), 0))
 		exit(EXIT_FAILURE);
 
-	if (!stat("/proc/sys/kernel/grsecurity/acl", &fstat)) {
+	if (!stat("/dev/grsec", &fstat)) {
 		if (!add_proc_object_acl(current_subject,
-					 "/proc/sys/kernel/grsecurity/acl",
+					 "/dev/grsec",
 					 proc_object_mode_conv("w"), GR_FEXIST))
 			exit(EXIT_FAILURE);
 	} else {
-		fprintf(stderr, "/proc/sys/kernel/grsecurity/acl does not "
+		fprintf(stderr, "/dev/grsec does not "
 			"exist.  Please recompile your kernel with "
-			"grsecurity's ACL system.\n");
+			"grsecurity and install a newer version of gradm.\n");
 		exit(EXIT_FAILURE);
 	}
 

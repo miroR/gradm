@@ -1,5 +1,3 @@
-#define GR_SYSCTL_PATH 		"/proc/sys/kernel/grsecurity/acl"
-
 #define GRSEC_DIR		"/etc/grsec"
 #define GR_ACL_PATH 		GRSEC_DIR "/acl"
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
