@@ -205,7 +205,7 @@ subject /usr/sbin/sshd dpo
 	/dev/log	rw
 	/dev/random	r
 	/dev/urandom	r
-	/dev/null	r
+	/dev/null	rw
 	/dev/ptmx	rw
 	/dev/pts	rw
 	/dev/tty	rw
