@@ -84,8 +84,6 @@ install: gradm gradm.8 acl
 		if [ -x /sbin/gradm ] ; then \
 			if [ ! -f /etc/grsec/pw ] ; then \
 				/sbin/gradm -P ; \
-			else \
-				$(FIND) /etc/grsec -type f -name pw ! -size 48c -exec /sbin/gradm -P \; ; \
 			fi \
 		fi \
 	fi
