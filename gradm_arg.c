@@ -138,7 +138,7 @@ void parse_args(int argc, char *argv[])
 				if(argc > 5 || argc < 3)
 					show_help();
 				gr_learn = 1;
-				if(argv[optind][0] != '-')
+				if(optind == (argc - 1) && argv[optind][0] != '-')
 					learn_log = strdup(argv[optind]);
 				break;
 			case 'O':
