@@ -471,7 +471,7 @@ int add_proc_subject_acl(struct role_acl *role, char * filename,
 
 	file_len = strlen(filename) + 1;
 
-        if(!strcmp(filename, "god") || stat(filename, &fstat)) {
+        if(stat(filename, &fstat)) {
 		dfile = add_deleted_file(filename);
 		fstat.st_ino = dfile->ino;
 		fstat.st_dev = 0;
