@@ -6,7 +6,7 @@
 #define GR_ACL_PATH 		GRSEC_DIR "/acl"
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
 
-#define GR_VERSION		"2.0"
+#define GR_VERSION		"2.0.1"
 
 #define GR_PWONLY		0
 #define GR_PWANDSUM		1
