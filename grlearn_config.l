@@ -11,12 +11,21 @@ FILENAME [/][^\t\n]*
 
 %option nounput
 
-%x ERROR
+%x ERROR COMMENT_STATE
 
 %%
 
+"#"					{
+					  BEGIN(COMMENT_STATE);
+					}
+"\n"					{
+					  BEGIN(INITIAL);
+					}
 "inherit-learn"				{
 					  return INHERITLEARN;
+					}
+"inherit-no-learn"			{
+					  return INHERITNOLEARN;
 					}
 "no-learn"				{
 					  return NOLEARN;
