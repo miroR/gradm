@@ -15,7 +15,7 @@ extern struct gr_learn_role_entry **special_role_list;
 }
 
 %token <string> FILENAME ROLENAME
-%token <num> NUM IPADDR;
+%token <num> NUM IPADDR
 %type <string> filename
 
 %%
