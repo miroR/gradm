@@ -75,6 +75,7 @@ void add_gradm_acl(struct role_acl *role)
 			proc_object_mode_conv("x"), GR_FEXIST))
 		exit(EXIT_FAILURE);
 	add_cap_acl(current_subject, "-CAP_ALL");
+	add_cap_acl(current_subject, "+CAP_IPC_LOCK");
 
 	return;
 }
