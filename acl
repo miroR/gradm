@@ -56,7 +56,7 @@
 # View the 1.9.x documentation for more information on
 # configuration inheritance
 #
-# new modes:
+# new object modes:
 # m -> allow creation of setuid/setgid files/directories
 #      and modification of files/directories to be setuid/setgid
 # M -> audit the setuid/setgid creation/modification
@@ -64,6 +64,7 @@
 # C -> audit the creation
 # d -> allow deletion of the file/directory
 # D -> audit the deletion
+# new subject modes:
 # r -> relax ptrace restrictions (allows process to ptrace processes
 #      other than its own descendants)
 # t -> reject all ptraces to this process
