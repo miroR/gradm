@@ -9,7 +9,7 @@ static int check_permission(struct role_acl * role, struct proc_acl * def_acl, c
 		if((tmpname = calloc(strlen(filename) + 1, sizeof(char))) == NULL)
 			failure("calloc");
 
-		strncpy(tmpname, filename, strlen(filename));
+		strcpy(tmpname, filename);
 	
 		  do {
 		   for_each_object(tmpf, def_acl->proc_object)
@@ -200,7 +200,7 @@ static int handle_notrojan_mode(void)
 		if (!(obj->mode & GR_EXEC)) continue;
 		if ((objname = malloc(strlen(obj->filename) + 1)) == NULL)
 		    failure("malloc");
-		strncpy(objname, obj->filename, strlen(obj->filename));
+		strcpy(objname, obj->filename);
 		do {
 		    for_each_role(role2, current_role) {
 		    for_each_subject(subj2, role2) {
