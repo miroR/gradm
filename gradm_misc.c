@@ -66,7 +66,7 @@ void check_acl_status(__u16 reqmode)
 	int fd;
 	int retval;
 	struct gr_arg arg;
-	struct gr_arg *parg = arg;
+	struct gr_arg *parg = &arg;
 
 	arg.mode = GRADM_STATUS;
 
