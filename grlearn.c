@@ -267,9 +267,9 @@ int main(int argc, char *argv[])
 	pid = fork();
 
 	if (pid > 0) {
-		write_pid_log(pid);
 		exit(EXIT_SUCCESS);
 	} else if (!pid) {
+		write_pid_log(getpid());
 		close(0);
 		close(1);
 		close(2);
