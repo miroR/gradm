@@ -13,6 +13,7 @@ int current_nest_depth = 0;
 	char *string;
 	__u32 long_int;
 	__u16 mode;
+	struct var_object * var;
 }
 
 %token <string> ROLE ROLE_NAME ROLE_TYPE SUBJECT SUBJ_NAME OBJ_NAME 
@@ -21,6 +22,10 @@ int current_nest_depth = 0;
 %token <string> ROLE_TRANSITION VARIABLE DEFINE DEFINE_NAME
 %type <long_int> subj_mode obj_mode ip_netmask
 %type <mode> role_type
+%type <var> variable_expression
+%left '&'
+%left '|'
+%left '-'
 
 %%
 
@@ -33,13 +38,42 @@ various_acls:			role_label
 	|			role_transitions
 	|			subject_label
 	|			variable_object
-	|			variable_object_use
+	|			variable_expression
+				{
+					interpret_variable($1);
+				}
 	|			nested_label
 	|			object_file_label
 	|			object_cap_label
 	|			object_res_label
 	|			object_connect_ip_label
 	|			object_bind_ip_label
+	;
+
+variable_expression:		VARIABLE
+				{
+					$$ = sym_retrieve($1);
+					if (!$$) {
+						fprintf(stderr, "Variable \"%s\" not defined on line %lu of %s.\n", $1, lineno, current_acl_file);
+						exit(EXIT_FAILURE);
+					}
+				}
+	|			variable_expression '|' variable_expression
+				{
+					$$ = union_objects($1, $3);
+				}
+	|			variable_expression '&' variable_expression
+				{
+					$$ = intersect_objects($1, $3);
+				}
+	|			variable_expression '-' variable_expression
+				{
+					$$ = differentiate_objects($1, $3);
+				}
+	|			'(' variable_expression ')'
+				{
+					$$ = $2;
+				}
 	;
 
 variable_object:		DEFINE DEFINE_NAME '{' var_object_list '}'
@@ -117,16 +151,6 @@ nested_subjs:			':' SUBJ_NAME
 					}
 					nested[current_nest_depth] = $3;
 					current_nest_depth++;
-				}
-	;
-
-variable_object_use:		VARIABLE
-				{
-					if (!sym_retrieve($1)) {
-						fprintf(stderr, "Variable \"%s\" not defined on line %lu of %s.\n", $1, lineno, current_acl_file);
-						exit(EXIT_FAILURE);
-					}
-					interpret_variable($1);
 				}
 	;
 

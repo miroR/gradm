@@ -8,18 +8,86 @@ struct object_variable {
 static struct object_variable *symtab = NULL;
 static unsigned int symtab_size = 0;
 
-void interpret_variable(char *variable)
+void interpret_variable(struct var_object *var)
 {
-	struct var_object *var;
-
-	var = sym_retrieve(variable);
-
 	for (; var; var = var->prev) {
 		if (!add_proc_object_acl(current_subject, var->filename, var->mode, GR_FEXIST))
 			exit(EXIT_FAILURE);
 	}
 
 	return;
+}
+
+struct var_object * intersect_objects(struct var_object *var1, struct var_object *var2)
+{
+	struct var_object *tmpvar1, *tmpvar2, *retvar = NULL;
+
+	for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
+		for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
+			if (!strcmp(tmpvar1->filename, tmpvar2->filename)) {
+				add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode & tmpvar2->mode);
+				break;
+			}
+		}
+	}
+
+	return retvar;
+}
+
+struct var_object * union_objects(struct var_object *var1, struct var_object *var2)
+{
+	struct var_object *tmpvar1, *tmpvar2, *retvar = NULL;
+	int found_dupe = 0;
+
+	for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
+		found_dupe = 0;
+		for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
+			if (!strcmp(tmpvar1->filename, tmpvar2->filename)) {
+				add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode | tmpvar2->mode);
+				found_dupe = 1;
+				break;
+			}
+		}
+		if (!found_dupe)
+			add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode);
+	}
+
+	for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
+		found_dupe = 0;
+		for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
+			if (!strcmp(tmpvar1->filename, tmpvar2->filename)) {
+				add_var_object(&retvar, tmpvar2->filename, tmpvar1->mode | tmpvar2->mode);
+				found_dupe = 1;
+				break;
+			}
+		}
+		if (!found_dupe)
+			add_var_object(&retvar, tmpvar2->filename, tmpvar2->mode);
+	}
+
+	return retvar;
+}
+
+struct var_object * differentiate_objects(struct var_object *var1, struct var_object *var2)
+{
+	struct var_object *tmpvar1, *tmpvar2, *retvar = NULL;
+	int found_dupe = 0;
+
+	for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
+		found_dupe = 0;
+		for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
+			if (!strcmp(tmpvar1->filename, tmpvar2->filename)) {
+				found_dupe = 1;
+				if (tmpvar1->mode != tmpvar2->mode)
+					add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode &= ~tmpvar2->mode);
+				break;
+			}
+		}
+		if (!found_dupe)
+			add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode);
+	}
+
+	return retvar;
 }
 
 void add_var_object(struct var_object **object, char *name, __u32 mode)

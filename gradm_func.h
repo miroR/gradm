@@ -56,4 +56,7 @@ void stop_grlearn(void);
 void sym_store(char *symname, struct var_object *object);
 struct var_object *sym_retrieve(char *symname);
 void add_var_object(struct var_object **object, char *name, __u32 mode);
-void interpret_variable(char *variable);
+void interpret_variable(struct var_object *var);
+struct var_object *union_objects(struct var_object *var1, struct var_object *var2);
+struct var_object *intersect_objects(struct var_object *var1, struct var_object *var2);
+struct var_object *differentiate_objects(struct var_object *var1, struct var_object *var2);
