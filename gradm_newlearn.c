@@ -31,6 +31,8 @@ char *dont_reduce_dirs[] = {
 				"/",
 				"/dev",
 				"/usr",
+				"/var",
+				"/opt",
 				NULL
 			   };
 
