@@ -72,6 +72,7 @@ high-reduce-path /usr/share/zoneinfo
 high-reduce-path /usr/X11R6/lib
 
 dont-reduce-path /
+dont-reduce-path /home
 dont-reduce-path /dev
 dont-reduce-path /usr
 dont-reduce-path /var
