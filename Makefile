@@ -25,7 +25,7 @@ LIBS=-lfl
 KERNVER=`uname -r | cut -d"." -f 2`
 #for 64-bit archs
 #OPT_FLAGS=-O2 -m64
-OPT_FLAGS=-O2 -g
+OPT_FLAGS=-O2
 CFLAGS=$(OPT_FLAGS) -DGRSEC_DIR=\"$(GRSEC_DIR)\" -DKERNVER=$(KERNVER)
 LDFLAGS=
 INSTALL = /usr/bin/install -c
@@ -102,7 +102,7 @@ lex.learn_pass2.c: gradm_learn_pass2.l
 install: $(GRADM_BIN) gradm.8 acl grlearn
 	mkdir -p $(DESTDIR)/sbin
 	$(INSTALL) -m 0755 $(GRADM_BIN) $(DESTDIR)/sbin
-#	$(STRIP) $(DESTDIR)/sbin/$(GRADM_BIN)
+	$(STRIP) $(DESTDIR)/sbin/$(GRADM_BIN)
 	$(INSTALL) -m 0700 grlearn $(DESTDIR)/sbin
 	$(STRIP) $(DESTDIR)/sbin/grlearn
 	mkdir -p -m 700 $(DESTDIR)$(GRSEC_DIR)

@@ -369,7 +369,7 @@ int main(int argc, char *argv[])
 
 	special_role_uid = 0;
 	
-	//no_coredump();
+	no_coredump();
 
 	init_variables();
 
