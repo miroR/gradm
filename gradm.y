@@ -36,6 +36,7 @@ compiled_acl:			various_acls
 	;
 
 various_acls:			role_label
+	|			domain_label
 	|			role_allow_ip
 	|			role_transitions
 	|			subject_label
@@ -101,6 +102,15 @@ var_object_list:		OBJ_NAME obj_mode
 				{
 				  add_var_object(&var_obj, $2, $3);
 				}
+	;
+
+domain_label:			DOMAIN ROLE_NAME ROLE_TYPE domain_user_list
+				{
+				}
+	;
+
+domain_user_list:		ROLE_NAME
+	|			domain_user_list ROLE_NAME
 	;
 
 role_label: 			ROLE ROLE_NAME role_type

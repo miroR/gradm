@@ -92,7 +92,8 @@ enum {
 	GR_ROLE_NOPW = 0x0020,
 	GR_ROLE_GOD = 0x0040,
 	GR_ROLE_LEARN = 0x0080,
-	GR_ROLE_TPE = 0x0100
+	GR_ROLE_TPE = 0x0100,
+	GR_ROLE_DOMAIN = 0x0200
 };
 
 enum {
@@ -205,6 +206,7 @@ struct role_acl {
 	struct role_acl *next;
 
 	struct role_transition *transitions;
+	uid_t *domain_children;
 	struct role_allowed_ip *allowed_ips;
 
 	struct proc_acl **subj_hash;
