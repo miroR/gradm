@@ -3,13 +3,14 @@
 #
 #It accepts lines in the form of <command> <pathname>
 #Where <command> can be inherit-learn, no-learn, inherit-no-learn,
-#high-reduce-path, dont-reduce-path, protected-path, and high-protected-path.
+#high-reduce-path, dont-reduce-path, protected-path, high-protected-path,
+#and always-reduce-path
 #
 #inherit-learn, no-learn, and inherit-no-learn operate only with
 #full learning
 #
-#high-reduce-path, dont-reduce-path, protected-path, and 
-#high-protected-path operate on both full and and regular learning 
+#high-reduce-path, dont-reduce-path, protected-path, always-reduce-path,
+#and high-protected-path operate on both full and and regular learning 
 #(subject and role learning)
 #
 #inherit-learn changes the learning process for the specified path
@@ -36,6 +37,10 @@
 #
 #dont-reduce-path modifies the heuristics of the learning process
 #so that it will never reduce accesses for this path
+#
+#always-reduce-path modifies the heuristics of the learning process
+#so that the path specified will always have all files and directories
+#within it reduced to the path specified.
 #
 #protected-path specifies a path on your system that is considered an
 #important resource.  Any process that modifies one of these paths
