@@ -70,6 +70,10 @@
 # new subject modes:
 # r -> relax ptrace restrictions (allows process to ptrace processes
 #      other than its own descendants)
+# i -> enable inheritance-based learning for this subject, causing
+#      all accesses of this subject and anything it executes to be placed
+#      in this subject, and inheritance flags added to executable objects
+#      in this subject
 #
 # user/group transitions:
 # You may now specify what users and groups a given subject can
