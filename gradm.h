@@ -13,6 +13,7 @@
 #include <termios.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <sys/poll.h>
 #include <asm/param.h>
 #include <glob.h>
 #include <dirent.h>
