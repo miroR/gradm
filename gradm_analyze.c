@@ -476,7 +476,7 @@ analyze_acls(void)
 
 		if (!check_permission(role, def_acl, "", &chk)) {
 			fprintf(stderr,
-				"CAP_SYS_MODULE, CAP_SYS_RAWIO, and CAP_MKNOD are both not "
+				"CAP_SYS_MODULE, CAP_SYS_RAWIO, and CAP_MKNOD are all not "
 				"removed in role %s.  This would allow an "
 				"attacker to modify the kernel by means of a "
 				"module or corrupt devices on your system.\n\n",
