@@ -36,7 +36,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 %x ROLE_STATE SUBJECT_STATE IP_STATE RES_STATE COMMENT_STATE ROLETYPE_STATE
 %x INCLUDE_STATE IPNETMASK_STATE IPPORT_STATE ROLETRANS_STATE
 %x VAR_STATE VAR_OBJ_STATE IDTRANS_STATE DOMAIN_STATE DOMAINTYPE_STATE
-%x DOMAINLIST_STATE
+%x DOMAINLIST_STATE IPIP_STATE
 
 %%
 
@@ -123,14 +123,16 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return RES_SOFTHARD;
 					}
 
-<IP_STATE>"disabled"			{
+<IPIP_STATE>"disabled"			{
 					  return DISABLED;
 					}
-<IP_STATE>[-0-9a-zA-Z.]*[a-zA-Z][-0-9a-zA-Z.]*		{
+<IPIP_STATE>[-0-9a-zA-Z.]*[a-zA-Z][-0-9a-zA-Z.]*		{
+					  BEGIN(IP_STATE);
 					  gradmlval.string = gr_strdup(yytext);
 					  return HOSTNAME;
 					}
-<IP_STATE>{IP}				{
+<IPIP_STATE>{IP}			{
+					  BEGIN(IP_STATE);
 					  gradmlval.num = get_ip(yytext);
 					  return IPADDR;
 					}
@@ -238,7 +240,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return DOMAIN;
 					}
 "role_allow_ip"				{
-					  BEGIN(IP_STATE);
+					  BEGIN(IPIP_STATE);
 					  return ROLE_ALLOW_IP;
 					}
 "role_transitions"			{
@@ -250,11 +252,11 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return SUBJECT;
 					}
 "connect"				{
-					  BEGIN(IP_STATE);
+					  BEGIN(IPIP_STATE);
 					  return CONNECT;
 					}
 "bind"					{
-					  BEGIN(IP_STATE);
+					  BEGIN(IPIP_STATE);
 					  return BIND;
 					}
 "include"[ \t]*[<][/].*[>]		{
