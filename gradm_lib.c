@@ -46,13 +46,13 @@ void * gr_stat_alloc(unsigned long len)
 	void *ret = NULL;
 
 	if (stat_alloc == NULL) {
-		stat_alloc = calloc(MAX_MEM_SIZE, sizeof(struct mem_entry *));
+		stat_alloc_num = MAX_MEM_SIZE;
+		stat_alloc = calloc(stat_alloc_num, sizeof(struct mem_entry *));
 		if (stat_alloc == NULL)
 			failure("calloc");
-		stat_alloc_num = MAX_MEM_SIZE;
 
 		/* allocate new mem_entries */
-		for (j = 0; j < MAX_MEM_SIZE; j++) {
+		for (j = 0; j < stat_alloc_num; j++) {
 			stat_alloc[j] = calloc(1, sizeof(struct mem_entry));
 			if (stat_alloc[j] == NULL)
 				failure("calloc");
@@ -75,21 +75,21 @@ void * gr_stat_alloc(unsigned long len)
 		stat_alloc = realloc(stat_alloc, (stat_alloc_num + MAX_MEM_SIZE) * sizeof(struct mem_entry *));
 		if (stat_alloc == NULL)
 			failure("realloc");
-		stat_alloc_num = stat_alloc_num + MAX_MEM_SIZE;
-		memset(stat_alloc + MAX_MEM_SIZE, 0, MAX_MEM_SIZE * sizeof(struct mem_entry *));
+		memset(stat_alloc + stat_alloc_num, 0, MAX_MEM_SIZE * sizeof(struct mem_entry *));
 
 		/* allocate new mem_entries */
 		for (j = 0; j < MAX_MEM_SIZE; j++) {
-			stat_alloc[MAX_MEM_SIZE + j] = calloc(1, sizeof(struct mem_entry));
-			if (stat_alloc[MAX_MEM_SIZE + j] == NULL)
+			stat_alloc[stat_alloc_num + j] = calloc(1, sizeof(struct mem_entry));
+			if (stat_alloc[stat_alloc_num + j] == NULL)
 				failure("calloc");
 		}
+		stat_alloc_num = stat_alloc_num + MAX_MEM_SIZE;
 	}
 
 	/* ->data was null, let's allocate it */
-	stat_alloc[i]->data = malloc(PATH_MAX * MAX_MEM_SIZE);
+	stat_alloc[i]->data = calloc(MAX_MEM_SIZE, PATH_MAX);
 	if (stat_alloc[i]->data == NULL)
-		failure("malloc");
+		failure("calloc");
 	stat_alloc[i]->current = stat_alloc[i]->data + len;
 	stat_alloc_start = i;
 	ret = stat_alloc[i]->data;
@@ -127,7 +127,7 @@ void * gr_dyn_realloc(void *addr, unsigned long len)
 	else {
 		ret = realloc(resent, (MAX_RESIZE_SIZE * len) + sizeof(struct resize_entry));
 		if (ret == NULL)
-			failure("relloc");
+			failure("realloc");
 		resent = ret;
 		resent->max = MAX_RESIZE_SIZE * len;
 		ret = ret + sizeof(struct resize_entry);
