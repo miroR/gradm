@@ -168,7 +168,6 @@ learn_log:
 			eff = $17;
 			fs = $19;
 
-
 			match_role(role_list, uid, gid, &group, &user);
 			/* only add objects for the role currently in memory */
 			if ((current_learn_rolemode == GR_ROLE_GROUP && group && !strcmp(group->rolename, current_learn_rolename)) ||

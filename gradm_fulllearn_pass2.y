@@ -109,39 +109,6 @@ learn_log:
 		}
 	| ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' id_type ':' NUM ':' NUM ':' NUM ':' IPADDR
 	{
-			struct gr_learn_group_node *group = NULL;
-			struct gr_learn_user_node *user = NULL;
-			uid_t uid;
-			gid_t gid;
-			unsigned long res1, res2;
-			u_int32_t addr;
-			char *filename = $9;
-
-			/* check if we have an inherited learning subject */
-			if (strcmp($11, "/")) {
-				filename = $11;
-				free($9);
-			} else
-				free($11);
-
-			uid = $5;
-			gid = $7;
-			res1 = $13;
-			res2 = $15;
-
-			addr = $21;
-
-			match_role(role_list, uid, gid, &group, &user);
-	
-			if (user) {
-				insert_ip(&(user->allowed_ips), addr, 0, 0, 0);
-				insert_learn_user_subject(user, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
-			} else if (group) {
-				insert_ip(&(group->allowed_ips), addr, 0, 0, 0);
-				insert_learn_group_subject(group, conv_filename_to_struct(filename, GR_FIND | GR_OVERRIDE));
-			}
-
-			free(filename);
 	}
 	;
 %%
