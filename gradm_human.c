@@ -200,7 +200,7 @@ void
 pass_struct_to_human(FILE * stream)
 {
 	unsigned short i;
-	char modes[32];
+	char modes[33];
 	struct role_acl *role;
 	struct proc_acl *proc;
 	struct file_acl *filp;
