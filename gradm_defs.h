@@ -320,7 +320,7 @@ struct sprole_pw {
 	unsigned char *rolename;
 	unsigned char salt[GR_SALT_SIZE];
 	unsigned char sum[GR_SHA_SUM_SIZE];
-}
+};
 
 struct gr_arg {
         struct user_acl_role_db role_db;
@@ -333,8 +333,7 @@ struct gr_arg {
 	unsigned short segv_dev;
 	ino_t segv_inode;	
 	uid_t segv_uid;
-        __u16 mode;
-  
+        __u16 mode;  
 };      
 
 struct learn_info ** learn_db;
