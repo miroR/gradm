@@ -540,7 +540,7 @@ void greatest_occurring_modes(struct gr_learn_file_node *node, u_int32_t *modear
 	for (i = 0; i < 12; i++) {
 		if (counts[i] > counts[max])
 			max = i;
-		else if (counts[i] > counts[max2])
+		else if (max == max2 || counts[i] > counts[max2])
 			max2 = i;
 	}
 
