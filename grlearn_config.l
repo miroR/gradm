@@ -15,10 +15,10 @@ FILENAME [/][^\t\n]*
 
 %%
 
-"#"					{
+<*>"#"					{
 					  BEGIN(COMMENT_STATE);
 					}
-"\n"					{
+<*>"\n"					{
 					  BEGIN(INITIAL);
 					}
 "inherit-learn"				{
