@@ -50,7 +50,7 @@ expand_acl(struct proc_acl *proc, struct role_acl *role)
 						    (proc,
 						     tmpf1->filename,
 						     tmpf1->mode,
-						     GR_FEXIST);
+						     GR_FEXIST | GR_GLOB | GR_SYMLINK);
 				}
 			}
 		}
@@ -78,7 +78,7 @@ expand_nested_acl(struct proc_acl *proc)
 				add_proc_object_acl(proc,
 						    tmpf1->filename,
 						    tmpf1->mode,
-						    GR_FEXIST);
+						    GR_FEXIST | GR_GLOB | GR_SYMLINK);
 		}
 	}
 
