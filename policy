@@ -181,9 +181,43 @@ subject /
 #	bind	0.0.0.0 stream dgram tcp udp
 
 # the d flag protects /proc fd and mem entries for sshd
-subject /usr/sbin/sshd dp
-	/etc/ssh r
-	/dev/log rw
-	+CAP_SYS_TTY_CONFIG
+subject /usr/sbin/sshd dpo
+	/		h
+	/bin/bash	x
+	/dev		h
+	/dev/log	rw
+	/dev/null	r
+	/dev/ptmx	rw
+	/dev/pts	rw
+	/dev/tty	rw
+	/dev/tty?	rw
+	/etc		r
+	/etc/grsec	h
+	/home
+	/lib		rx
+	/root
+	/proc
+	/proc/kcore	h
+	/proc/sys	h
+	/usr/lib
+	/var/log
+	/var/log/lastlog	rw
+	/var/log/wtmp		w
+	/var/run/sshd
+	/var/run/utmp		rw
+
+	-CAP_ALL
+	+CAP_CHOWN
+	+CAP_SETGID
+	+CAP_SETUID
 	+CAP_SYS_CHROOT
 
+subject /usr/X11R6/bin/XFree86
+	/dev/mem	rw
+
+	+CAP_SYS_ADMIN
+	+CAP_SYS_TTY_CONFIG
+	+CAP_SYS_RAWIO
+
+subject /usr/bin/ssh
+	/etc/ssh/ssh_config r
