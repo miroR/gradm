@@ -44,7 +44,7 @@ learn_log:
 			res2 = atol($15);
 
 			if (inet_aton($21, &ip))
-				addr = ntohl(ip.s_addr);
+				addr = ip.s_addr;
 			else
 				addr = 0;				
 
@@ -72,7 +72,7 @@ learn_log:
 			gid = atoi($7);
 
 			if (inet_aton($23, &ip))
-				addr = ntohl(ip.s_addr);
+				addr = ip.s_addr;
 			else
 				addr = 0;				
 
