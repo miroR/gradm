@@ -249,6 +249,7 @@ int main(int argc, char *argv[])
 	struct file_acl *filp;
 	struct proc_acl *proc;
 	struct role_acl *rolp;
+	struct role_transition *rolet;
 	extern struct rlimconv rlim_table[];
 	int i;
 #endif
@@ -268,6 +269,10 @@ int main(int argc, char *argv[])
 		rolp->roletype & GR_ROLE_GROUP ? "group" :
 		rolp->roletype & GR_ROLE_DEFAULT ? "default" : "",
 		rolp->uidgid);
+	printf("\tTRANSITIONS:");
+	for (rolet = rolp->transitions; rolet; rolet=rolet->prev)
+		printf(" %s", rolet->rolename);
+	printf("\n");
 	for (proc = rolp->proc_subject;proc;proc=proc->prev) {
 		printf("\tSUBJECT: %s dev:%d inode:%lu mode:%d c_raise:%x c_drop:%x\n",
 			proc->filename, proc->dev, proc->inode, proc->mode, proc->cap_raise,
