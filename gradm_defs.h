@@ -33,7 +33,7 @@
 #define MAX_INCLUDE_DEPTH	10
 #define MAX_NEST_DEPTH		8
 
-#define GR_NLIMITS	(RLIM_NLIMITS + 1)
+#define GR_NLIMITS	(RLIMIT_LOCKS + 2)
 
 enum {
 	GRADM_DISABLE 	= 0,
