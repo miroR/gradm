@@ -13,7 +13,6 @@ char *high_reduce_dirs[] = {
 				"/usr/bin",
 				"/usr/sbin",
 				"/sbin",
-				"/etc",
 				"/bin",
 				"/usr/local/share",
 				"/usr/local/bin",
@@ -562,10 +561,10 @@ int reduce_all_leaves(struct gr_learn_file_node *node)
 	return 0;
 }
 
-u_int16_t greatest_occurring_mode(struct gr_learn_file_node *node)
+void greatest_occurring_modes(struct gr_learn_file_node *node, u_int32_t *modeary)
 {
 	struct gr_learn_file_node **tmp;
-	u_int16_t modes[12] = { GR_FIND,
+	u_int32_t modes[12] = { GR_FIND,
 			    GR_FIND | GR_READ,
 			    GR_FIND | GR_READ | GR_WRITE,
 			    GR_FIND | GR_READ | GR_EXEC,
@@ -579,7 +578,7 @@ u_int16_t greatest_occurring_mode(struct gr_learn_file_node *node)
 			    GR_FIND | GR_READ | GR_WRITE | GR_CREATE,
 			};
 	unsigned long counts[12] = {0};
-	u_int16_t max;
+	u_int16_t max, max2;
 	int i;
 
 	tmp = node->leaves;
@@ -594,35 +593,43 @@ u_int16_t greatest_occurring_mode(struct gr_learn_file_node *node)
 	}
 
 	max = 0;
+	max2 = 0;
 
 	for (i = 0; i < 12; i++) {
 		if (counts[i] > counts[max])
 			max = i;
+		else if (counts[i] > counts[max2])
+			max2 = i;
 	}
 
-	return modes[max];
+	*modeary = modes[max];
+	*(modeary + 1) = modes[max2];
 }
 
 int reduce_children_mode(struct gr_learn_file_node *node)
 {
 	struct gr_learn_file_node **tmp;
 	struct gr_learn_file_node **tmp2;
-	u_int16_t mode;
+	u_int32_t modes[2];
 	int tmpdir = 0;
 
 	tmp = node->leaves;
 	if (!tmp)
 		return 0;
 	
-	mode = greatest_occurring_mode(node);
+	greatest_occurring_modes(node, (u_int32_t *)&modes);
 
-	node->mode |= mode;
+	node->mode |= modes[0];
+	if (modes[0] == (GR_FIND | GR_WRITE) &&
+	    modes[1] == (GR_FIND | GR_READ | GR_WRITE | GR_CREATE | GR_DELETE))
+		node->mode |= modes[1];
 
 	if (node->mode == (GR_FIND | GR_READ | GR_WRITE | GR_CREATE | GR_DELETE))
 		tmpdir = 1;
 
 	while (*tmp) {
-		if (((tmpdir && !((*tmp)->mode & GR_EXEC)) || ((*tmp)->mode == mode)) && !(*tmp)->leaves) {
+		if (((tmpdir && !((*tmp)->mode & GR_EXEC)) ||
+		     ((*tmp)->mode == modes[0])) && !(*tmp)->leaves) {
 			tmp2 = tmp;
 			cachednode = NULL;
 			cachednode = 0;
@@ -781,7 +788,7 @@ int *analyze_node_reduction(struct gr_learn_file_node *node)
 
 	tmp = high_reduce_dirs;
 	while (*tmp) {
-		if (!strcmp(node->filename, *tmp) && ((node_num > 4) || (child_num > 10)))
+		if (!strcmp(node->filename, *tmp) && ((node_num > 2) || child_num > 5))
 			reduction_level *= 2;
 		tmp++;
 	}
