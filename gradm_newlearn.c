@@ -554,6 +554,8 @@ int reduce_children_mode(struct gr_learn_file_node *node)
 	struct gr_learn_file_node **tmp;
 	struct gr_learn_file_node **tmp2;
 	u_int32_t modes[2];
+	char str1[33], str2[33];
+	int ret = 0;
 	int tmpdir = 0;
 
 	tmp = node->leaves;
@@ -564,6 +566,9 @@ int reduce_children_mode(struct gr_learn_file_node *node)
 
 	node->mode |= modes[0];
 	node->mode |= modes[1];
+	conv_mode_to_str(modes[0], str1, sizeof(str1));
+	conv_mode_to_str(modes[1], str2, sizeof(str2));
+	printf("mode0=%s, mode1=%s\n", str1, str2);
 
 	if (node->mode == (GR_FIND | GR_READ | GR_WRITE | GR_CREATE | GR_DELETE))
 		tmpdir = 1;
@@ -575,6 +580,7 @@ int reduce_children_mode(struct gr_learn_file_node *node)
 			tmp2 = tmp;
 			cachednode = NULL;
 			cachednode = 0;
+			ret++;
 			free((*tmp)->filename);
 			gr_stat_free(*tmp);
 			while (*(tmp2 + 1)) {
@@ -586,7 +592,7 @@ int reduce_children_mode(struct gr_learn_file_node *node)
 			tmp++;
 	}
 
-	return 0;
+	return ret;
 }
 
 int analyze_node_read_permissions(struct gr_learn_file_node *node)
@@ -682,6 +688,7 @@ int *analyze_node_reduction(struct gr_learn_file_node *node)
 	unsigned long child_num;
 	unsigned long depth_num;
 	unsigned long nested_num;
+	int child_reduced = 0;
 	char **tmp;
 
 	if (!node->leaves)
@@ -746,11 +753,17 @@ int *analyze_node_reduction(struct gr_learn_file_node *node)
 	if (node->subject)
 		goto final;
 
+	if (!strcmp(node->filename, "/home/spender"))
+		printf("/home/spender is %d\n", reduction_level);
+
 	if (analyze_node_read_permissions(node) || analyze_node_write_permissions(node))
 		reduction_level *= 2;
 	else {
-		if (reduction_level >= reduce_leaves_thresh)
-			return (int *)&reduce_children_mode;
+		if (reduction_level >= reduce_child_thresh) {
+			child_reduced = (int *)&reduce_children_mode;
+			if (child_reduced > (3 * child_num) / 4)
+				return 0;
+		}
 	}
 
 final:
