@@ -742,7 +742,6 @@ void parse_acls(void)
 	}
 
 	add_kernel_acl();
-	add_admin_acl();
 
 	gradmin = open_acl_file(GR_ACL_PATH);
 	change_current_acl_file(GR_ACL_PATH);

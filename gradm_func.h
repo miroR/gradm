@@ -112,11 +112,6 @@ void add_cap_acl(struct proc_acl *subject, const char * cap);
 //	process acl with that derived from capability.h through 
 //	converting the capability argument to its integer equivalent.
 
-void add_admin_acl(void);
-//Pre: none
-//Post: adds the acl for admin mode: full inherited capabilities, full 
-//	overriding file access, kill and view access
-
 void add_gradm_acl(struct role_acl *role);
 //Pre: none
 //Post: adds the acl for gradm: very restrictive
