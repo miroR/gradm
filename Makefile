@@ -103,9 +103,9 @@ lex.learn_pass2.c: gradm_learn_pass2.l
 install: $(GRADM_BIN) gradm.8 acl grlearn
 	mkdir -p $(DESTDIR)/sbin
 	$(INSTALL) -m 0755 $(GRADM_BIN) $(DESTDIR)/sbin
-#	$(STRIP) $(DESTDIR)/sbin/$(GRADM_BIN)
+	$(STRIP) $(DESTDIR)/sbin/$(GRADM_BIN)
 	$(INSTALL) -m 0700 grlearn $(DESTDIR)/sbin
-#	$(STRIP) $(DESTDIR)/sbin/grlearn
+	$(STRIP) $(DESTDIR)/sbin/grlearn
 	mkdir -p -m 700 $(DESTDIR)$(GRSEC_DIR)
 	@if [ ! -f $(DESTDIR)$(GRSEC_DIR)/acl ] ; then \
 		$(INSTALL) -m 0600 acl $(DESTDIR)$(GRSEC_DIR) ; \
