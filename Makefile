@@ -87,9 +87,10 @@ install: gradm gradm.8 acl
 	$(INSTALL) -m 0644 gradm.8 $(DESTDIR)$(MANDIR)/man8
 	@if [ -z $(DESTDIR) ] ; then \
 		if [ -x /sbin/gradm ] ; then \
+			$(FIND) /etc/grsec -type f -name pw -size 48c -exec rm -f /etc/grsec/pw \; ; \
 			if [ ! -f /etc/grsec/pw ] ; then \
 				/sbin/gradm -P ; \
-			fi \
+                        fi \
 		fi \
 	fi
 
