@@ -11,6 +11,7 @@
 # g -> This role is a group role
 # G -> This role can use gradm to authenticate to the kernel
 #      An ACL for gradm will automatically be added to the role
+# l -> Enable learning for this role
 #
 # a role can only be one of user, group, or special
 #
