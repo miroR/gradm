@@ -63,4 +63,3 @@ subject /
 	-CAP_MKNOD
 	-CAP_SYS_RAWIO
 	-CAP_SYS_MODULE
-include </etc/grsec/otherstuff>
