@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	fd2 = open(argv[1], O_WRONLY | O_APPEND | O_CREAT | O_SYNC, 0600);
+	fd2 = open(argv[1], O_WRONLY | O_APPEND | O_CREAT, 0600);
 
 	if (fd2 < 0) {
 		fprintf(stderr, "Error opening %s\n"
@@ -210,9 +210,9 @@ int main(int argc, char *argv[])
 	fds.events = POLLIN;
 
 	while (poll(&fds, 1, -1) > 0) {
-		memset(buf, 0, LEARN_BUFFER_SLOTS * LEARN_BUFFER_SIZE);
+		for(i = 0; i < LEARN_BUFFER_SLOTS; i++)
+			*(buf + (i * LEARN_BUFFER_SIZE)) = 0;
 		retval = read(fd, buf, LEARN_BUFFER_SLOTS * LEARN_BUFFER_SIZE);
-
 		for(i = 0; i < LEARN_BUFFER_SLOTS; i++) {
 			tmpaddr = buf + (i * LEARN_BUFFER_SIZE);
 			if (*tmpaddr == 0)
