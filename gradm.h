@@ -22,10 +22,10 @@
 #include <pwd.h>
 #include <grp.h>
 #include <fnmatch.h>
+#include <elf.h>
 #include <sys/resource.h>
 #include <sys/mman.h>
 #include <asm/posix_types.h>
-#include <linux/elf.h>
 #include <linux/capability.h>
 #include <linux/limits.h>
 #include <linux/threads.h>
