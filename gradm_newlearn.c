@@ -447,7 +447,7 @@ int reduce_all_children(struct gr_learn_file_node *node)
 	for (i = 0; i < num; i++) {
 		if (*(tmp + i) && !(*(tmp + i))->leaves) {
 			cachednode = NULL;
-			cachednode = 0;
+			cachedlen = 0;
 			free((*(tmp + i))->filename);
 			gr_stat_free(*(tmp + i));
 			j = i;
@@ -490,7 +490,7 @@ int reduce_all_leaves(struct gr_learn_file_node *node)
 			}
 		}
 		cachednode = NULL;
-		cachednode = 0;
+		cachedlen = 0;
 		free((*tmp)->filename);
 		gr_stat_free(*tmp);
 		*tmp = NULL;
@@ -575,7 +575,7 @@ int reduce_children_mode(struct gr_learn_file_node *node)
 		    && !(*tmp)->leaves) {
 			tmp2 = tmp;
 			cachednode = NULL;
-			cachednode = 0;
+			cachedlen = 0;
 			ret++;
 			free((*tmp)->filename);
 			gr_stat_free(*tmp);
@@ -807,7 +807,7 @@ int third_reduce_node(struct gr_learn_file_node *node,
 			node->mode |= (*tmp)->mode;
 			tmp2 = tmp;
 			cachednode = NULL;
-			cachednode = 0;
+			cachedlen = 0;
 			free((*tmp)->filename);
 			gr_stat_free(*tmp);
 			while(*(tmp2 + 1)) {
