@@ -700,6 +700,12 @@ proc_object_mode_conv(const char *mode)
 			retmode |= GR_WRITE;
 			retmode |= GR_APPEND;
 			break;
+		case 'c':
+			retmode |= GR_CREATE;
+			break;
+		case 'd':
+			retmode |= GR_DELETE;
+			break;
 		case 'x':
 			retmode |= GR_EXEC;
 			break;
@@ -734,13 +740,19 @@ proc_object_mode_conv(const char *mode)
 		case 'I':
 			retmode |= GR_AUDIT_INHERIT;
 			break;
-		case 'C':
+		case 'M':
 			retmode |= GR_AUDIT_SETID;
+			break;
+		case 'C':
+			retmode |= GR_AUDIT_CREATE;
+			break;
+		case 'D':
+			retmode |= GR_AUDIT_DELETE;
 			break;
 		case 's':
 			retmode |= GR_SUPPRESS;
 			break;
-		case 'c':
+		case 'm':
 			retmode |= GR_SETID;
 			break;
 		default:

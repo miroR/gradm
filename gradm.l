@@ -153,7 +153,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(gr_line);
 					  return OBJ_NAME;
 					}
-<VAR_OBJ_STATE>[rwxahitcFRWXAICso]+	{
+<VAR_OBJ_STATE>[rwxahitmFRWXAIMdDcCso]+	{
 					  gradmlval.string = strdup(yytext);
 					  return OBJ_MODE;
 					}

@@ -11,14 +11,18 @@ static struct mode_name_table {
 	GR_APPEND, 'a'}, {
 	GR_INHERIT, 'i'}, {
 	GR_PTRACERD, 't'}, {
-	GR_SETID,    'c'}, {
+	GR_SETID,    'm'}, {
+	GR_CREATE,    'c'}, {
+	GR_DELETE,    'd'}, {
 	GR_AUDIT_FIND, 'F'}, {
 	GR_AUDIT_READ, 'R'}, {
 	GR_AUDIT_WRITE, 'W'}, {
 	GR_AUDIT_EXEC, 'X'}, {
 	GR_AUDIT_APPEND, 'A'}, {
 	GR_AUDIT_INHERIT, 'I'}, {
-	GR_AUDIT_SETID, 'C'}, {
+	GR_AUDIT_SETID, 'M'}, {
+	GR_AUDIT_CREATE, 'C'}, {
+	GR_AUDIT_DELETE, 'D'}, {
 	GR_SUPPRESS, 's'}, {
 	GR_FIND, 'h'}
 };
