@@ -61,6 +61,7 @@ add_gradm_acl(struct role_acl *role)
 	char gradm_realpath[PATH_MAX] = { 0 };
 	char *gradm_name;
 	struct ip_acl ip;
+	struct protoent *proto;
 
 	find_gradm_path(gradm_realpath);
 
@@ -78,13 +79,24 @@ add_gradm_acl(struct role_acl *role)
 		exit(EXIT_FAILURE);
 	}
 
+	proto = getprotobyname("udp");
+	if (proto == NULL) {
+		fprintf(stderr, "Error while parsing /etc/protocols.\n");
+		exit(EXIT_FAILURE);
+	}
 	memset(&ip, 0, sizeof (ip));
+	ip.low = 2049;
+	ip.high = 2049;
+	ip.type = SOCK_DGRAM;
+	ip.proto[proto->p_proto / 32] |= (1 << (proto->p_proto % 32));
 	add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
+	memset(&ip, 0, sizeof (ip));
 	add_ip_acl(current_subject, GR_IP_BIND, &ip);
 
 	add_proc_object_acl(current_subject, "/", proc_object_mode_conv("h"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/etc/ld.so.cache", proc_object_mode_conv("r"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/etc/ld.so.preload", proc_object_mode_conv("r"), GR_FEXIST);
+	add_proc_object_acl(current_subject, "/etc/protocols", proc_object_mode_conv("r"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/dev/urandom", proc_object_mode_conv("r"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/lib", proc_object_mode_conv("rx"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/usr/lib", proc_object_mode_conv("rx"), GR_FEXIST);
