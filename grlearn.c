@@ -146,26 +146,27 @@ __inline__ char * rewrite_learn_entry(char *p)
 	*endobj = '\0';
 	/* now we have separated the string */
 
-	if (strncmp(tmp, "/proc/", 6))
+	if (strncmp(tmp, "/proc/", 6)) {
+		*endobj = '\t';
 		return p;
+	}
 
-	if (*(tmp + 6) < '1' || *(tmp + 6) > '9')
+	if (*(tmp + 6) < '1' || *(tmp + 6) > '9') {
+		*endobj = '\t';
 		return p;
+	}
 
 	slash = strchr(tmp + 6, '/');
+	*endobj = '\t';
+	next = endobj;
+	while(*next++);
 	if (slash == NULL) {
 		/* we have a /proc/<pid> dir, convert to /proc */
-		*endobj = '\t';
-		next = endobj;
-		while(*next++);
 		len = next - endobj;
 		memmove(tmp + 5, endobj, len);
 		return next;
 	} else {
 		/* we have /proc/<pid>/something, convert to /proc/star/something */
-		*endobj = '\t';
-		next = endobj;
-		while(*next++);
 		len = next - slash;
 		*(tmp + 6) = '*';
 		memmove(tmp + 7, slash, len);
