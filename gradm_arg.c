@@ -30,7 +30,7 @@ show_help(void)
 	       "	-L <filename>, --learn\n"
 	       "			Specify the pathname for learning logs\n"
 	       "	-O <filename>, --output\n"
-	       "			Specify where to place ACLs generated from learning mode\n"
+	       "			Specify where to place policies generated from learning mode\n"
 	       "	-M <filename|uid>, --modsegv\n"
 	       "			Remove a ban on a specific file or UID\n"
 	       "	-a <rolename> , --auth\n"
@@ -75,7 +75,7 @@ parse_args(int argc, char *argv[])
 	int gr_enable = 0;
 	int gr_fulllearn = 0;
 	struct gr_pw_entry entry;
-	struct gr_arg *grarg;
+	struct gr_arg_wrapper *grarg;
 	char cwd[PATH_MAX];
 	const char *const short_opts = "SEFuDP::RL:O:M:a:n:hv";
 	const struct option long_opts[] = {
@@ -153,8 +153,8 @@ parse_args(int argc, char *argv[])
 			expand_acls();
 			analyze_acls();
 			grarg = conv_user_to_kernel(&entry);
-			read_saltandpass(entry.rolename, grarg->salt,
-					 grarg->sum);
+			read_saltandpass(entry.rolename, grarg->arg->salt,
+					 grarg->arg->sum);
 			transmit_to_kernel(grarg);
 			break;
 		case 'M':
@@ -285,8 +285,8 @@ parse_args(int argc, char *argv[])
 		if (gr_learn)
 			start_grlearn(learn_log);
 		grarg = conv_user_to_kernel(&entry);
-		read_saltandpass(entry.rolename, grarg->salt,
-				 grarg->sum);
+		read_saltandpass(entry.rolename, grarg->arg->salt,
+				 grarg->arg->sum);
 		transmit_to_kernel(grarg);
 	} else if (gr_learn && gr_output) {
 		FILE *stream;

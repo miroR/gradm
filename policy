@@ -1,4 +1,5 @@
-#sample default process acl for grsecurity
+#sample default policy for grsecurity
+#
 # Role flags:
 # A -> This role is an administrative role, thus it has special privilege normal
 #      roles do not have.  In particular, this role bypasses the 
@@ -6,11 +7,12 @@
 # N -> Don't require authentication for this role.  To access
 #      the role, use gradm -n <rolename>
 # s -> This role is a special role, meaning it does not belong to a
-#      user or group, and does not fall under ACL enforcement
+#      user or group, and does not require an enforced secure policy
+#      base to be included in the ruleset
 # u -> This role is a user role
 # g -> This role is a group role
 # G -> This role can use gradm to authenticate to the kernel
-#      An ACL for gradm will automatically be added to the role
+#      A polciy for gradm will automatically be added to the role
 # T -> Enable TPE for this role
 # l -> Enable learning for this role
 #

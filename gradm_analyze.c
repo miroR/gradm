@@ -83,7 +83,7 @@ check_subjects(struct role_acl *role)
 		if (!check_permission(role, def_acl, tmp->filename, &chk))
 			fprintf(stderr,
 				"Warning: write access is allowed to your "
-				"subject ACL for %s in role %s.  Please ensure that the subject is running with less privilege than the default subject.\n",
+				"subject for %s in role %s.  Please ensure that the subject is running with less privilege than the default subject.\n",
 				tmp->filename, role->rolename);
 
 	return errs_found;
@@ -368,7 +368,7 @@ analyze_acls(void)
 		if (!check_permission(role, def_acl, GRSEC_DIR, &chk)) {
 			fprintf(stderr,
 				"Viewing access is allowed by role %s to %s, the directory which "
-				"holds ACL and ACL password information.\n\n",
+				"stores RBAC policies and RBAC password information.\n\n",
 				role->rolename, GRSEC_DIR);
 			errs_found++;
 		}
@@ -503,7 +503,7 @@ analyze_acls(void)
 		if (!check_permission(role, def_acl, "", &chk)) {
 			fprintf(stderr, "CAP_SYS_ADMIN is not "
 				"removed in role %s.  This would allow an "
-				"attacker to mount filesystems to bypass ACLs\n\n",
+				"attacker to mount filesystems to bypass your policies\n\n",
 				role->rolename);
 			errs_found++;
 		}

@@ -14,18 +14,17 @@ open_acl_file(const char *filename)
 }
 
 int
-transmit_to_kernel(struct gr_arg *buf)
+transmit_to_kernel(struct gr_arg_wrapper *buf)
 {
 	int fd;
 	int err = 0;
-	void *pbuf = buf;
 
 	if ((fd = open(GRDEV_PATH, O_WRONLY)) < 0) {
 		fprintf(stderr, "Could not open %s.\n", GRDEV_PATH);
 		failure("open");
 	}
 
-	if (write(fd, &pbuf, sizeof(struct gr_arg *)) != sizeof(struct gr_arg *)) {
+	if (write(fd, buf, sizeof(struct gr_arg_wrapper)) != sizeof(struct gr_arg_wrapper)) {
 		err = 1;
 		switch (errno) {
 		case EFAULT:
@@ -57,12 +56,12 @@ transmit_to_kernel(struct gr_arg *buf)
 	}
 
 	close(fd);
-	if (buf->mode != GRADM_DISABLE) {
-		memset(buf, 0, sizeof(struct gr_arg));
+	if (buf->arg->mode != GRADM_DISABLE) {
+		memset(buf->arg, 0, sizeof(struct gr_arg));
 		if (err)
 			exit(EXIT_FAILURE);
 	} else {
-		memset(buf, 0, sizeof(struct gr_arg));
+		memset(buf->arg, 0, sizeof(struct gr_arg));
 		if (err)
 			exit(EXIT_FAILURE);
 		else
@@ -77,8 +76,11 @@ void check_acl_status(__u16 reqmode)
 	int fd;
 	int retval;
 	struct gr_arg arg;
-	struct gr_arg *parg = &arg;
+	struct gr_arg_wrapper wrapper;
 
+	wrapper.version = GRADM_VERSION;
+	wrapper.size = sizeof(struct gr_arg);
+	wrapper.arg = &arg;
 	arg.mode = GRADM_STATUS;
 
 	if ((fd = open(GRDEV_PATH, O_WRONLY)) < 0) {
@@ -86,7 +88,7 @@ void check_acl_status(__u16 reqmode)
 		failure("open");
 	}
 
-	retval = write(fd, &parg, sizeof(struct gr_arg *));
+	retval = write(fd, &wrapper, sizeof(struct gr_arg_wrapper));
 	close(fd);
 
 	switch (reqmode) {
@@ -131,6 +133,10 @@ init_variables(void)
 	current_acl_file = NULL;
 	current_role = NULL;
 	current_subject = NULL;
+	num_roles = 0;
+	num_subjects = 0;
+	num_objects = 0;
+	num_pointers = 0;
 
 	memset(&ip, 0, sizeof (ip));
 

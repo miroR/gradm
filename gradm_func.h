@@ -1,7 +1,7 @@
 void yyerror(const char *s);
 FILE *open_acl_file(const char *filename);
 void get_user_passwd(struct gr_pw_entry *entry, int mode);
-int transmit_to_kernel(struct gr_arg *buf);
+int transmit_to_kernel(struct gr_arg_wrapper *buf);
 void generate_salt(struct gr_pw_entry *entry);
 void write_user_passwd(struct gr_pw_entry *entry);
 void parse_acls(void);
@@ -20,7 +20,7 @@ void add_cap_acl(struct proc_acl *subject, const char *cap);
 void add_gradm_acl(struct role_acl *role);
 void add_grlearn_acl(struct role_acl *role);
 void change_current_acl_file(const char *filename);
-struct gr_arg *conv_user_to_kernel(struct gr_pw_entry *entry);
+struct gr_arg_wrapper *conv_user_to_kernel(struct gr_pw_entry *entry);
 int parent_dir(const char *filename, char *parent_dirent[]);
 void rem_proc_object_acl(struct proc_acl *proc, struct file_acl *filp);
 void expand_acls(void);

@@ -26,7 +26,8 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
 %x ROLE_STATE SUBJECT_STATE IP_STATE RES_STATE COMMENT_STATE ROLETYPE_STATE
 %x INCLUDE_STATE IPNETMASK_STATE IPPORT_STATE ROLETRANS_STATE
-%x VAR_STATE VAR_OBJ_STATE IDTRANS_STATE
+%x VAR_STATE VAR_OBJ_STATE IDTRANS_STATE DOMAIN_STATE DOMAINTYPE_STATE
+%x DOMAINLIST_STATE
 
 %%
 
@@ -49,8 +50,22 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(yytext);
 					  return ROLE_TYPE;
 					}
+<DOMAINTYPE_STATE>[ug]			{
+					  BEGIN(DOMAINLIST_STATE);
+					  gradmlval.string = strdup(yytext);
+					  return DOMAIN_TYPE;
+					}
 <ROLE_STATE>[_a-zA-Z0-9-]{1,30}		{
 					  BEGIN(ROLETYPE_STATE);
+					  gradmlval.string = strdup(yytext);
+					  return ROLE_NAME;
+					}
+<DOMAIN_STATE>[_a-zA-Z0-9-]{1,30}	{
+					  BEGIN(DOMAINTYPE_STATE);
+					  gradmlval.string = strdup(yytext);
+					  return ROLE_NAME;
+					}
+<DOMAINLIST_STATE>[_a-zA-Z0-9-]{1,30}	{
 					  gradmlval.string = strdup(yytext);
 					  return ROLE_NAME;
 					}
@@ -195,6 +210,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 "role"					{
 					  BEGIN(ROLE_STATE);
 					  return ROLE;
+					}
+"domain"				{
+					  BEGIN(DOMAIN_STATE);
+					  return DOMAIN;
 					}
 "role_allow_ip"				{
 					  BEGIN(IP_STATE);
@@ -352,30 +371,15 @@ void no_coredump(void)
 	return;
 }
 
-int main(int argc, char *argv[])
-{
 #ifdef GRADM_DEBUG
+void show_policy(void) {
 	struct file_acl *filp;
 	struct proc_acl *proc;
 	struct role_acl *rolp;
 	struct role_transition *rolet;
 	extern struct rlimconv rlim_table[];
 	int i;
-#endif
-	if (geteuid() != getuid()) {
-		fprintf(stderr, "gradm is not meant to run suid root.\n");
-		exit(EXIT_FAILURE);
-	}
 
-	special_role_uid = 0;
-	
-	no_coredump();
-
-	init_variables();
-
-	parse_args(argc, argv);
-
-#ifdef GRADM_DEBUG
 	for (rolp = current_role;rolp;rolp=rolp->prev) {
 	printf("ROLE: %s type:%s uid/gid:%u\n", rolp->rolename,
 		rolp->roletype & GR_ROLE_SPECIAL ? "special" :
@@ -391,7 +395,7 @@ int main(int argc, char *argv[])
 		printf("\tSUBJECT: %s dev:%d inode:%lu mode:%d c_raise:%x c_drop:%x\n",
 			proc->filename, proc->dev, proc->inode, proc->mode, ~proc->cap_drop,
 			proc->cap_drop);
-		if (!proc->ip_object)
+		if (!proc->ips)
 			printf("\t\tNo socket restrictions\n");
 		for (filp = proc->hash->first;filp;filp=filp->prev)
                         printf("\t\tOBJECT: %s dev:%d inode:%lu mode:%d\n", filp->filename, filp->dev, filp->inode, filp->mode);
@@ -400,6 +404,26 @@ int main(int argc, char *argv[])
 				printf("\t\t%s: soft: %lu hard: %lu\n", rlim_table[i].name, proc->res[i].rlim_cur, proc->res[i].rlim_max);
 	}
 	}
+}
+#endif
+
+int main(int argc, char *argv[])
+{
+	if (geteuid() != getuid()) {
+		fprintf(stderr, "gradm is not meant to run suid root.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	special_role_uid = 0;
+	
+	no_coredump();
+
+	init_variables();
+
+	parse_args(argc, argv);
+
+#ifdef GRADM_DEBUG
+	show_policy();
 #endif
 	return 0;
 }

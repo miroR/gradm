@@ -3,10 +3,11 @@
 #endif
 #define GRLEARN_PATH		"/sbin/grlearn"
 #define GRDEV_PATH		"/dev/grsec"
-#define GR_ACL_PATH 		GRSEC_DIR "/acl"
+#define GR_POLICY_PATH 		GRSEC_DIR "/policy"
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
 
 #define GR_VERSION		"2.0.1"
+#define GRADM_VERSION		0x201
 
 #define GR_PWONLY		0
 #define GR_PWANDSUM		1
@@ -92,7 +93,8 @@ enum {
 	GR_ROLE_NOPW = 0x0020,
 	GR_ROLE_GOD = 0x0040,
 	GR_ROLE_LEARN = 0x0080,
-	GR_ROLE_TPE = 0x0100
+	GR_ROLE_TPE = 0x0100,
+	GR_ROLE_DOMAIN = 0x0200
 };
 
 enum {
@@ -206,6 +208,8 @@ struct role_acl {
 
 	struct role_transition *transitions;
 	struct role_allowed_ip *allowed_ips;
+	uid_t *domain_children;
+	__u16 domain_child_num;
 
 	struct proc_acl **subj_hash;
 	__u32 subj_hash_size;
@@ -239,7 +243,6 @@ struct proc_acl {
 
 	struct proc_acl *parent_subject;
 	struct gr_hash_struct *hash;
-	struct ip_acl *ip_object;
 	struct proc_acl *prev;
 	struct proc_acl *next;
 
@@ -355,13 +358,11 @@ struct gr_hash_struct {
 
 struct user_acl_role_db {
 	struct role_acl **r_table;
-	__u32 r_entries;	/* Number of entries in table */
-	__u32 s_entries;	/* total number of subject acls */
-	__u32 i_entries;	/* total number of ip acls */
-	__u32 o_entries;	/* Total number of object acls */
-	__u32 g_entries;	/* total number of globbed objects */
-	__u32 a_entries;	/* total number of allowed role ips */
-	__u32 t_entries;	/* total number of transitions */
+	__u32 num_pointers;		/* Number of allocations to track */
+	__u32 num_roles;		/* Number of roles */
+	__u32 num_domain_children;	/* Number of domain children */
+	__u32 num_subjects;		/* Number of subjects */
+	__u32 num_objects; 		/* Number of objects */
 };
 
 struct sprole_pw {
@@ -384,7 +385,19 @@ struct gr_arg {
 	__u16 mode;
 };
 
+struct gr_arg_wrapper {
+	struct gr_arg *arg;
+	__u32 version;
+	__u32 size;
+};
+
 struct capability_set capability_list[30];
 struct rlimconv rlim_table[12];
 
 uid_t special_role_uid;
+
+__u32 num_subjects;
+__u32 num_roles;
+__u32 num_objects;
+__u32 num_pointers;
+__u32 num_domain_children;

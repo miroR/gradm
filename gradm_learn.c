@@ -138,7 +138,8 @@ void merge_acl_rules()
 				for_each_object(object, subject) {
 					insert_learn_object(matchsubj, conv_filename_to_struct(object->filename, object->mode));
 				}
-				for (ipp = subject->ip_object; ipp; ipp = ipp->prev) {
+				for (i = 0; i < subject->ip_num; i++) {
+					ipp = subject->ips[i];
 					if (ipp->mode == GR_IP_CONNECT) {
 						for (i = ipp->low; i <= ipp->high; i++)
 						for (x = 0; x < 5; x++)

@@ -41,6 +41,10 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 			exit(EXIT_FAILURE);
 		}
 
+		/* increment pointer count upon allocation of user transition list */
+		if (subject->user_transitions == NULL)
+			num_pointers++;
+
 		subject->user_trans_num++;
 		subject->user_transitions = gr_dyn_realloc(subject->user_transitions, subject->user_trans_num * sizeof(uid_t));
 		*(subject->user_transitions + subject->user_trans_num - 1) = pwd->pw_uid;
@@ -76,9 +80,69 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 			exit(EXIT_FAILURE);
 		}
 
+		/* increment pointer count upon allocation of group transition list */
+		if (subject->group_transitions == NULL)
+			num_pointers++;
+
 		subject->group_trans_num++;
 		subject->group_transitions = gr_dyn_realloc(subject->group_transitions, subject->group_trans_num * sizeof(gid_t));
 		*(subject->group_transitions + subject->group_trans_num - 1) = grp->gr_gid;
+	}
+
+	return;
+}
+
+void
+add_domain_child(struct role_acl *role, char *idname)
+{
+	struct passwd *pwd;
+	struct group *grp;
+
+	/* reason for this is that in the kernel, the hash table which is keyed by UID/GID
+	   has a size dependent on the number of roles.  Since we want to fake a domain
+	   as being a real role for each of those users/groups by providing a pointer
+	   to the domain for each user/group, we need to count each of these against the
+	   role count */
+	num_domain_children++;
+
+	/* increment pointer count upon allocation of domain list */
+	if (role->domain_children == NULL)
+		num_pointers++;
+
+	if (role->roletype & GR_ROLE_USER) {
+		pwd = getpwnam(idname);
+
+		if (!pwd) {
+			fprintf(stderr, "User %s on line %lu of %s "
+				"does not exist.\nThe RBAC system will "
+				"not be allowed to be enabled until "
+				"this error is fixed.\n", idname,
+				lineno, current_acl_file);
+			exit(EXIT_FAILURE);
+		}
+
+		role->domain_child_num++;
+		role->domain_children = gr_dyn_realloc(role->domain_children, role->domain_child_num * sizeof(uid_t));
+		*(role->domain_children + role->domain_child_num - 1) = pwd->pw_uid;
+	} else if (role->roletype & GR_ROLE_GROUP) {
+		grp = getgrnam(idname);
+
+		if (!grp) {
+			fprintf(stderr, "Group %s on line %lu of %s "
+				"does not exist.\nThe RBAC system will "
+				"not be allowed to be enabled until "
+				"this error is fixed.\n", idname,
+				lineno, current_acl_file);
+			exit(EXIT_FAILURE);
+		}
+
+		role->domain_child_num++;
+		role->domain_children = gr_dyn_realloc(role->domain_children, role->domain_child_num * sizeof(uid_t));
+		*(role->domain_children + role->domain_child_num - 1) = grp->gr_gid;
+	} else {
+		// should never get here
+		fprintf(stderr, "Unhandled exception 1.\n");
+		exit(EXIT_FAILURE);
 	}
 
 	return;
@@ -89,6 +153,9 @@ add_role_transition(struct role_acl *role, char *rolename)
 {
 	struct role_transition **roletpp;
 	struct role_transition *roletp;
+
+	/* one for transition, one for name */
+	num_pointers += 2;
 
 	roletp =
 	    (struct role_transition *) calloc(1,
@@ -206,6 +273,11 @@ add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 	struct passwd *pwd;
 	struct group *grp;
 
+	num_roles++;
+
+	/* one for role, one for name */
+	num_pointers += 2;
+
 	if (!rolename) {
 		fprintf(stderr, "Out of memory.\n");
 		exit(EXIT_FAILURE);
@@ -296,6 +368,9 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 	char *p, *p2;
 	struct file_acl *anchor;
 	struct file_acl *glob, *glob2;
+
+	/* one for the object itself, one for the filename */
+	num_pointers += 2;
 
 	if (!basepoint)
 		failure("strdup");
@@ -447,6 +522,10 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 
 	file_len++;
 
+	num_objects++;
+	/* one for the object, one for the filename, one for the name entry struct in the kernel*/
+	num_pointers += 3;
+
 	if (lstat(filename, &fstat)) {
 		dfile = add_deleted_file(filename);
 		fstat.st_ino = dfile->ino;
@@ -520,6 +599,10 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 	struct deleted_file *dfile;
 	struct stat fstat;
 	unsigned int file_len;
+
+	num_subjects++;
+	/* one for the subject, one for the filename */
+	num_pointers += 2;
 
 	if (!role) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "
@@ -831,8 +914,8 @@ parse_acls(void)
 		exit(EXIT_FAILURE);
 	}
 
-	gradmin = open_acl_file(GR_ACL_PATH);
-	change_current_acl_file(GR_ACL_PATH);
+	gradmin = open_acl_file(GR_POLICY_PATH);
+	change_current_acl_file(GR_POLICY_PATH);
 	gradmparse();
 	fclose(gradmin);
 
@@ -884,30 +967,16 @@ setup_special_roles(struct gr_arg *grarg)
 	return;
 }
 
-struct gr_arg *
+struct gr_arg_wrapper *
 conv_user_to_kernel(struct gr_pw_entry *entry)
 {
+	struct gr_arg_wrapper *wrapper;
 	struct gr_arg *retarg;
 	struct user_acl_role_db *role_db;
 	struct role_acl *rtmp = NULL;
-	struct proc_acl *tmp = NULL;
-	struct file_acl *tmpf = NULL;
-	struct file_acl *tmpg = NULL;
-	struct role_allowed_ip *atmp = NULL;
-	struct role_transition *trtmp = NULL;
-	struct ip_acl *tmpi = NULL;
-	struct ip_acl *i_tmp = NULL;
 	struct role_acl **r_tmp = NULL;
-	struct ip_acl **i_table = NULL;
-	unsigned long facls = 0;
-	unsigned long gacls = 0;
-	unsigned long tpacls = 0;
-	unsigned long racls = 0;
-	unsigned long iacls = 0;
-	unsigned long tiacls = 0;
-	unsigned long aacls = 0;
-	unsigned long tracls = 0;
 	unsigned long i = 0;
+	unsigned long racls = 0;
 	__u16 sproles = 0;
 	int err;
 
@@ -916,35 +985,26 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 		if (rtmp->roletype & GR_ROLE_SPECIAL &&
 		    !(rtmp->roletype & GR_ROLE_NOPW))
 			sproles++;
-
-		for_each_allowed_ip(atmp, rtmp->allowed_ips)
-		    aacls++;
-
-		for_each_transition(trtmp, rtmp->transitions)
-		    tracls++;
-
-		for_each_subject(tmp, rtmp) {
-			tpacls++;
-			for (tmpi = tmp->ip_object; tmpi; tmpi = tmpi->prev)
-			    tiacls++;
-			for_each_object(tmpf, tmp) {
-			    facls++;
-			    for_each_globbed(tmpg, tmpf)
-				gacls++;
-			}
-		}
 	}
 
 	if ((retarg =
 	     (struct gr_arg *) calloc(1, sizeof (struct gr_arg))) == NULL)
 		failure("calloc");
 
+	if ((wrapper =
+	     (struct gr_arg_wrapper *) calloc(1, sizeof (struct gr_arg_wrapper))) == NULL)
+		failure("calloc");
+
+	wrapper->version = GRADM_VERSION;
+	wrapper->size = sizeof(struct gr_arg);
+	wrapper->arg = retarg;
+
 	err = mlock(retarg, sizeof (struct gr_arg));
 	if (err && !getuid())
 		fprintf(stderr, "Warning, unable to lock authentication "
 			"structure in physical memory.\n");
 
-	if (!racls && !tpacls && !facls)	// we are disabling, don't want to calloc 0
+	if (!racls)	// we are disabling, don't want to calloc 0
 		goto set_pw;
 
 	if ((retarg->sprole_pws =
@@ -961,20 +1021,15 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 
 	retarg->num_sprole_pws = sproles;
 
-	if ((role_db =
-	     (struct user_acl_role_db *) calloc(1,
-						sizeof (struct
-							user_acl_role_db))) ==
-	    NULL)
+	role_db = (struct user_acl_role_db *) calloc(1, sizeof (struct user_acl_role_db));
+	if (role_db == NULL)
 		failure("calloc");
 
-	role_db->r_entries = racls;
-	role_db->s_entries = tpacls;
-	role_db->i_entries = tiacls;
-	role_db->o_entries = facls;
-	role_db->g_entries = gacls;
-	role_db->a_entries = aacls;
-	role_db->t_entries = tracls;
+	role_db->num_pointers = num_pointers;
+	role_db->num_roles = num_roles;
+	role_db->num_domain_children = num_domain_children;
+	role_db->num_subjects = num_subjects;
+	role_db->num_objects = num_objects;
 
 	if ((r_tmp = role_db->r_table =
 	     (struct role_acl **) calloc(racls,
@@ -983,37 +1038,6 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 
 	for_each_role(rtmp, current_role) {
 		*r_tmp = rtmp;
-		for_each_subject(tmp, rtmp) {
-			iacls = 0;
-			for (tmpi = tmp->ip_object; tmpi; tmpi = tmpi->prev)
-			    iacls++;
-			if (iacls) {
-				i_table =
-				    (struct ip_acl **) calloc(iacls,
-							      sizeof (struct
-								      ip_acl
-								      *));
-				if (!i_table)
-					failure("calloc");
-				i = 0;
-				for (tmpi = tmp->ip_object; tmpi; tmpi = tmpi->prev) {
-					i_tmp =
-					    (struct ip_acl *) calloc(1,
-								     sizeof
-								     (struct
-								      ip_acl));
-					memcpy(i_tmp, tmpi,
-					       sizeof (struct ip_acl));
-					*(i_table + i) = i_tmp;
-					i++;
-				}
-				tmp->ips = i_table;
-				tmp->ip_num = iacls;
-			} else {
-				tmp->ips = NULL;
-				tmp->ip_num = 0;
-			}
-		}
 		r_tmp++;
 	}
 
@@ -1032,5 +1056,5 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 
 	memset(entry, 0, sizeof (struct gr_pw_entry));
 
-	return retarg;
+	return wrapper;
 }

@@ -21,7 +21,7 @@ int current_nest_depth = 0;
 %token <string> IPPROTO OBJ_MODE SUBJ_MODE IPNETMASK CAP_NAME ROLE_ALLOW_IP
 %token <string> ROLE_TRANSITION VARIABLE DEFINE DEFINE_NAME DISABLED
 %token <string> ID_NAME USER_TRANS_ALLOW GROUP_TRANS_ALLOW 
-%token <string> USER_TRANS_DENY GROUP_TRANS_DENY
+%token <string> USER_TRANS_DENY GROUP_TRANS_DENY DOMAIN_TYPE DOMAIN
 %type <long_int> subj_mode obj_mode ip_netmask
 %type <mode> role_type
 %type <var> variable_expression
@@ -36,6 +36,7 @@ compiled_acl:			various_acls
 	;
 
 various_acls:			role_label
+	|			domain_label
 	|			role_allow_ip
 	|			role_transitions
 	|			subject_label
@@ -100,6 +101,24 @@ var_object_list:		OBJ_NAME obj_mode
 	|			var_object_list OBJ_NAME obj_mode
 				{
 				  add_var_object(&var_obj, $2, $3);
+				}
+	;
+
+domain_label:			DOMAIN ROLE_NAME DOMAIN_TYPE 
+				{
+				 if (!add_role_acl(&current_role, $2, GR_ROLE_DOMAIN | role_mode_conv($3), 1))
+					exit(EXIT_FAILURE);
+				}
+				domain_user_list
+	;
+
+domain_user_list:		ROLE_NAME
+				{
+					add_domain_child(current_role, $1);
+				}
+	|			domain_user_list ROLE_NAME
+				{
+					add_domain_child(current_role, $2);
 				}
 	;
 

@@ -6,6 +6,8 @@ add_role_allowed_ip(struct role_acl *role, __u32 addr, __u32 netmask)
 	struct role_allowed_ip **roleipp;
 	struct role_allowed_ip *roleip;
 
+	num_pointers++;
+
 	roleip =
 	    (struct role_allowed_ip *) calloc(1,
 					      sizeof (struct role_allowed_ip));
@@ -30,29 +32,32 @@ add_role_allowed_ip(struct role_acl *role, __u32 addr, __u32 netmask)
 void
 add_ip_acl(struct proc_acl *subject, __u8 mode, struct ip_acl *acl_tmp)
 {
-	struct ip_acl **ipp;
 	struct ip_acl *p;
 	int i;
 
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.\n  Definition "
-			"of an IP ACL without a subject definition.\n"
+			"of an IP policy without a subject definition.\n"
 			"The RBAC system will not be allowed to be "
 			"enabled until this problem is fixed.\n",
 			lineno, current_acl_file);
 		exit(EXIT_FAILURE);
 	}
 
-	ipp = &(subject->ip_object);
+	/* add one for the pointer to array of pointers */
+	if (subject->ips == NULL)
+		num_pointers++;
+
+	num_pointers++;
+
+	subject->ip_num++;
+	subject->ips = gr_dyn_realloc(subject->ips, subject->ip_num * sizeof(struct ip_acl *));
 
 	p = (struct ip_acl *) calloc(1, sizeof (struct ip_acl));
 	if (!p)
 		failure("calloc");
 
-	if (*ipp)
-		(*ipp)->next = p;
-
-	p->prev = *ipp;
+	*(subject->ips + subject->ip_num - 1) = p;
 
 	p->mode = mode;
 	p->addr = acl_tmp->addr;
@@ -65,8 +70,6 @@ add_ip_acl(struct proc_acl *subject, __u8 mode, struct ip_acl *acl_tmp)
 	for (i = 0; i < 8; i++)
 		subject->ip_proto[i] |= p->proto[i];
 	subject->ip_type |= p->type;
-
-	*ipp = p;
 
 	return;
 }

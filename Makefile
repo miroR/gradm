@@ -1,6 +1,6 @@
 ##############################################################################
-#gradm (c) 2002 Brad Spengler 		                http://grsecurity.net#
-#----------------------------				---------------------#
+#gradm (c) 2002,2003,2004 Brad Spengler 	        http://grsecurity.net#
+#--------------------------------------			---------------------#
 #gradm is licensed under the GNU GPL http://www.gnu.org		             #
 ##############################################################################
 
@@ -99,15 +99,15 @@ lex.learn_pass1.c: gradm_learn_pass1.l
 lex.learn_pass2.c: gradm_learn_pass2.l
 	$(USE_LEX) $(LEXFLAGS) -Plearn_pass2 ./gradm_learn_pass2.l
 
-install: $(GRADM_BIN) gradm.8 acl grlearn
+install: $(GRADM_BIN) gradm.8 policy grlearn
 	mkdir -p $(DESTDIR)/sbin
 	$(INSTALL) -m 0755 $(GRADM_BIN) $(DESTDIR)/sbin
 	$(STRIP) $(DESTDIR)/sbin/$(GRADM_BIN)
 	$(INSTALL) -m 0700 grlearn $(DESTDIR)/sbin
 	$(STRIP) $(DESTDIR)/sbin/grlearn
 	mkdir -p -m 700 $(DESTDIR)$(GRSEC_DIR)
-	@if [ ! -f $(DESTDIR)$(GRSEC_DIR)/acl ] ; then \
-		$(INSTALL) -m 0600 acl $(DESTDIR)$(GRSEC_DIR) ; \
+	@if [ ! -f $(DESTDIR)$(GRSEC_DIR)/policy ] ; then \
+		$(INSTALL) -m 0600 policy $(DESTDIR)$(GRSEC_DIR) ; \
 	fi
 	@if [ -z "`cut -d" " -f3 /proc/mounts | grep "^devfs"`" ] ; then \
 		rm -f $(DESTDIR)/dev/grsec ; \
