@@ -11,7 +11,9 @@ extern struct gr_learn_group_node **role_list;
 }
 
 %token <num> NUM IPADDR FILENAME ROLENAME
+%token <string> USER GROUP
 %type <num> filename
+%type <string> id_type
 
 %%
 
@@ -21,6 +23,10 @@ learn_logs:	learn_log
 
 filename:	/*empty*/	{ $$ = 1; }
 	|	FILENAME	{ $$ = 1; }
+	;
+
+id_type:	USER
+	|	GROUP
 	;
 
 learn_log:
@@ -56,6 +62,9 @@ learn_log:
 
 			if (user && group)
 				insert_user(&role_list, user, group, uid, gid);
+		}
+	|	ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' id_type ':' NUM ':' NUM ':' NUM ':' IPADDR
+		{
 		}
 	;
 %%

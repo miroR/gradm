@@ -8,7 +8,7 @@ static struct in_addr ip;
 %}
 
 ROLENAME [_a-zA-Z0-9-]{1,30}
-NUM [0-9]+
+NUM [-]?[0-9]+
 FILENAME [/][^\t\n]*
 IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
@@ -18,6 +18,14 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
 %%
 
+"u"					{
+					  fulllearn_pass1lval.string = "user";
+					  return USER;
+					}
+"g"					{
+					  fulllearn_pass1lval.string = "group";
+					  return GROUP;
+					}
 {NUM}					{
 					  fulllearn_pass1lval.num = atol(yytext);
 					  return NUM;

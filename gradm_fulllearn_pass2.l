@@ -8,7 +8,7 @@ static struct in_addr ip;
 %}
 
 ROLENAME [_a-zA-Z0-9-]{1,30}
-NUM [0-9]+
+NUM [-]?[0-9]+
 FILENAME [/][^\t\n]*
 IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
