@@ -154,7 +154,7 @@ void add_fulllearn_acl(void)
 	memset(&ip, 0, sizeof (ip));
 	add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
 	add_ip_acl(current_subject, GR_IP_BIND, &ip);
-
+	add_gradm_acl(current_role);
 	add_kernel_acl();
 	expand_acls();
 	return;
