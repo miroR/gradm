@@ -5,6 +5,7 @@
 unsigned long lineno;
 char *gr_line;
 unsigned int old_state;
+unsigned int old_state2;
 
 int gradmerror(char *s);
 int gradmwrap(void);
@@ -31,10 +32,16 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
 <*>"\n"					{
 					  lineno++;
+					  if (YYSTATE == COMMENT_STATE)
+						  BEGIN(old_state2);
 					  if (YYSTATE != VAR_STATE && YYSTATE != VAR_OBJ_STATE)
 						  BEGIN(INITIAL);
 					}
-<*>"#"					{ BEGIN(COMMENT_STATE); }
+<*>"#"					{
+					  if (YYSTATE != COMMENT_STATE)
+						  old_state2 = YYSTATE;
+					  BEGIN(COMMENT_STATE);
+					}
 <*>[ \t]+				;
 <COMMENT_STATE>.*			;
 
