@@ -222,7 +222,7 @@ parse_args(int argc, char *argv[])
 		}
 	}
 
-	if ((gr_learn && !gr_output) || (gr_output && !gr_learn)) {
+	if ((gr_output && !gr_learn)) {
 		fprintf(stderr, "-L and -O must be used together.\n");
 		exit(EXIT_FAILURE);
 	}
