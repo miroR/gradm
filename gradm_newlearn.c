@@ -1440,15 +1440,17 @@ void reduce_ports_tree(struct gr_learn_ip_node *base)
 
 __u8 extract_ip_field(__u32 ip, unsigned long depth)
 {
+	__u8 ip_node[4] = ip;
+
 	switch(depth) {
 	case 3:
-		return ((ip & 0xff000000) >> 24);
+		return ip_node[3];
 	case 2:
-		return ((ip & 0x00ff0000) >> 16);
+		return ip_node[2];
 	case 1:
-		return ((ip & 0x0000ff00) >> 8);
+		return ip_node[1];
 	case 0:
-		return (ip & 0x000000ff);
+		return ip_node[0];
 	default:
 		return 0;
 	}
