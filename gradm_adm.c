@@ -56,8 +56,7 @@ add_gradm_acl(struct role_acl *role)
 		exit(EXIT_FAILURE);
 
 	if (!stat("/dev/grsec", &fstat)) {
-		if (!add_proc_object_acl(current_subject,
-					 "/dev/grsec",
+		if (!add_proc_object_acl(current_subject, "/dev/grsec",
 					 proc_object_mode_conv("w"), GR_FEXIST))
 			exit(EXIT_FAILURE);
 	} else {
