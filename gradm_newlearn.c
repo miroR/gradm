@@ -1529,7 +1529,7 @@ void insert_ip(struct gr_learn_ip_node **base, __u32 ip, __u16 port, __u8 proto,
 	insert->ip_proto[proto / 32] = (1 << (proto % 32));
 	insert->ip_type |= (1 << socktype);
 	memcpy(&ip_node, &ip, sizeof(ip));
-	insert->ip_node = ip_node[0];
+	insert->ip_node = ip_node[3];
 
 	node = find_insert_ip(base, ip, &parent);
 
