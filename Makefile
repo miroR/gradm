@@ -38,7 +38,7 @@ OBJECTS=gradm.tab.o lex.gradm.o learn.tab.o lex.learn.o gradm_misc.o \
 	gradm_sha256.o gradm_adm.o gradm_analyze.o gradm_res.o \
 	gradm_human.o gradm_learn.o gradm_net.o gradm_nest.o
 
-all: $(USE_YACC) $(USE_LEX) gradm
+all: $(USE_YACC) $(USE_LEX) gradm grlearn
 
 USE_YACC = $(shell if [ -x $(BYACC) ]; then echo $(BYACC); \
 	else if [ -x $(BISON) ]; then echo $(BISON) -y; \
@@ -58,6 +58,9 @@ USE_LEX = $(shell if [ -x $(FLEX) ]; then echo $(FLEX); \
 gradm: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $(OBJECTS) $(LIBS) $(LDFLAGS)
 
+grlearn: grlearn.c
+	$(CC) $(CFLAGS) -o $@ grlearn.c $(LIBS) $(LDFLAGS)
+
 
 gradm.tab.c: gradm.y
 	$(USE_YACC) -b gradm -p gradm -d ./gradm.y
@@ -71,10 +74,12 @@ learn.tab.c: gradm_learner.y
 lex.learn.c: gradm_learner.l
 	$(USE_LEX) $(LEXFLAGS) -Plearn ./gradm_learner.l
 
-install: gradm gradm.8 acl
+install: gradm gradm.8 acl grlearn
 	mkdir -p $(DESTDIR)/sbin
 	$(INSTALL) -m 0755 gradm $(DESTDIR)/sbin
 	$(STRIP) $(DESTDIR)/sbin/gradm
+	$(INSTALL) -m 0700 grlearn $(DESTDIR)/sbin
+	$(STRIP) $(DESTDIR)/sbin/grlearn
 	mkdir -p -m 700 $(DESTDIR)/etc/grsec
 	@if [ ! -f $(DESTDIR)/etc/grsec/acl ] ; then \
 		$(INSTALL) -m 0600 acl $(DESTDIR)/etc/grsec ; \
@@ -95,4 +100,4 @@ install: gradm gradm.8 acl
 	fi
 
 clean:
-	rm -f core *.o gradm lex.*.c *.tab.c *.tab.h
+	rm -f core *.o gradm lex.*.c *.tab.c *.tab.h grlearn
