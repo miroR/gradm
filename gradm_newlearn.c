@@ -1440,7 +1440,9 @@ void reduce_ports_tree(struct gr_learn_ip_node *base)
 
 __u8 extract_ip_field(__u32 ip, unsigned long depth)
 {
-	__u8 ip_node[4] = ip;
+	__u8 ip_node[4];
+
+	memcpy(ip_node, &ip, sizeof(ip));
 
 	switch(depth) {
 	case 3:
