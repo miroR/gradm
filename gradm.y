@@ -16,14 +16,14 @@ int current_nest_depth = 0;
 	struct var_object * var;
 }
 
-%token <string> ROLE ROLE_NAME ROLE_TYPE SUBJECT SUBJ_NAME OBJ_NAME 
+%token <string> ROLE ROLE_NAME SUBJECT SUBJ_NAME OBJ_NAME 
 %token <string> RES_NAME RES_SOFTHARD CONNECT BIND IPTYPE
 %token <string> IPPROTO CAP_NAME ROLE_ALLOW_IP
 %token <string> ROLE_TRANSITION VARIABLE DEFINE DEFINE_NAME DISABLED
 %token <string> ID_NAME USER_TRANS_ALLOW GROUP_TRANS_ALLOW 
 %token <string> USER_TRANS_DENY GROUP_TRANS_DENY DOMAIN_TYPE DOMAIN
 %token <num> OBJ_MODE SUBJ_MODE IPADDR IPNETMASK
-%token <shortnum> IPPORT
+%token <shortnum> IPPORT ROLE_TYPE
 %type <num> subj_mode obj_mode ip_netmask
 %type <shortnum> role_type
 %type <var> variable_expression
@@ -134,7 +134,7 @@ role_label: 			ROLE ROLE_NAME role_type
 role_type: /* empty */
 				{ $$ = role_mode_conv(""); }
 	|			ROLE_TYPE
-				{ $$ = role_mode_conv($1); }
+				{ $$ = $1; }
 	;
 
 subject_label:			SUBJECT SUBJ_NAME subj_mode
