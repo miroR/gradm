@@ -64,6 +64,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = gr_strdup(yytext);
 					  return DOMAIN_TYPE;
 					}
+<DOMAINLIST_STATE>"\\\n"		;
 <ROLE_STATE>[_a-zA-Z0-9-]{1,30}		{
 					  BEGIN(ROLETYPE_STATE);
 					  gradmlval.string = gr_strdup(yytext);
