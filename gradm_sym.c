@@ -97,7 +97,7 @@ done:
 	return retvar;
 }
 
-void add_var_object(struct var_object **object, char *name, __u32 mode)
+void add_var_object(struct var_object **object, char *name, u_int32_t mode)
 {
 	struct var_object *v;
 

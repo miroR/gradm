@@ -66,7 +66,7 @@ char *high_protected_paths[] = {
 struct gr_learn_file_node **cachednode = NULL;
 unsigned int cachedlen = 0;
 
-int is_protected_path(char *filename, __u32 mode)
+int is_protected_path(char *filename, u_int32_t mode)
 {
 	char **tmp;
 	unsigned int len;
@@ -560,10 +560,10 @@ int reduce_all_leaves(struct gr_learn_file_node *node)
 	return 0;
 }
 
-__u16 greatest_occurring_mode(struct gr_learn_file_node *node)
+u_int16_t greatest_occurring_mode(struct gr_learn_file_node *node)
 {
 	struct gr_learn_file_node **tmp;
-	__u16 modes[12] = { GR_FIND,
+	u_int16_t modes[12] = { GR_FIND,
 			    GR_FIND | GR_READ,
 			    GR_FIND | GR_READ | GR_WRITE,
 			    GR_FIND | GR_READ | GR_EXEC,
@@ -577,7 +577,7 @@ __u16 greatest_occurring_mode(struct gr_learn_file_node *node)
 			    GR_FIND | GR_READ | GR_WRITE | GR_CREATE,
 			};
 	unsigned long counts[12] = {0};
-	__u16 max;
+	u_int16_t max;
 	int i;
 
 	tmp = node->leaves;
@@ -605,7 +605,7 @@ int reduce_children_mode(struct gr_learn_file_node *node)
 {
 	struct gr_learn_file_node **tmp;
 	struct gr_learn_file_node **tmp2;
-	__u16 mode;
+	u_int16_t mode;
 	int tmpdir = 0;
 
 	tmp = node->leaves;
@@ -931,7 +931,7 @@ struct gr_learn_file_node **find_insert_file(struct gr_learn_file_node **base,
 
 
 
-void do_insert_file(struct gr_learn_file_node **base, char *filename, __u32 mode, __u8 subj)
+void do_insert_file(struct gr_learn_file_node **base, char *filename, u_int32_t mode, u_int8_t subj)
 {
 	struct gr_learn_file_node **node;
 	struct gr_learn_file_node *parent = NULL;
@@ -961,7 +961,7 @@ void do_insert_file(struct gr_learn_file_node **base, char *filename, __u32 mode
 	return;
 }
 
-void insert_file(struct gr_learn_file_node **base, char *filename, __u32 mode, __u8 subj)
+void insert_file(struct gr_learn_file_node **base, char *filename, u_int32_t mode, u_int8_t subj)
 {
 	/* we're inserting a new file, and an entry for / does not exist, add it */
 	if (!(*base)) {
@@ -1145,8 +1145,8 @@ show_ips:
 
 void traverse_ip_tree(struct gr_learn_ip_node *base,
 		   struct gr_learn_ip_node **optarg,
-		   int (*act)(struct gr_learn_ip_node *node, struct gr_learn_ip_node **optarg, __u8 contype, FILE *stream),
-		   __u8 contype, FILE *stream)
+		   int (*act)(struct gr_learn_ip_node *node, struct gr_learn_ip_node **optarg, u_int8_t contype, FILE *stream),
+		   u_int8_t contype, FILE *stream)
 {
 	struct gr_learn_ip_node **node;
 
@@ -1193,13 +1193,13 @@ unsigned long count_total_ips(struct gr_learn_ip_node *node)
 }
 	
 
-int display_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node **unused, __u8 contype,
+int display_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node **unused, u_int8_t contype,
 		    FILE *stream)
 {
 	struct gr_learn_ip_node *saved = node;
 	int depth = count_ip_depth(node);
-	__u16 **tmpport;
-	__u8 ip[4];
+	u_int16_t **tmpport;
+	u_int8_t ip[4];
 	char ipandtype[64] = {0};
 	char socktypeandprotos[4096] = {0};
 	struct protoent *proto;
@@ -1282,12 +1282,12 @@ print_ip:
 	return 0;
 }
 
-int display_only_ip(struct gr_learn_ip_node *node, struct gr_learn_ip_node **unused, __u8 unused2,
+int display_only_ip(struct gr_learn_ip_node *node, struct gr_learn_ip_node **unused, u_int8_t unused2,
 		    FILE *stream)
 {
 	struct gr_learn_ip_node *saved = node;
 	int depth = count_ip_depth(node);
-	__u8 ip[4];
+	u_int8_t ip[4];
 	int netmask = 0;
 	int i;
 
@@ -1317,13 +1317,13 @@ print_ip:
 	return 0;
 }
 
-void display_ip_tree(struct gr_learn_ip_node *base, __u8 contype, FILE *stream)
+void display_ip_tree(struct gr_learn_ip_node *base, u_int8_t contype, FILE *stream)
 {
 	traverse_ip_tree(base, NULL, &display_ip_node, contype, stream);
 	return;
 }
 
-unsigned long count_ports(__u16 **ports)
+unsigned long count_ports(u_int16_t **ports)
 {
 	unsigned long ret = 0;
 
@@ -1365,9 +1365,9 @@ int analyze_ip_node(struct gr_learn_ip_node *node)
 		return 0;
 }
 
-void insert_port(struct gr_learn_ip_node *node, __u16 port)
+void insert_port(struct gr_learn_ip_node *node, u_int16_t port)
 {
-	__u16 **tmpport;
+	u_int16_t **tmpport;
 	unsigned long num;
 
 	tmpport = node->ports;
@@ -1381,22 +1381,22 @@ void insert_port(struct gr_learn_ip_node *node, __u16 port)
 	}
 
 	if (!num) {
-		node->ports = (__u16 **)gr_dyn_alloc(2 * sizeof(__u16 *));
-		*(node->ports) = (__u16 *)gr_stat_alloc(sizeof(__u16));
+		node->ports = (u_int16_t **)gr_dyn_alloc(2 * sizeof(u_int16_t *));
+		*(node->ports) = (u_int16_t *)gr_stat_alloc(sizeof(u_int16_t));
 		**(node->ports) = port;
 	} else {
-		node->ports = (__u16 **)gr_dyn_realloc(node->ports, (num + 2) * sizeof(__u16 *));
-		memset(node->ports + num, 0, 2 * sizeof(__u16 *));
-		*(node->ports + num) = (__u16 *)gr_stat_alloc(sizeof(__u16));
+		node->ports = (u_int16_t **)gr_dyn_realloc(node->ports, (num + 2) * sizeof(u_int16_t *));
+		memset(node->ports + num, 0, 2 * sizeof(u_int16_t *));
+		*(node->ports + num) = (u_int16_t *)gr_stat_alloc(sizeof(u_int16_t));
 		**(node->ports + num) = port;
 	}
 
 	return;
 }
 
-void remove_port(struct gr_learn_ip_node *node, __u16 port)
+void remove_port(struct gr_learn_ip_node *node, u_int16_t port)
 {
-	__u16 **ports = node->ports;
+	u_int16_t **ports = node->ports;
 	unsigned long num = count_ports(ports);
 	unsigned long i;
 
@@ -1415,7 +1415,7 @@ void remove_port(struct gr_learn_ip_node *node, __u16 port)
 
 void do_reduce_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node *actor)
 {
-	__u16 **tmpport = node->ports;
+	u_int16_t **tmpport = node->ports;
 	struct gr_learn_ip_node **tmpip;
 	int i;
 
@@ -1455,7 +1455,7 @@ void do_reduce_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node *a
 
 
 
-int reduce_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node **actor, __u8 unused1,
+int reduce_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node **actor, u_int8_t unused1,
 		   FILE *unused2)
 {
 	
@@ -1471,7 +1471,7 @@ int analyze_port_node(struct gr_learn_ip_node *node)
 {
 	unsigned long low_ports = 0, high_ports = 0;
 	int ret = 0;
-	__u16 **tmpport;
+	u_int16_t **tmpport;
 
 	tmpport = node->ports;
 
@@ -1491,7 +1491,7 @@ int analyze_port_node(struct gr_learn_ip_node *node)
 	return ret;
 }	
 
-int reduce_port_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node **unused, __u8 unused1,
+int reduce_port_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node **unused, u_int8_t unused1,
 		     FILE *unused2)
 {
 	
@@ -1526,9 +1526,9 @@ void reduce_ports_tree(struct gr_learn_ip_node *base)
 	return;
 }
 
-__u8 extract_ip_field(__u32 ip, unsigned long depth)
+u_int8_t extract_ip_field(u_int32_t ip, unsigned long depth)
 {
-	__u8 ip_node[4];
+	u_int8_t ip_node[4];
 
 	memcpy(ip_node, &ip, sizeof(ip));
 
@@ -1547,7 +1547,7 @@ __u8 extract_ip_field(__u32 ip, unsigned long depth)
 
 }
 
-struct gr_learn_ip_node ** find_insert_ip(struct gr_learn_ip_node **base, __u32 ip,
+struct gr_learn_ip_node ** find_insert_ip(struct gr_learn_ip_node **base, u_int32_t ip,
 					  struct gr_learn_ip_node **parent)
 {
 	struct gr_learn_ip_node *** node = NULL;
@@ -1595,13 +1595,13 @@ struct gr_learn_ip_node ** find_insert_ip(struct gr_learn_ip_node **base, __u32 
 }
 
 
-void insert_ip(struct gr_learn_ip_node **base, __u32 ip, __u16 port, __u8 proto,
-		__u8 socktype)
+void insert_ip(struct gr_learn_ip_node **base, u_int32_t ip, u_int16_t port, u_int8_t proto,
+		u_int8_t socktype)
 {
 	struct gr_learn_ip_node **node;
 	struct gr_learn_ip_node *parent = NULL;
 	struct gr_learn_ip_node *insert;
-	__u8 ip_node[4];
+	u_int8_t ip_node[4];
 
 	insert = (struct gr_learn_ip_node *)gr_stat_alloc(sizeof(struct gr_learn_ip_node));
 
@@ -1657,7 +1657,7 @@ void sort_file_list(struct gr_hash_struct *hash)
 	return qsort(hash->table, hash->table_size, sizeof (struct gr_learn_file_tmp_node *), strcompare);
 }
 
-struct gr_learn_file_tmp_node *conv_filename_to_struct(char *filename, __u32 mode)
+struct gr_learn_file_tmp_node *conv_filename_to_struct(char *filename, u_int32_t mode)
 {
 	struct gr_learn_file_tmp_node *node;
 
@@ -1669,7 +1669,7 @@ struct gr_learn_file_tmp_node *conv_filename_to_struct(char *filename, __u32 mod
 }
 
 struct gr_learn_role_entry *
-insert_learn_role(struct gr_learn_role_entry ***role_list, char *rolename, __u16 rolemode)
+insert_learn_role(struct gr_learn_role_entry ***role_list, char *rolename, u_int16_t rolemode)
 {
 	unsigned long num = 0;
 

@@ -133,7 +133,7 @@ enum {
 
 struct capability_set {
 	char *cap_name;
-	__u32 cap_val;
+	u_int32_t cap_val;
 };
 
 struct rlimconv {
@@ -143,27 +143,27 @@ struct rlimconv {
 
 struct chk_perm {
 	unsigned short type;
-	__u32 w_modes;
-	__u32 u_modes;
-	__u32 w_caps;
-	__u32 u_caps;
+	u_int32_t w_modes;
+	u_int32_t u_modes;
+	u_int32_t w_caps;
+	u_int32_t u_caps;
 };
 
 struct role_allowed_ip {
-	__u32 addr;
-	__u32 netmask;
+	u_int32_t addr;
+	u_int32_t netmask;
 
 	struct role_allowed_ip *prev;
 	struct role_allowed_ip *next;
 };
 
 struct ip_acl {
-	__u32 addr;
-	__u32 netmask;
-	__u16 low, high;
-	__u8 mode;		// connect or bind
-	__u32 type;		// stream, dgram, raw..etc
-	__u32 proto[8];		// we have to support all 255 protocols
+	u_int32_t addr;
+	u_int32_t netmask;
+	u_int16_t low, high;
+	u_int8_t mode;		// connect or bind
+	u_int32_t type;		// stream, dgram, raw..etc
+	u_int32_t proto[8];		// we have to support all 255 protocols
 
 	struct ip_acl *prev;
 	struct ip_acl *next;
@@ -173,7 +173,7 @@ struct file_acl {
 	char *filename;
 	ino_t inode;
 	gr_dev_t dev;
-	__u32 mode;
+	u_int32_t mode;
 
 	struct proc_acl *nested;
 	struct file_acl *globbed;
@@ -184,7 +184,7 @@ struct file_acl {
 
 struct var_object {
 	char *filename;
-	__u32 mode;
+	u_int32_t mode;
 
 	struct var_object *prev;
 	struct var_object *next;
@@ -200,9 +200,9 @@ struct role_transition {
 struct role_acl {
 	char *rolename;
 	uid_t uidgid;
-	__u16 roletype;
+	u_int16_t roletype;
 
-	__u16 auth_attempts;
+	u_int16_t auth_attempts;
 	unsigned long expires;
 
 	struct proc_acl *root_label;
@@ -214,36 +214,36 @@ struct role_acl {
 	struct role_transition *transitions;
 	struct role_allowed_ip *allowed_ips;
 	uid_t *domain_children;
-	__u16 domain_child_num;
+	u_int16_t domain_child_num;
 
 	struct proc_acl **subj_hash;
-	__u32 subj_hash_size;
+	u_int32_t subj_hash_size;
 };
 
 struct proc_acl {
 	char *filename;
 	ino_t inode;
 	gr_dev_t dev;
-	__u32 mode;
-	__u32 cap_mask;
-	__u32 cap_drop;
+	u_int32_t mode;
+	u_int32_t cap_mask;
+	u_int32_t cap_drop;
 
 	struct rlimit res[GR_NLIMITS];
-	__u16 resmask;
+	u_int16_t resmask;
 
-	__u8 user_trans_type;
-	__u8 group_trans_type;
+	u_int8_t user_trans_type;
+	u_int8_t group_trans_type;
 	uid_t *user_transitions;
 	gid_t *group_transitions;
-	__u16 user_trans_num;
-	__u16 group_trans_num;
+	u_int16_t user_trans_num;
+	u_int16_t group_trans_num;
 
-	__u32 ip_proto[8];
-	__u32 ip_type;
+	u_int32_t ip_proto[8];
+	u_int32_t ip_type;
 	struct ip_acl **ips;
-	__u32 ip_num;
+	u_int32_t ip_num;
 
-	__u32 crashes;
+	u_int32_t crashes;
 	unsigned long expires;
 
 	struct proc_acl *parent_subject;
@@ -252,14 +252,14 @@ struct proc_acl {
 	struct proc_acl *next;
 
 	struct file_acl **obj_hash;
-	__u32 obj_hash_size;
+	u_int32_t obj_hash_size;
 };
 
 struct gr_learn_ip_node {
-	__u8 ip_node;
-	__u16 **ports;
-	__u32 ip_proto[8];
-	__u32 ip_type;
+	u_int8_t ip_node;
+	u_int16_t **ports;
+	u_int32_t ip_proto[8];
+	u_int32_t ip_type;
 	unsigned char root_node:1;
 	unsigned char all_low_ports:1;
 	unsigned char all_high_ports:1;
@@ -269,7 +269,7 @@ struct gr_learn_ip_node {
 
 struct gr_learn_role_entry {
 	char *rolename;
-	__u16 rolemode;
+	u_int16_t rolemode;
 	unsigned int id;
 	struct gr_hash_struct *hash;
 	struct gr_learn_file_node *subject_list;
@@ -287,7 +287,7 @@ struct gr_learn_group_node {
 
 struct gr_learn_file_tmp_node {
 	char *filename;
-	__u32 mode;
+	u_int32_t mode;
 };
 
 struct gr_learn_user_node {
@@ -300,14 +300,14 @@ struct gr_learn_user_node {
 };
 
 struct gr_learn_subject_node {
-	__u32 cap_raise;
+	u_int32_t cap_raise;
 	struct rlimit res[GR_NLIMITS];
-	__u16 resmask;
+	u_int16_t resmask;
 };
 
 struct gr_learn_file_node {
 	char *filename;
-	__u32 mode;
+	u_int32_t mode;
 	struct gr_learn_file_node **leaves;
 	struct gr_learn_file_node *parent;
 	struct gr_hash_struct *hash;
@@ -326,7 +326,7 @@ struct gr_pw_entry {
 	gr_dev_t segv_dev;
 	ino_t segv_inode;
 	uid_t segv_uid;
-	__u16 mode;
+	u_int16_t mode;
 };
 
 /* We use this to keep track of deleted files, since each subject needs
@@ -356,18 +356,18 @@ struct gr_hash_struct {
 	void **table;
 	void **nametable;
 	void *first;
-	__u32 table_size;
-	__u32 used_size;
+	u_int32_t table_size;
+	u_int32_t used_size;
 	int type;
 };
 
 struct user_acl_role_db {
 	struct role_acl **r_table;
-	__u32 num_pointers;		/* Number of allocations to track */
-	__u32 num_roles;		/* Number of roles */
-	__u32 num_domain_children;	/* Number of domain children */
-	__u32 num_subjects;		/* Number of subjects */
-	__u32 num_objects; 		/* Number of objects */
+	u_int32_t num_pointers;		/* Number of allocations to track */
+	u_int32_t num_roles;		/* Number of roles */
+	u_int32_t num_domain_children;	/* Number of domain children */
+	u_int32_t num_subjects;		/* Number of subjects */
+	u_int32_t num_objects; 		/* Number of objects */
 };
 
 struct sprole_pw {
@@ -386,14 +386,14 @@ struct gr_arg {
 	gr_dev_t segv_dev;
 	ino_t segv_inode;
 	uid_t segv_uid;
-	__u16 num_sprole_pws;
-	__u16 mode;
+	u_int16_t num_sprole_pws;
+	u_int16_t mode;
 };
 
 struct gr_arg_wrapper {
 	struct gr_arg *arg;
-	__u32 version;
-	__u32 size;
+	u_int32_t version;
+	u_int32_t size;
 };
 
 struct capability_set capability_list[30];
@@ -401,12 +401,12 @@ struct rlimconv rlim_table[12];
 
 uid_t special_role_uid;
 
-__u32 num_subjects;
-__u32 num_roles;
-__u32 num_objects;
-__u32 num_pointers;
-__u32 num_domain_children;
+u_int32_t num_subjects;
+u_int32_t num_roles;
+u_int32_t num_objects;
+u_int32_t num_pointers;
+u_int32_t num_domain_children;
 
 char *current_learn_rolename;
 char *current_learn_subject;
-__u16 current_learn_rolemode;
+u_int16_t current_learn_rolemode;

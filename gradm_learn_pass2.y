@@ -39,8 +39,8 @@ learn_log:
 			struct gr_learn_role_entry *role;
 			struct gr_learn_file_node *subjlist;
 			struct gr_learn_file_node *subject;
-			__u32 mode;
-			__u16 rolemode;
+			u_int32_t mode;
+			u_int16_t rolemode;
 			unsigned long res1, res2;
 
 			rolemode = $3;
@@ -81,10 +81,10 @@ learn_log:
 			struct gr_learn_role_entry *role;
 			struct gr_learn_file_node *subjlist;
 			struct gr_learn_file_node *subject;
-			__u16 rolemode;
-			__u32 addr;
-			__u16 port;
-			__u8 mode, proto, socktype;
+			u_int16_t rolemode;
+			u_int32_t addr;
+			u_int16_t port;
+			u_int8_t mode, proto, socktype;
 
 			mode = $19;
 			rolemode = $3;

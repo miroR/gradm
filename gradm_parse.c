@@ -225,7 +225,7 @@ add_deleted_file(char *filename)
 }
 
 static int
-is_role_dupe(struct role_acl *role, const char *rolename, const __u16 type)
+is_role_dupe(struct role_acl *role, const char *rolename, const u_int16_t type)
 {
 	struct role_acl *tmp;
 
@@ -267,7 +267,7 @@ is_proc_subject_dupe(struct role_acl *role, struct proc_acl *subject)
 }
 
 int
-add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
+add_role_acl(struct role_acl **role, char *rolename, u_int16_t type, int ignore)
 {
 	struct role_acl *rtmp;
 	struct passwd *pwd;
@@ -374,7 +374,7 @@ int count_slashes(char *str)
 
 static int
 add_globbing_file(struct proc_acl *subject, char *filename,
-		  __u32 mode, int type)
+		  u_int32_t mode, int type)
 {
 	char *basepoint = strdup(filename);
 	char *p, *p2;
@@ -512,7 +512,7 @@ parse_homedir(char *filename)
 
 int
 add_proc_object_acl(struct proc_acl *subject, char *filename,
-		    __u32 mode, int type)
+		    u_int32_t mode, int type)
 {
 	struct file_acl *p;
 	struct file_acl *p2;
@@ -626,7 +626,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 }
 
 int
-add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag)
+add_proc_subject_acl(struct role_acl *role, char *filename, u_int32_t mode, int flag)
 {
 	struct proc_acl *p;
 	struct proc_acl *p2;
@@ -716,11 +716,11 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 	return 1;
 }
 
-__u16
+u_int16_t
 role_mode_conv(const char *mode)
 {
 	int len = strlen(mode) - 1;
-	__u16 retmode = GR_ROLE_DEFAULT;
+	u_int16_t retmode = GR_ROLE_DEFAULT;
 
 	for (; len >= 0; len--) {
 		switch (mode[len]) {
@@ -782,11 +782,11 @@ role_mode_conv(const char *mode)
 	return retmode;
 }
 
-__u32
+u_int32_t
 proc_subject_mode_conv(const char *mode)
 {
 	int i;
-	__u32 retmode = 0;
+	u_int32_t retmode = 0;
 
 	retmode |= GR_FIND;
 
@@ -862,11 +862,11 @@ proc_subject_mode_conv(const char *mode)
 	return retmode;
 }
 
-__u32
+u_int32_t
 proc_object_mode_conv(const char *mode)
 {
 	int i;
-	__u32 retmode = 0;
+	u_int32_t retmode = 0;
 
 	retmode |= GR_FIND;
 
@@ -972,7 +972,7 @@ setup_special_roles(struct gr_arg *grarg)
 	struct role_acl *rtmp = NULL;
 	struct gr_pw_entry entry;
 	int err;
-	__u16 i = 0;
+	u_int16_t i = 0;
 
 	memset(&entry, 0, sizeof (struct gr_pw_entry));
 
@@ -1018,7 +1018,7 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 	struct role_acl *rtmp = NULL;
 	struct role_acl **r_tmp = NULL;
 	unsigned long racls = 0;
-	__u16 sproles = 0;
+	u_int16_t sproles = 0;
 	int err;
 
 	for_each_role(rtmp, current_role) {

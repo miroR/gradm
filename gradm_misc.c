@@ -71,7 +71,7 @@ transmit_to_kernel(struct gr_arg_wrapper *buf)
 	return err;
 }
 
-void check_acl_status(__u16 reqmode)
+void check_acl_status(u_int16_t reqmode)
 {
 	int fd;
 	int retval;

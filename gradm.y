@@ -11,8 +11,8 @@ int current_nest_depth = 0;
 
 %union {
 	char *string;
-	__u32 num;
-	__u16 shortnum;
+	u_int32_t num;
+	u_int16_t shortnum;
 	struct var_object * var;
 }
 

@@ -1,7 +1,7 @@
 #include "gradm.h"
 
 static struct role_name_table {
-	__u16 modeint;
+	u_int16_t modeint;
 	char modechar;
 } role_mode_table[] = {
 	{
@@ -15,7 +15,7 @@ static struct role_name_table {
 };
 
 static struct mode_name_table {
-	__u32 modeint;
+	u_int32_t modeint;
 	char modechar;
 } mode_table[] = {
 	{
@@ -43,7 +43,7 @@ static struct mode_name_table {
 };
 
 static struct subj_mode_name_table {
-	__u32 modeint;
+	u_int32_t modeint;
 	char modechar;
 } subj_mode_table[] = {
 	{
@@ -70,7 +70,7 @@ static struct subj_mode_name_table {
 };
 
 void
-conv_mode_to_str(__u32 mode, char *modestr, unsigned short len)
+conv_mode_to_str(u_int32_t mode, char *modestr, unsigned short len)
 {
 	unsigned short i;
 	unsigned short x;
@@ -111,7 +111,7 @@ conv_mode_to_str(__u32 mode, char *modestr, unsigned short len)
 }
 
 void
-conv_subj_mode_to_str(__u32 mode, char *modestr, unsigned short len)
+conv_subj_mode_to_str(u_int32_t mode, char *modestr, unsigned short len)
 {
 	unsigned short i;
 	unsigned short x;
@@ -140,7 +140,7 @@ conv_subj_mode_to_str(__u32 mode, char *modestr, unsigned short len)
 }
 
 void
-conv_role_mode_to_str(__u16 mode, char *modestr, unsigned short len)
+conv_role_mode_to_str(u_int16_t mode, char *modestr, unsigned short len)
 {
 	unsigned short i;
 	unsigned short x;

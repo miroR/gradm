@@ -38,7 +38,7 @@ learn_log:
 			struct gr_learn_file_node *subject = NULL;
 			uid_t uid;
 			gid_t gid;
-			__u32 mode;
+			u_int32_t mode;
 			unsigned long res1, res2;
 			char *filename = $9;
 
@@ -92,9 +92,9 @@ learn_log:
 			struct gr_learn_file_node *subject = NULL;
 			uid_t uid;
 			gid_t gid;
-			__u32 addr;
-			__u16 port;
-			__u8 mode, proto, socktype;
+			u_int32_t addr;
+			u_int16_t port;
+			u_int8_t mode, proto, socktype;
 			char *filename = $9;
 
 			/* check if we have an inherited learning subject */

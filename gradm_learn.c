@@ -15,7 +15,7 @@ void learn_pass1(FILE *stream)
 	struct gr_learn_role_entry **tmp;
 	struct gr_learn_file_tmp_node **tmptable;
 	unsigned long i;
-	__u32 table_size;
+	u_int32_t table_size;
 
 	learn_pass1in = stream;
 	learn_pass1parse();

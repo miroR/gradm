@@ -2,7 +2,7 @@
 
 void
 add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
-		    char **nestednames, int nestlen, __u32 nestmode)
+		    char **nestednames, int nestlen, u_int32_t nestmode)
 {
 	int i;
 	char *nestname;

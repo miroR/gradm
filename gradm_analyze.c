@@ -8,7 +8,7 @@ check_permission(struct role_acl *role, struct proc_acl *def_acl,
 	struct proc_acl *tmpp = def_acl;
 	struct file_acl *tmpg = NULL;
 	char *tmpname;
-	__u32 cap_drop = 0, cap_mask = 0;
+	u_int32_t cap_drop = 0, cap_mask = 0;
 
 	if (chk->type == CHK_FILE) {
 		tmpname = alloca(strlen(filename) + 1);
@@ -482,9 +482,7 @@ analyze_acls(void)
 		}
 
 		chk.type = CHK_CAP;
-		chk.u_caps =
-		    (1 << CAP_SYS_MODULE) | (1 << CAP_SYS_RAWIO) | (1 <<
-								    CAP_MKNOD);;
+		chk.u_caps = cap_conv("CAP_SYS_MODULE") | cap_conv("CAP_SYS_RAWIO") | cap_conv("CAP_MKNOD");
 		chk.w_caps = 0xffffffff;
 
 		if (!check_permission(role, def_acl, "", &chk)) {
@@ -497,7 +495,7 @@ analyze_acls(void)
 			errs_found++;
 		}
 
-		chk.u_caps = (1 << CAP_SYS_ADMIN);
+		chk.u_caps = cap_conv("CAP_SYS_ADMIN");
 		chk.w_caps = 0xffffffff;
 
 		if (!check_permission(role, def_acl, "", &chk)) {
@@ -508,7 +506,7 @@ analyze_acls(void)
 			errs_found++;
 		}
 
-		chk.u_caps = (1 << CAP_NET_ADMIN);
+		chk.u_caps = cap_conv("CAP_NET_ADMIN");
 		chk.w_caps = 0xffffffff;
 
 		if (!check_permission(role, def_acl, "", &chk)) {
@@ -519,7 +517,7 @@ analyze_acls(void)
 			errs_found++;
 		}
 
-		chk.u_caps = (1 << CAP_NET_BIND_SERVICE);
+		chk.u_caps = cap_conv("CAP_NET_BIND_SERVICE");
 		chk.w_caps = 0xffffffff;
 
 		if (!check_permission(role, def_acl, "", &chk)) {
@@ -531,7 +529,7 @@ analyze_acls(void)
 			errs_found++;
 		}
 
-		chk.u_caps = (1 << CAP_SYS_TTY_CONFIG);
+		chk.u_caps = cap_conv("CAP_SYS_TTY_CONFIG");
 		chk.w_caps = 0xffffffff;
 
 		if (!check_permission(role, def_acl, "", &chk)) {

@@ -9,13 +9,13 @@ void analyze_acls(void);
 void generate_hash(struct gr_pw_entry *entry);
 void init_variables(void);
 void parse_args(int argc, char *argv[]);
-__u32 cap_conv(const char *cap);
-__u32 file_mode_conv(const char *mode);
-__u32 proc_subject_mode_conv(const char *mode);
-__u32 proc_object_mode_conv(const char *mode);
-int add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag);
+u_int32_t cap_conv(const char *cap);
+u_int32_t file_mode_conv(const char *mode);
+u_int32_t proc_subject_mode_conv(const char *mode);
+u_int32_t proc_object_mode_conv(const char *mode);
+int add_proc_subject_acl(struct role_acl *role, char *filename, u_int32_t mode, int flag);
 int add_proc_object_acl(struct proc_acl *subject, char *filename,
-			__u32 mode, int type);
+			u_int32_t mode, int type);
 void add_cap_acl(struct proc_acl *subject, const char *cap);
 void add_gradm_acl(struct role_acl *role);
 void add_grlearn_acl(struct role_acl *role);
@@ -34,37 +34,37 @@ void handle_learn_logs(const char *logfile, FILE * stream);
 void modify_caps(struct proc_acl *proc, int cap);
 void modify_res(struct proc_acl *proc, int res, unsigned long cur,
 		unsigned long max);
-void add_ip_acl(struct proc_acl *subject, __u8 mode, struct ip_acl *tmp);
+void add_ip_acl(struct proc_acl *subject, u_int8_t mode, struct ip_acl *tmp);
 int read_saltandpass(char *rolename, unsigned char *salt, unsigned char *pass);
 void add_kernel_acl(void);
-int add_role_acl(struct role_acl **role, char *rolename, __u16 type,
+int add_role_acl(struct role_acl **role, char *rolename, u_int16_t type,
 		 int ignore);
-__u16 role_mode_conv(const char *mode);
-__u32 get_ip(char *p);
+u_int16_t role_mode_conv(const char *mode);
+u_int32_t get_ip(char *p);
 void conv_name_to_type(struct ip_acl *ip, char *name);
-void add_role_allowed_ip(struct role_acl *role, __u32 addr, __u32 netmask);
+void add_role_allowed_ip(struct role_acl *role, u_int32_t addr, u_int32_t netmask);
 void add_role_transition(struct role_acl *role, char *rolename);
 void add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int allowdeny);
-void add_proc_nested_acl(struct role_acl *role, char *mainsubjname, char **nestednames, int nestlen, __u32 nestmode);
+void add_proc_nested_acl(struct role_acl *role, char *mainsubjname, char **nestednames, int nestlen, u_int32_t nestmode);
 void start_grlearn(char *logfile);
 void stop_grlearn(void);
 void sym_store(char *symname, struct var_object *object);
 struct var_object *sym_retrieve(char *symname);
-void add_var_object(struct var_object **object, char *name, __u32 mode);
+void add_var_object(struct var_object **object, char *name, u_int32_t mode);
 void interpret_variable(struct var_object *var);
 struct var_object *union_objects(struct var_object *var1, struct var_object *var2);
 struct var_object *intersect_objects(struct var_object *var1, struct var_object *var2);
 struct var_object *differentiate_objects(struct var_object *var1, struct var_object *var2);
 void sort_file_list(struct gr_hash_struct *hash);
 struct gr_learn_file_node *match_file_node(struct gr_learn_file_node *base, const char *filename);
-struct gr_learn_file_tmp_node *conv_filename_to_struct(char *filename, __u32 mode);
+struct gr_learn_file_tmp_node *conv_filename_to_struct(char *filename, u_int32_t mode);
 void match_role(struct gr_learn_group_node **grouplist, uid_t uid, gid_t gid, struct gr_learn_group_node **group, struct gr_learn_user_node **user);
-struct gr_learn_ip_node ** find_insert_ip(struct gr_learn_ip_node **base, __u32 ip, struct gr_learn_ip_node **parent);
-void conv_mode_to_str(__u32 mode, char *modestr, unsigned short len);
-void conv_subj_mode_to_str(__u32 mode, char *modestr, unsigned short len);
+struct gr_learn_ip_node ** find_insert_ip(struct gr_learn_ip_node **base, u_int32_t ip, struct gr_learn_ip_node **parent);
+void conv_mode_to_str(u_int32_t mode, char *modestr, unsigned short len);
+void conv_subj_mode_to_str(u_int32_t mode, char *modestr, unsigned short len);
 void generate_full_learned_acls(char *learn_log, FILE *stream);
 void reduce_roles(struct gr_learn_group_node ***grouplist);
-void insert_file(struct gr_learn_file_node **base, char *filename, __u32 mode, __u8 subj);
+void insert_file(struct gr_learn_file_node **base, char *filename, u_int32_t mode, u_int8_t subj);
 void first_stage_reduce_tree(struct gr_learn_file_node *base);
 void second_stage_reduce_tree(struct gr_learn_file_node *base);
 void third_stage_reduce_tree(struct gr_learn_file_node *base);
@@ -78,12 +78,12 @@ void reduce_ip_tree(struct gr_learn_ip_node *base);
 void reduce_ports_tree(struct gr_learn_ip_node *base);
 void display_roles(struct gr_learn_group_node **grouplist, FILE *stream);
 void add_fulllearn_acl(void);
-void insert_ip(struct gr_learn_ip_node **base, __u32 ip, __u16 port, __u8 proto,
-		__u8 socktype);
-int is_protected_path(char *filename, __u32 mode);
+void insert_ip(struct gr_learn_ip_node **base, u_int32_t ip, u_int16_t port, u_int8_t proto,
+		u_int8_t socktype);
+int is_protected_path(char *filename, u_int32_t mode);
 
 struct gr_learn_role_entry *
-insert_learn_role(struct gr_learn_role_entry ***role_list, char *rolename, __u16 rolemode);
+insert_learn_role(struct gr_learn_role_entry ***role_list, char *rolename, u_int16_t rolemode);
 void insert_learn_object(struct gr_learn_file_node *subject, struct gr_learn_file_tmp_node *object);
 void insert_learn_role_subject(struct gr_learn_role_entry *role, struct gr_learn_file_tmp_node *subject);
 void insert_learn_group_subject(struct gr_learn_group_node *role, struct gr_learn_file_tmp_node *subject);
@@ -94,17 +94,17 @@ int full_reduce_object_node(struct gr_learn_file_node *subject,
 			    struct gr_learn_file_node *unused1,
 			    FILE *unused2);
 void
-conv_role_mode_to_str(__u16 mode, char *modestr, unsigned short len);
+conv_role_mode_to_str(u_int16_t mode, char *modestr, unsigned short len);
 int full_reduce_ip_node(struct gr_learn_file_node *subject,
 			struct gr_learn_file_node *unused1,
 			FILE *unused2);
-void display_ip_tree(struct gr_learn_ip_node *base, __u8 contype, FILE *stream);
-int display_only_ip(struct gr_learn_ip_node *node, struct gr_learn_ip_node **unused, __u8 unused2,
+void display_ip_tree(struct gr_learn_ip_node *base, u_int8_t contype, FILE *stream);
+int display_only_ip(struct gr_learn_ip_node *node, struct gr_learn_ip_node **unused, u_int8_t unused2,
 		    FILE *stream);
 void traverse_ip_tree(struct gr_learn_ip_node *base,
 			struct gr_learn_ip_node **optarg,
-			int (*act)(struct gr_learn_ip_node *node, struct gr_learn_ip_node **optarg, __u8 contype, FILE *stream),
-			__u8 contype, FILE *stream);
+			int (*act)(struct gr_learn_ip_node *node, struct gr_learn_ip_node **optarg, u_int8_t contype, FILE *stream),
+			u_int8_t contype, FILE *stream);
 void display_tree(struct gr_learn_file_node *base, FILE *stream);
 void enforce_high_protected_paths(struct gr_learn_file_node *subject);
 void insert_user(struct gr_learn_group_node ***grouplist, char *username, char *groupname, uid_t uid, gid_t gid);
@@ -113,7 +113,7 @@ int ensure_subject_security(struct gr_learn_file_node *subject,
 			struct gr_learn_file_node *unused1,
 			FILE *unused2);
 
-void check_acl_status(__u16 reqmode);
+void check_acl_status(u_int16_t reqmode);
 struct file_acl *lookup_acl_object_by_name(struct proc_acl *subject, char *name);
 struct proc_acl *lookup_acl_subject_by_name(struct role_acl *role, char *name);
 struct file_acl *lookup_acl_object(struct proc_acl *subject, struct file_acl *object);

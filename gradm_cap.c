@@ -1,39 +1,39 @@
 #include "gradm.h"
 
 struct capability_set capability_list[] = {
-	{"CAP_CHOWN", CAP_CHOWN},
-	{"CAP_DAC_OVERRIDE", CAP_DAC_OVERRIDE},
-	{"CAP_DAC_READ_SEARCH", CAP_DAC_READ_SEARCH},
-	{"CAP_FOWNER", CAP_FOWNER},
-	{"CAP_FSETID", CAP_FSETID},
-	{"CAP_KILL", CAP_KILL},
-	{"CAP_SETGID", CAP_SETGID},
-	{"CAP_SETUID", CAP_SETUID},
-	{"CAP_SETPCAP", CAP_SETPCAP},
-	{"CAP_LINUX_IMMUTABLE", CAP_LINUX_IMMUTABLE},
-	{"CAP_NET_BIND_SERVICE", CAP_NET_BIND_SERVICE},
-	{"CAP_NET_BROADCAST", CAP_NET_BROADCAST},
-	{"CAP_NET_ADMIN", CAP_NET_ADMIN},
-	{"CAP_NET_RAW", CAP_NET_RAW},
-	{"CAP_IPC_LOCK", CAP_IPC_LOCK},
-	{"CAP_IPC_OWNER", CAP_IPC_OWNER},
-	{"CAP_SYS_MODULE", CAP_SYS_MODULE},
-	{"CAP_SYS_RAWIO", CAP_SYS_RAWIO},
-	{"CAP_SYS_CHROOT", CAP_SYS_CHROOT},
-	{"CAP_SYS_PTRACE", CAP_SYS_PTRACE},
-	{"CAP_SYS_PACCT", CAP_SYS_PACCT},
-	{"CAP_SYS_ADMIN", CAP_SYS_ADMIN},
-	{"CAP_SYS_BOOT", CAP_SYS_BOOT},
-	{"CAP_SYS_NICE", CAP_SYS_NICE},
-	{"CAP_SYS_RESOURCE", CAP_SYS_RESOURCE},
-	{"CAP_SYS_TIME", CAP_SYS_TIME},
-	{"CAP_SYS_TTY_CONFIG", CAP_SYS_TTY_CONFIG},
-	{"CAP_MKNOD", CAP_MKNOD},
-	{"CAP_LEASE", CAP_LEASE},
+	{"CAP_CHOWN", 0},
+	{"CAP_DAC_OVERRIDE", 1},
+	{"CAP_DAC_READ_SEARCH", 2},
+	{"CAP_FOWNER", 3},
+	{"CAP_FSETID", 4},
+	{"CAP_KILL", 5},
+	{"CAP_SETGID", 6},
+	{"CAP_SETUID", 7},
+	{"CAP_SETPCAP", 8},
+	{"CAP_LINUX_IMMUTABLE", 9},
+	{"CAP_NET_BIND_SERVICE", 10},
+	{"CAP_NET_BROADCAST", 11},
+	{"CAP_NET_ADMIN", 12},
+	{"CAP_NET_RAW", 13},
+	{"CAP_IPC_LOCK", 14},
+	{"CAP_IPC_OWNER", 15},
+	{"CAP_SYS_MODULE", 16},
+	{"CAP_SYS_RAWIO", 17},
+	{"CAP_SYS_CHROOT", 18},
+	{"CAP_SYS_PTRACE", 19},
+	{"CAP_SYS_PACCT", 20},
+	{"CAP_SYS_ADMIN", 21},
+	{"CAP_SYS_BOOT", 22},
+	{"CAP_SYS_NICE", 23},
+	{"CAP_SYS_RESOURCE", 24},
+	{"CAP_SYS_TIME", 25},
+	{"CAP_SYS_TTY_CONFIG", 26},
+	{"CAP_MKNOD", 27},
+	{"CAP_LEASE", 28},
 	{"CAP_ALL", ~0}
 };
 
-__u32
+u_int32_t
 cap_conv(const char *cap)
 {
 	int i;
@@ -60,7 +60,7 @@ cap_conv(const char *cap)
 void
 add_cap_acl(struct proc_acl *subject, const char *cap)
 {
-	__u32 kcap = cap_conv(cap + 1);
+	u_int32_t kcap = cap_conv(cap + 1);
 
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "

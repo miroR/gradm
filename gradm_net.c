@@ -1,7 +1,7 @@
 #include "gradm.h"
 
 void
-add_role_allowed_ip(struct role_acl *role, __u32 addr, __u32 netmask)
+add_role_allowed_ip(struct role_acl *role, u_int32_t addr, u_int32_t netmask)
 {
 	struct role_allowed_ip **roleipp;
 	struct role_allowed_ip *roleip;
@@ -30,7 +30,7 @@ add_role_allowed_ip(struct role_acl *role, __u32 addr, __u32 netmask)
 }
 
 void
-add_ip_acl(struct proc_acl *subject, __u8 mode, struct ip_acl *acl_tmp)
+add_ip_acl(struct proc_acl *subject, u_int8_t mode, struct ip_acl *acl_tmp)
 {
 	struct ip_acl *p;
 	int i;
@@ -74,7 +74,7 @@ add_ip_acl(struct proc_acl *subject, __u8 mode, struct ip_acl *acl_tmp)
 	return;
 }
 
-__u32
+u_int32_t
 get_ip(char *ip)
 {
 	struct in_addr address;

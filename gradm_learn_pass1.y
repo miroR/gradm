@@ -38,8 +38,8 @@ learn_log:
 		{
 			struct gr_learn_role_entry *role;
 			unsigned long res1, res2;
-			__u16 rolemode;
-			__u32 addr;
+			u_int16_t rolemode;
+			u_int32_t addr;
 
 			rolemode = $3;
 			res1 = $13;
@@ -73,8 +73,8 @@ learn_log:
 	|	ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' IPADDR ':' NUM ':' NUM ':' NUM ':' NUM ':' IPADDR
 		{
 			struct gr_learn_role_entry *role;
-			__u16 rolemode;
-			__u32 addr;
+			u_int16_t rolemode;
+			u_int32_t addr;
 
 			rolemode = $3;
 

@@ -15,13 +15,13 @@
  */
 
 typedef struct {
-	__u32 state[8];
-	__u32 count[2];
-	__u8 buf[128];
+	u_int32_t state[8];
+	u_int32_t count[2];
+	u_int8_t buf[128];
 } sha256_ctx_t;
 
-static __inline__ __u32
-generic_rotr32(const __u32 x, const unsigned bits)
+static __inline__ u_int32_t
+generic_rotr32(const u_int32_t x, const unsigned bits)
 {
 	const unsigned n = bits % 32;
 	return (x >> n) | (x << (32 - n));
@@ -44,7 +44,7 @@ generic_rotr32(const __u32 x, const unsigned bits)
 #define H6         0x1f83d9ab
 #define H7         0x5be0cd19
 
-const static __u32 sha256_K[64] = {
+const static u_int32_t sha256_K[64] = {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
 	0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
 	0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
@@ -75,10 +75,10 @@ const static __u32 sha256_K[64] = {
 #define BLEND_OP(I) W[I] = s1(W[I-2]) + W[I-7] + s0(W[I-15]) + W[I-16];
 
 static void
-SHA256Transform(__u32 * state, const __u8 * input)
+SHA256Transform(u_int32_t * state, const u_int8_t * input)
 {
-	__u32 a, b, c, d, e, f, g, h, t1, t2;
-	__u32 W[64];
+	u_int32_t a, b, c, d, e, f, g, h, t1, t2;
+	u_int32_t W[64];
 
 	int i;
 
@@ -169,7 +169,7 @@ SHA256Transform(__u32 * state, const __u8 * input)
 
 	/* clear any sensitive info... */
 	a = b = c = d = e = f = g = h = t1 = t2 = 0;
-	memset(W, 0, 64 * sizeof (__u32));
+	memset(W, 0, 64 * sizeof (u_int32_t));
 }
 
 static void
@@ -188,12 +188,12 @@ SHA256Init(sha256_ctx_t * C)
 }
 
 static void
-SHA256Update(sha256_ctx_t * C, const __u8 * input, __u32 inputLen)
+SHA256Update(sha256_ctx_t * C, const u_int8_t * input, u_int32_t inputLen)
 {
-	__u32 i, index, partLen;
+	u_int32_t i, index, partLen;
 
 	/* Compute number of bytes mod 128 */
-	index = (__u32) ((C->count[0] >> 3) & 0x3f);
+	index = (u_int32_t) ((C->count[0] >> 3) & 0x3f);
 
 	/* Update number of bits */
 	if ((C->count[0] += (inputLen << 3)) < (inputLen << 3)) {
@@ -220,11 +220,11 @@ SHA256Update(sha256_ctx_t * C, const __u8 * input, __u32 inputLen)
 }
 
 static void
-SHA256Final(sha256_ctx_t * C, __u8 * digest)
+SHA256Final(sha256_ctx_t * C, u_int8_t * digest)
 {
-	const static __u8 padding[64] = { 0x80, };
-	__u8 bits[8];
-	__u32 t, index, padLen;
+	const static u_int8_t padding[64] = { 0x80, };
+	u_int8_t bits[8];
+	u_int32_t t, index, padLen;
 	int i, j;
 
 	/* Save number of bits */

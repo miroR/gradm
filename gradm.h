@@ -11,11 +11,6 @@
 #include <sched.h>
 #include <fcntl.h>
 #include <termios.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <sys/poll.h>
-#include <asm/param.h>
-#include <asm/ioctls.h>
 #include <dirent.h>
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -23,13 +18,14 @@
 #include <grp.h>
 #include <fnmatch.h>
 #include <elf.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <sys/poll.h>
+#include <sys/types.h>
 #include <sys/resource.h>
 #include <sys/mman.h>
-#include <asm/posix_types.h>
-#include <linux/capability.h>
-#include <linux/limits.h>
-#include <linux/threads.h>
-#include <linux/version.h>
+#include <asm/param.h>
+#include <asm/ioctls.h>
 
 #define failure(x) do { \
 	fprintf(stderr, x ": %s\n\n", strerror(errno)); \
@@ -59,7 +55,7 @@
 
 
 #if KERNVER == 6
-typedef __u32 gr_dev_t;
+typedef u_int32_t gr_dev_t;
 #undef MAJOR
 #undef MINOR
 #undef MKDEV

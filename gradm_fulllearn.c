@@ -30,7 +30,7 @@ int full_reduce_subjects(struct gr_learn_group_node *group,
 {
 	struct gr_learn_file_tmp_node **tmptable;
 	unsigned long i;
-	__u32 table_size;
+	u_int32_t table_size;
 
 	if (user) {
 		printf("Beginning full learning subject reduction for user %s...", user->rolename);
@@ -104,7 +104,7 @@ int full_reduce_object_node(struct gr_learn_file_node *subject,
 {
 	struct gr_learn_file_tmp_node **tmptable;
 	unsigned long i;
-	__u32 table_size;
+	u_int32_t table_size;
 
 	if (subject->hash == NULL)
 		return 0;
@@ -183,7 +183,7 @@ int full_reduce_ips(struct gr_learn_group_node *group,
 void free_ip_ports(struct gr_learn_ip_node *node)
 {
 	struct gr_learn_ip_node **tmp;
-	__u16 **tmp2;
+	u_int16_t **tmp2;
 
 	if (node == NULL)
 		return;
