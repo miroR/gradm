@@ -99,12 +99,12 @@
 # gradm -L /etc/grsec/learning.logs -E
 # and then generate the rules after disabling the system after the 
 # learning phase with:
-# gradm -L /etc/grsec/learning.logs -O /etc/grsec/acl
+# gradm -L /etc/grsec/learning.logs -O /etc/grsec/policy
 # To use full system learning, enable the system like:
 # gradm -F -L /etc/grsec/learning.logs
 # and then generate the rules after disabling the system after the 
 # learning phase with:
-# gradm -F -L /etc/grsec/learning.logs -O /etc/grsec/acl
+# gradm -F -L /etc/grsec/learning.logs -O /etc/grsec/policy
 
 role admin sA
 subject / r

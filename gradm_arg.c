@@ -17,7 +17,7 @@ show_help(void)
 	       "Usage: gradm [option] ... \n\n"
 	       "Examples:\n"
 	       "	gradm -P\n"
-	       "	gradm -F -L /etc/grsec/learning.logs -O /etc/grsec/acl\n"
+	       "	gradm -F -L /etc/grsec/learning.logs -O /etc/grsec/policy\n"
 	       "Options:\n"
 	       "	-E, --enable	Enable the grsecurity RBAC system\n"
 	       "	-D, --disable	Disable the grsecurity RBAC system\n"
