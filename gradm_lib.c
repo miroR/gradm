@@ -346,7 +346,7 @@ struct file_acl *lookup_acl_object(struct proc_acl *subject, struct file_acl *ob
 	return (struct file_acl *)lookup_hash_entry(subject->hash, object);
 }
 
-struct gr_learn_file_tmp_node *lookup_learn_object(struct gr_learn_file_tmp_node *subject, char *filename)
+struct gr_learn_file_tmp_node *lookup_learn_object(struct gr_learn_file_node *subject, char *filename)
 {
 	return (struct gr_learn_file_tmp_node *)lookup_hash_entry(subject->hash, filename);
 }
@@ -491,7 +491,7 @@ struct gr_hash_struct *create_hash_table(int type)
 	return hash;
 }
 
-void insert_learn_object(struct gr_learn_file_tmp_node *subject, struct gr_learn_file_tmp_node *object);
+void insert_learn_object(struct gr_learn_file_tmp_node *subject, struct gr_learn_file_tmp_node *object)
 {
 	if (subject->hash == NULL)
 		subject->hash = create_hash_table(GR_HASH_FILENAME);
