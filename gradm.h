@@ -15,6 +15,7 @@
 #include <sys/wait.h>
 #include <sys/poll.h>
 #include <asm/param.h>
+#include <asm/ioctls.h>
 #include <glob.h>
 #include <dirent.h>
 #include <arpa/inet.h>
