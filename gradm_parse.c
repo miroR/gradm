@@ -762,7 +762,7 @@ static void setup_special_roles(struct gr_arg *grarg)
 	struct role_acl *rtmp = NULL;
 	struct gr_pw_entry entry;
 	int err;
-	__u16 i;
+	__u16 i = 0;
 
 	memset(&entry, 0, sizeof(struct gr_pw_entry));
 
