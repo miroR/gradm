@@ -97,7 +97,11 @@ parse_args(int argc, char *argv[])
 	};
 
 	getcwd(cwd, PATH_MAX - 1);
-
+	err = ioctl(0, TIOCEXCL, NULL);
+	if (err) {
+		fprintf(stderr, "Warning: terminal is being monitored, exiting.\n");
+		exit(1);
+	}
 	err = mlock(&entry, sizeof (entry));
 	if (err && !getuid())
 		fprintf(stderr, "Warning: Unable to lock password "
