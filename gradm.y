@@ -65,10 +65,10 @@ subject_label:			SUBJECT SUBJ_NAME subj_mode
 
 				 if (!stat($2, &fstat) && S_ISREG(fstat.st_mode)) {
 					if (is_valid_elf_binary($2)) {
-						if (!add_proc_object_acl(current_subject, $2, proc_object_mode_conv("x"), GR_LEARN))
+						if (!add_proc_object_acl(current_subject, $2, proc_object_mode_conv("x"), GR_FLEARN))
 							exit(EXIT_FAILURE);
 					} else {
-						if (!add_proc_object_acl(current_subject, $2, proc_object_mode_conv("rx"), GR_LEARN))
+						if (!add_proc_object_acl(current_subject, $2, proc_object_mode_conv("rx"), GR_FLEARN))
 							exit(EXIT_FAILURE);
 					}
 				 }
@@ -78,7 +78,7 @@ subject_label:			SUBJECT SUBJ_NAME subj_mode
 object_file_label:		OBJ_NAME obj_mode
 				{
 				printf("adding obj %s\n", $1);
-				 if (!add_proc_object_acl(current_subject, $1, $2, 0))
+				 if (!add_proc_object_acl(current_subject, $1, $2, GR_FEXIST))
 					exit(EXIT_FAILURE);
 				}
 	;

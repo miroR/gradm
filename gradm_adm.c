@@ -54,7 +54,7 @@ void add_gradm_acl(void)
 
 	if(!stat("/proc/sys/kernel/grsecurity/acl", &fstat)) {
 		if(!add_proc_object_acl(current_subject, 
-				"/proc/sys/kernel/grsecurity/acl", proc_object_mode_conv("w"), 0))
+				"/proc/sys/kernel/grsecurity/acl", proc_object_mode_conv("w"), GR_FEXIST))
 			exit(EXIT_FAILURE);
 	} else {
 		fprintf(stderr, "/proc/sys/kernel/grsecurity/acl does not "
@@ -68,11 +68,11 @@ void add_gradm_acl(void)
 	add_ip_acl(current_subject, GR_IP_BIND, &ip);
 
 	if(!add_proc_object_acl(current_subject, "/", 
-			proc_object_mode_conv("h"), 0))
+			proc_object_mode_conv("h"), GR_FEXIST))
 		exit(EXIT_FAILURE);
 	
 	if(!add_proc_object_acl(current_subject, gradm_name, 
-			proc_object_mode_conv("x"), 0))
+			proc_object_mode_conv("x"), GR_FEXIST))
 		exit(EXIT_FAILURE);
 	add_cap_acl(current_subject, "-CAP_ALL");
 
@@ -83,7 +83,7 @@ void add_admin_acl(void)
 {
 	if(!add_proc_subject_acl(current_role, "god", proc_subject_mode_conv("kvo")))
 		exit(EXIT_FAILURE);
-	if(!add_proc_object_acl(current_subject, "/", proc_object_mode_conv("rwxi"), 0))
+	if(!add_proc_object_acl(current_subject, "/", proc_object_mode_conv("rwxi"), GR_FEXIST))
 		exit(EXIT_FAILURE);
 	add_cap_acl(current_subject, "+CAP_ALL");
 
@@ -94,13 +94,13 @@ void add_kernel_acl(void)
 {
 	if(!add_proc_subject_acl(current_role, "kernel", proc_subject_mode_conv("o")))
 		exit(EXIT_FAILURE);
-	if(!add_proc_object_acl(current_subject, "/", proc_object_mode_conv(""), 0))
+	if(!add_proc_object_acl(current_subject, "/", proc_object_mode_conv(""), GR_FEXIST))
 		exit(EXIT_FAILURE);
-	if(!add_proc_object_acl(current_subject, "/bin/true", proc_object_mode_conv("x"), 0))
+	if(!add_proc_object_acl(current_subject, "/bin/true", proc_object_mode_conv("x"), GR_FEXIST))
 		exit(EXIT_FAILURE);
-	if(!add_proc_object_acl(current_subject, "/sbin/hotplug", proc_object_mode_conv("rx"), 0))
+	if(!add_proc_object_acl(current_subject, "/sbin/hotplug", proc_object_mode_conv("rx"), GR_FEXIST))
 		exit(EXIT_FAILURE);
-	if(!add_proc_object_acl(current_subject, "/sbin/modprobe", proc_object_mode_conv("x"), 0))
+	if(!add_proc_object_acl(current_subject, "/sbin/modprobe", proc_object_mode_conv("x"), GR_FEXIST))
 		exit(EXIT_FAILURE);
 
 	return;

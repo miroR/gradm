@@ -376,7 +376,7 @@ void merge_acl_rules(void)
 				else
 					add_proc_object_acl(proc,
 						(*(learn_db + i))->obj_name,
-						(*(learn_db + i))->mode, GR_LEARN);
+						(*(learn_db + i))->mode, GR_FLEARN);
 			}
 		}
 

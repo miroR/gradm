@@ -15,8 +15,10 @@
 #define GR_SALT_SIZE		16
 #define GR_SHA_SUM_SIZE		32
 
-#define GR_FEXIST		0
-#define GR_FFAKE		1
+#define GR_FEXIST		0x1
+#define GR_FFAKE		0x2
+#define GR_FLEARN		0x4
+#define GR_GLOB			0x8
 
 #define CHK_FILE		0
 #define CHK_CAP			1

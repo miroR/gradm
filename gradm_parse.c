@@ -64,8 +64,8 @@ static struct file_acl * is_proc_object_dupe(struct file_acl * filp, struct file
         struct file_acl *tmp;
         
 	for_each_object(tmp, filp)
-                if(!strcmp(tmp->filename, filp2->filename) ||
-		   ((tmp->inode == filp2->inode) && (tmp->dev == filp2->dev)))
+                if(((tmp->inode == filp2->inode) && (tmp->dev == filp2->dev)) ||
+		   !strcmp(tmp->filename, filp2->filename))
                         return tmp;
                                 
         return NULL;
@@ -76,8 +76,8 @@ static struct proc_acl * is_proc_subject_dupe(struct role_acl *role, struct proc
         struct proc_acl *tmp;
         
 	for_each_subject(tmp, role)
-                if(!strcmp(tmp->filename, proc->filename) ||
-		   ((tmp->inode == proc->inode) && (tmp->dev == proc->dev)))
+                if(((tmp->inode == proc->inode) && (tmp->dev == proc->dev)) ||
+		   !strcmp(tmp->filename, proc->filename))
                         return tmp;
                         
         return NULL;
@@ -168,7 +168,7 @@ static int add_globbing_file(struct proc_acl *subject, char * filename,
 	char *last;
 	glob_t pglob;
 	int err;
-	struct file_acl ftmp;
+	struct file_acl ftmp, ftmp2;
 	struct stat fstat;
 
 	while(len--) {
@@ -229,18 +229,32 @@ out2:
 				last);
 
 			ftmp.filename = tmp;
-			ftmp.inode = 0;
-			ftmp.dev = 0;
 
-			if(!stat(ftmp.filename, &fstat)) {
+			if(!lstat(ftmp.filename, &fstat)) {
 				ftmp.inode = fstat.st_ino;
 				ftmp.dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
+
+				if (S_ISLNK(fstat.st_mode)) {
+					char buf[PATH_MAX];
+					memset(&buf, 0, sizeof(buf));
+					realpath(ftmp.filename, buf);
+					ftmp2.filename = buf;
+
+					if (!lstat(ftmp2.filename, &fstat)) {
+						ftmp2.inode = fstat.st_ino;
+						ftmp2.dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
+						if (is_proc_object_dupe(subject->proc_object, &ftmp2))
+							continue;
+						if (!add_proc_object_acl(subject, strdup(buf), mode, type | GR_GLOB))
+							return 0;
+					}
+				}
+				if (is_proc_object_dupe(subject->proc_object, &ftmp))
+					continue;
+				if (!add_proc_object_acl(subject, strdup(tmp), mode, type))
+					return 0;
 			}
 
-			if (is_proc_object_dupe(subject->proc_object, &ftmp))
-				continue;
-			if (!add_proc_object_acl(subject, strdup(tmp), mode, type))
-				return 0;
 		}
 		globfree(&pglob);
 	} else {
@@ -269,23 +283,54 @@ out2:
 			}
 
 			ftmp.filename = *(pglob.gl_pathv + i);
-			ftmp.inode = 0;
-			ftmp.dev = 0;
 
 			if(!stat(ftmp.filename, &fstat)) {
 				ftmp.inode = fstat.st_ino;
 				ftmp.dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
-			}
 
-			if (is_proc_object_dupe(subject->proc_object, &ftmp))
-				continue;
-			if (!add_proc_object_acl(subject, *(pglob.gl_pathv + i), mode, type))
-				return 0;
+				if (S_ISLNK(fstat.st_mode)) {
+					char buf[PATH_MAX];
+					memset(&buf, 0, sizeof(buf));
+					realpath(ftmp.filename, buf);
+					ftmp2.filename = buf;
+
+					if (!lstat(ftmp2.filename, &fstat)) {
+						ftmp2.inode = fstat.st_ino;
+						ftmp2.dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
+
+						if (is_proc_object_dupe(subject->proc_objectp, &ftmp2))
+							continue;
+						if (!add_proc_object_acl(subject, strdup(buf), mode, type | GR_GLOB))
+							return 0;
+					}
+				}
+				if (is_proc_object_dupe(subject->proc_object, &ftmp))
+					continue;
+				if (!add_proc_object_acl(subject, *(pglob.gl_pathv + i), mode, type))
+					return 0;
+			}
 		}
 	}
 
 	return 1;
 }	
+
+static void display_all_dupes(struct proc_acl *subject, struct file_acl *filp2)
+{
+        struct file_acl *tmp = subject->proc_object;
+        struct stat fstat;
+        struct file_acl ftmp;
+
+        for_each_object(tmp, subject->proc_object)
+                if (!stat(tmp->filename, &fstat)) {
+                        ftmp.inode = fstat.st_ino;
+                        ftmp.dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
+                        if (ftmp.inode == filp2->inode && ftmp.dev == filp2->dev)
+                                fprintf(stderr, "%s\n", tmp->filename);
+                }
+
+        return;
+}
 
 
 int add_proc_object_acl(struct proc_acl * subject, char * filename, 
@@ -316,11 +361,17 @@ int add_proc_object_acl(struct proc_acl * subject, char * filename,
 	if (strchr(filename, '?') || strchr(filename, '*'))
 		return add_globbing_file(subject, filename, mode, type);
 
-        if(stat(filename, &fstat)) {
+        if(lstat(filename, &fstat)) {
 		dfile = add_deleted_file(filename);
 		fstat.st_ino = dfile->ino;
 		fstat.st_dev = 0;
 		mode |= GR_DELETED;		
+	} else if (S_ISLNK(fstat.st_mode) && !(type & GR_GLOB)) {
+		char buf[PATH_MAX];
+		memset(&buf, 0, sizeof(buf));
+		realpath(filename, buf);
+		if (!add_proc_object_acl(subject, strdup(buf), mode, type))
+			return 0;
 	}
 
 	if((p = (struct file_acl *) calloc(1, sizeof(struct file_acl))) == NULL)
@@ -345,7 +396,7 @@ int add_proc_object_acl(struct proc_acl * subject, char * filename,
 	p->inode = fstat.st_ino;
 	p->dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
 
-	if(type == GR_LEARN) {
+	if(type & GR_LEARN) {
 	        struct file_acl *tmp = *filp;
         
 		for_each_object(tmp, *filp) {
@@ -358,12 +409,13 @@ int add_proc_object_acl(struct proc_acl * subject, char * filename,
 	} else if((p2 = is_proc_object_dupe(*filp, p))) {
 		fprintf(stderr, "Duplicate ACL entry found for \"%s\""
 			" on line %lu of %s.\n"
-			"\"%s\" references the same object as \"%s\""
-			" specified on an earlier line.\n"
-                        "The ACL system will not load until this"
-                        " error is fixed.\n", p->filename, lineno, 
-			current_acl_file, p->filename, p2->filename);
-                return 0;
+			"\"%s\" references the same object as the following object(s):\n",
+			p->filename, lineno, current_acl_file, p->filename);
+                display_all_dupes(subject, p);
+		fprintf(stderr, "specified on an earlier line."
+			"The ACL system will not load until this"
+			" error is fixed.\n");
+		return 0;
         }
 
 	*filp = p;

@@ -40,7 +40,7 @@ static void expand_acl(struct proc_acl * proc)
 	     if(!strcmp(tmpf1->filename, tmpf2->filename))
 	      break;
 	    if(!tmpf2) // object not found in current subject
-	     add_proc_object_acl(proc, tmpf1->filename, tmpf1->mode, 0);
+	     add_proc_object_acl(proc, tmpf1->filename, tmpf1->mode, GR_FEXIST);
 	   }
 	  }
 	 }
