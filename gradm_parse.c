@@ -916,6 +916,9 @@ proc_object_mode_conv(const char *mode)
 		case 't':
 			retmode |= GR_PTRACERD;
 			break;
+		case 'l':
+			retmode |= GR_LINK;
+			break;
 		case 'F':
 			retmode |= GR_AUDIT_FIND;
 			break;
@@ -943,6 +946,9 @@ proc_object_mode_conv(const char *mode)
 			break;
 		case 'D':
 			retmode |= GR_AUDIT_DELETE;
+			break;
+		case 'L':
+			retmode |= GR_AUDIT_LINK;
 			break;
 		case 's':
 			retmode |= GR_SUPPRESS;

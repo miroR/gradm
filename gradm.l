@@ -195,7 +195,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = gr_strdup(gr_line);
 					  return OBJ_NAME;
 					}
-<VAR_OBJ_STATE>[rwxahitmFRWXAIMdDcCspo]+	{
+<VAR_OBJ_STATE>[rwxahitmlLFRWXAIMdDcCspo]+	{
 					  gradmlval.num = proc_object_mode_conv(yytext);
 					  return OBJ_MODE;
 					}
@@ -284,7 +284,7 @@ $HOME[/]?[^ \t\n]*			{
 					  gradmlval.string = gr_strdup(gr_line);
 					  return OBJ_NAME;
 					}
-[rwxahitmFRWXAIMcCdDspo]+		{
+[rwxahitmlLFRWXAIMcCdDspo]+		{
 					  gradmlval.num = proc_object_mode_conv(yytext);
 					  return OBJ_MODE;
 					}

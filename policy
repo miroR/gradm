@@ -67,6 +67,10 @@
 # d -> allow deletion of the file/directory
 # D -> audit the deletion
 # p -> reject all ptraces to this object
+# l -> allow a hardlink at this path
+#	(hardlinking requires at a minimum c and l modes, and the target
+#	 link cannot have any greater permission than the source file)
+# L -> audit link creation
 # new subject modes:
 # r -> relax ptrace restrictions (allows process to ptrace processes
 #      other than its own descendants)
@@ -112,7 +116,7 @@
 
 role admin sA
 subject / r
-	/ rwcdmxi
+	/ rwcdmlxi
 
 role default G
 role_transitions admin
