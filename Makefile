@@ -10,6 +10,7 @@ LEXFLAGS=-B
 YACC=/usr/bin/yacc
 BYACC=/usr/bin/byacc
 BISON=/usr/bin/bison
+MKNOD=/bin/mknod
 #for dietlibc
 #CC=/usr/bin/diet /usr/bin/gcc
 CC=/usr/bin/gcc
@@ -77,6 +78,9 @@ install: gradm gradm.8 acl
 	mkdir -p -m 700 $(DESTDIR)/etc/grsec
 	@if [ ! -f $(DESTDIR)/etc/grsec/acl ] ; then \
 		$(INSTALL) -m 0600 acl $(DESTDIR)/etc/grsec ; \
+	fi
+	@if [ ! -f /dev/grsec ] ; then \
+		$(MKNOD) /dev/grsec c 1 10 ; \
 	fi
 	mkdir -p $(DESTDIR)$(MANDIR)/man8
 	$(INSTALL) -m 0644 gradm.8 $(DESTDIR)$(MANDIR)/man8
