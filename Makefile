@@ -80,7 +80,7 @@ install: gradm gradm.8 acl
 		$(INSTALL) -m 0600 acl $(DESTDIR)/etc/grsec ; \
 	fi
 	@if [ ! -f /dev/grsec ] ; then \
-		$(MKNOD) /dev/grsec c 1 10 ; \
+		$(MKNOD) -m=622 /dev/grsec c 1 10 ; \
 	fi
 	mkdir -p $(DESTDIR)$(MANDIR)/man8
 	$(INSTALL) -m 0644 gradm.8 $(DESTDIR)$(MANDIR)/man8
