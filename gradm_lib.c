@@ -1,5 +1,15 @@
 #include "gradm.h"
 
+char * gr_strdup(char *p)
+{
+	char *ret;
+
+	ret = strdup(p);
+	if (ret == NULL)
+		failure("strdup");
+	return ret;
+}
+
 void * gr_stat_alloc(unsigned long len)
 {
 	void *ptr;
@@ -503,7 +513,7 @@ char *gr_get_user_name(uid_t uid)
 	if (pwd) {
 		tmpuser = gr_stat_alloc(sizeof(struct gr_user_map));
 		tmpuser->uid = uid;
-		tmpuser->user = strdup(pwd->pw_name);
+		tmpuser->user = gr_strdup(pwd->pw_name);
 		tmpuser->next = user_list;
 		user_list = tmpuser;
 		return pwd->pw_name;
@@ -528,7 +538,7 @@ char *gr_get_group_name(gid_t gid)
 	if (grp) {
 		tmpgroup = gr_stat_alloc(sizeof(struct gr_group_map));
 		tmpgroup->gid = gid;
-		tmpgroup->group = strdup(grp->gr_name);
+		tmpgroup->group = gr_strdup(grp->gr_name);
 		tmpgroup->next = group_list;
 		group_list = tmpgroup;
 		return grp->gr_name;

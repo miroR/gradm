@@ -61,25 +61,25 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 <DOMAINTYPE_STATE>([ug]l?)|(l?[ug])	{
 					  BEGIN(DOMAINLIST_STATE);
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return DOMAIN_TYPE;
 					}
 <ROLE_STATE>[_a-zA-Z0-9-]{1,30}		{
 					  BEGIN(ROLETYPE_STATE);
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return ROLE_NAME;
 					}
 <DOMAIN_STATE>[_a-zA-Z0-9-]{1,30}	{
 					  BEGIN(DOMAINTYPE_STATE);
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return ROLE_NAME;
 					}
 <DOMAINLIST_STATE>[_a-zA-Z0-9-]{1,30}	{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return ROLE_NAME;
 					}
 <ROLETRANS_STATE>[_a-zA-Z0-9-]{1,30}	{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return ROLE_NAME;
 					}
 
@@ -87,25 +87,25 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return ':';
 					}
 <SUBJECT_STATE>[/][^ :\t\n]*		{ 
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return SUBJ_NAME;
 					}
 <SUBJECT_STATE>["][/][^:\n]*["]		{
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = strdup(gr_line);
+					  gradmlval.string = gr_strdup(gr_line);
 					  return SUBJ_NAME;
 					}
 <SUBJECT_STATE>$HOME[/]?[^ :\t\n]*	{ 
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return SUBJ_NAME;
 					}
 <SUBJECT_STATE>["]$HOME[/]?[^:\n]*["]		{
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = strdup(gr_line);
+					  gradmlval.string = gr_strdup(gr_line);
 					  return SUBJ_NAME;
 					}
 <SUBJECT_STATE>[TKCAPRMSGXOolhpkvdbri]+	{
@@ -114,11 +114,11 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 
 <RES_STATE>"unlimited"			{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return RES_SOFTHARD;
 					}
 <RES_STATE>[0-9]+[smhdKMG]?		{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return RES_SOFTHARD;
 					}
 
@@ -138,11 +138,11 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return *yytext;
 					}
 <IP_STATE>"raw_sock"|"dgram"|"rdm"|"stream"|"any_sock" {
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return IPTYPE;
 					}
 <IP_STATE>[a-z_-]+			{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return IPPROTO;
 					}
 
@@ -169,11 +169,11 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 [$][a-zA-Z0-9_]+			{
 					  gr_line = yytext;
 					  gr_line++;
-					  gradmlval.string = strdup(gr_line);
+					  gradmlval.string = gr_strdup(gr_line);
 					  return VARIABLE;
 					}
 <VAR_STATE>[a-zA-Z0-9_]+		{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return DEFINE_NAME;
 					}
 <VAR_STATE>"{"				{
@@ -185,14 +185,14 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return '}';
 					}
 <VAR_OBJ_STATE>[/][^ \t\n]*		{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return OBJ_NAME;
 					}
 <VAR_OBJ_STATE>["][/].*["]		{
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = strdup(gr_line);
+					  gradmlval.string = gr_strdup(gr_line);
 					  return OBJ_NAME;
 					}
 <VAR_OBJ_STATE>[rwxahitmFRWXAIMdDcCspo]+	{
@@ -200,7 +200,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return OBJ_MODE;
 					}
 <IDTRANS_STATE>[_a-zA-Z0-9-]{1,30}	{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return ID_NAME;
 					}
 "user_transition_allow"			{
@@ -253,35 +253,35 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  add_include(gr_line);					  
 					}
 [+-]"CAP_"[_A-Z]+			{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return CAP_NAME;
 					}
 "RES_"[A-Z]+				{
 					  BEGIN(RES_STATE);
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return RES_NAME;
 					}
 
 [/][^ \t\n]*				{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return OBJ_NAME;
 					}
 ["][/].*["]				{
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = strdup(gr_line);
+					  gradmlval.string = gr_strdup(gr_line);
 					  return OBJ_NAME;
 					}
 $HOME[/]?[^ \t\n]*			{
-					  gradmlval.string = strdup(yytext);
+					  gradmlval.string = gr_strdup(yytext);
 					  return OBJ_NAME;
 					}
 ["]$HOME[/]?.*["]			{
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = strdup(gr_line);
+					  gradmlval.string = gr_strdup(gr_line);
 					  return OBJ_NAME;
 					}
 [rwxahitmFRWXAIMcCdDspo]+		{

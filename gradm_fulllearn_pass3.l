@@ -32,7 +32,7 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return NUM;
 					}
 {NOTAFILE}				{
-					  fulllearn_pass3lval.string = strdup("/proc");
+					  fulllearn_pass3lval.string = gr_strdup("/proc");
 					  return FILENAME;
 					}
 {ROLENAME}				{
@@ -44,7 +44,7 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  char *p = yytext;
 					  if (len > 10 && !strcmp(p + len - 10, " (deleted)"))
 						*(p + len - 10) = '\0';
-					  fulllearn_pass3lval.string = strdup(yytext);
+					  fulllearn_pass3lval.string = gr_strdup(yytext);
 					  return FILENAME;
 					}
 {IPADDR}				{

@@ -65,7 +65,7 @@ add_gradm_acl(struct role_acl *role)
 
 	find_gradm_path(gradm_realpath);
 
-	gradm_name = strdup(gradm_realpath);
+	gradm_name = gr_strdup(gradm_realpath);
 
 	add_proc_subject_acl(role, gradm_name, proc_subject_mode_conv("do"), 0);
 
@@ -113,7 +113,7 @@ add_gradm_acl(struct role_acl *role)
 void
 add_kernel_acl(void)
 {
-	add_role_acl(&current_role, strdup(":::kernel:::"), role_mode_conv("sN"), 1);
+	add_role_acl(&current_role, gr_strdup(":::kernel:::"), role_mode_conv("sN"), 1);
 
 	add_proc_subject_acl(current_role, "/", proc_subject_mode_conv("o"), 0);
 
@@ -157,7 +157,7 @@ void add_fulllearn_acl(void)
 
 	add_kernel_acl();
 
-	add_role_acl(&current_role, strdup("default"), role_mode_conv("A"), 0);
+	add_role_acl(&current_role, gr_strdup("default"), role_mode_conv("A"), 0);
 
 	add_proc_subject_acl(current_role, "/", proc_subject_mode_conv("ol"), 0);
 

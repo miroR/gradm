@@ -25,7 +25,7 @@ learn_logs:	learn_log
 	|	learn_logs learn_log
 	;
 
-filename:	/*empty*/	{ $$ = strdup(""); }
+filename:	/*empty*/	{ $$ = gr_strdup(""); }
 	|	FILENAME	{
 				  if (!strcmp($1, "//"))
 					$1[1] = '\0';

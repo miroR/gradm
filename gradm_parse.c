@@ -387,7 +387,7 @@ static int
 add_globbing_file(struct proc_acl *subject, char *filename,
 		  u_int32_t mode, int type)
 {
-	char *basepoint = strdup(filename);
+	char *basepoint = gr_strdup(filename);
 	char *p, *p2;
 	struct file_acl *anchor;
 	struct file_acl *glob, *glob2;
@@ -397,7 +397,7 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 	num_pointers += 2;
 
 	if (!basepoint)
-		failure("strdup");
+		failure("gr_strdup");
 
 	/* calculate basepoint, eg basepoint of /home/ * /test is /home */
 	p = p2 = basepoint;
@@ -582,7 +582,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 		char buf[PATH_MAX];
 		memset(&buf, 0, sizeof (buf));
 		realpath(filename, buf);
-		if(!add_proc_object_acl(subject, strdup(buf), mode, type | GR_SYMLINK))
+		if(!add_proc_object_acl(subject, gr_strdup(buf), mode, type | GR_SYMLINK))
 			return 0;
 	}
 

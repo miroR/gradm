@@ -287,17 +287,17 @@ void insert_user(struct gr_learn_group_node ***grouplist, char *username, char *
 
 		tmpuser = ((*group)->users + num);
 		*tmpuser = (struct gr_learn_user_node *)gr_stat_alloc(sizeof(struct gr_learn_user_node));
-		(*tmpuser)->rolename = strdup(username);
+		(*tmpuser)->rolename = gr_strdup(username);
 		(*tmpuser)->uid = uid;
 		(*tmpuser)->group = *group;
 	} else {
 		*group = (struct gr_learn_group_node *)gr_stat_alloc(sizeof(struct gr_learn_group_node));
-		(*group)->rolename = strdup(groupname);
+		(*group)->rolename = gr_strdup(groupname);
 		(*group)->gid = gid;
 		(*group)->users = (struct gr_learn_user_node **)gr_dyn_alloc(2 * sizeof(struct gr_learn_user_node *));
 		tmpuser = (*group)->users;
 		*tmpuser = (struct gr_learn_user_node *)gr_stat_alloc(sizeof(struct gr_learn_user_node));
-		(*tmpuser)->rolename = strdup(username);
+		(*tmpuser)->rolename = gr_strdup(username);
 		(*tmpuser)->uid = uid;
 		(*tmpuser)->group = *group;
 	}
@@ -948,7 +948,7 @@ void do_insert_file(struct gr_learn_file_node **base, char *filename, u_int32_t 
 
 	insert = (struct gr_learn_file_node *)gr_stat_alloc(sizeof(struct gr_learn_file_node));
 
-	insert->filename = strdup(filename);
+	insert->filename = gr_strdup(filename);
 	insert->mode = mode;
 
 	if (subj)
@@ -1004,7 +1004,7 @@ int first_reduce_node(struct gr_learn_file_node *node,
 	tmp = node->leaves;
 
 	while (*tmp) {
-		p = strdup((*tmp)->filename);
+		p = gr_strdup((*tmp)->filename);
 		if (node_len == 1)
 			p2 = strchr(p + 1, '/');
 		else
@@ -1709,7 +1709,7 @@ struct gr_learn_file_tmp_node *conv_filename_to_struct(char *filename, u_int32_t
 	struct gr_learn_file_tmp_node *node;
 
 	node = (struct gr_learn_file_tmp_node *)gr_stat_alloc(sizeof(struct gr_learn_file_tmp_node));
-	node->filename = strdup(filename);
+	node->filename = gr_strdup(filename);
 	node->mode = mode;
 
 	return node;
@@ -1729,8 +1729,6 @@ insert_learn_role(struct gr_learn_role_entry ***role_list, char *rolename, u_int
 		while(*tmp) {
 			if (!strcmp((*tmp)->rolename, rolename)) {
 				(*tmp)->rolemode |= rolemode;
-				/* allocated in lexer */
-				free(rolename);
 				return *tmp;
 			}
 			num++;
@@ -1741,7 +1739,7 @@ insert_learn_role(struct gr_learn_role_entry ***role_list, char *rolename, u_int
 	}
 
 	(*((*role_list) + num)) = (struct gr_learn_role_entry *)gr_stat_alloc(sizeof(struct gr_learn_role_entry));
-	(*((*role_list) + num))->rolename = rolename;
+	(*((*role_list) + num))->rolename = gr_strdup(rolename);
 	(*((*role_list) + num))->rolemode = rolemode;
 
 	/* give every learned role a / subject */

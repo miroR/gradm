@@ -39,7 +39,7 @@ FILENAME [/][^\t\n]*
 					  return NUM;
 					}
 {FILENAME}				{
-					  grlearn_configlval.string = strdup(yytext);
+					  grlearn_configlval.string = gr_strdup(yytext);
 					  return FILENAME;
 					}
 .					;

@@ -261,7 +261,7 @@ parse_args(int argc, char *argv[])
 			if (optarg) {
 				char pathbuf[PATH_MAX];
 				if (*optarg == '/')
-					learn_log = strdup(optarg);
+					learn_log = gr_strdup(optarg);
 				else {
 					strcpy(pathbuf, cwd);
 					if (strlen(optarg) + strlen(pathbuf) + 2 > PATH_MAX) {
@@ -270,7 +270,7 @@ parse_args(int argc, char *argv[])
 					}
 					strcat(pathbuf, "/");
 					strcat(pathbuf, optarg);
-					learn_log = strdup(pathbuf);
+					learn_log = gr_strdup(pathbuf);
 				}
 			}
 			break;
@@ -279,7 +279,7 @@ parse_args(int argc, char *argv[])
 				show_help();
 			gr_output = 1;
 			if (optarg)
-				output_log = strdup(optarg);
+				output_log = gr_strdup(optarg);
 			break;
 		case 'P':
 			if (argc > 3)
