@@ -61,7 +61,6 @@ void
 add_cap_acl(struct proc_acl *subject, const char *cap)
 {
 	__u32 kcap = cap_conv(cap + 1);
-	__u32 cap_same;
 
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "
