@@ -21,6 +21,7 @@
 #define CHK_FILE		0
 #define CHK_CAP			1
 
+#undef PATH_MAX
 #define PATH_MAX 		4096
 #define MAX_LINE_LEN 		5000
 
