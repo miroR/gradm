@@ -183,6 +183,13 @@ struct file_acl {
 |  process acl								 |
 \************************************************************************/
   
+struct role_transition {
+	char *rolename;
+
+	struct role_transition *prev;
+	struct role_transition *next;
+};
+
 struct role_acl {
 	char * rolename;
 	uid_t uidgid;
@@ -197,6 +204,7 @@ struct role_acl {
 	struct role_acl *prev;
         struct role_acl *next;
 
+	struct role_transition *transitions;
 	struct role_allowed_ip *allowed_ips;
 
 	struct proc_acl **subj_hash;
@@ -315,6 +323,7 @@ struct user_acl_role_db {
 	__u32 i_entries; /* total number of ip acls */
 	__u32 o_entries; /* Total number of object acls */
 	__u32 a_entries; /* total number of allowed role ips */
+	__u32 t_entries; /* total number of transitions */
 };
 
 struct sprole_pw {

@@ -235,12 +235,41 @@ static int handle_notrojan_mode(void)
 	return ret;
 }					
 
+void check_role_transitions(void)
+{
+	struct role_acl *role, *role2;
+	struct role_transition *trans;
+	int found = 0;
+
+	for_each_role(role, current_role) {
+		for_each_transition(trans, role->transitions) {
+			found = 0;
+			for_each_role(role2, current_role) {
+				if (!(role2->roletype & GR_ROLE_SPECIAL))
+					continue;
+				if (!strcmp(role2->rolename, trans->rolename))
+					found = 1;
+			}
+			if (!found) {
+				fprintf(stderr, "Error in transition to special role %s in role "
+					"%s.\nSpecial role %s does not exist.\n", trans->rolename,
+					role->rolename, trans->rolename);
+				exit(EXIT_FAILURE);
+			}
+		}
+	}
+
+	return;
+}
+
 void analyze_acls(void)
 {
 	struct proc_acl *def_acl;
 	struct chk_perm chk;
 	unsigned int errs_found = 0;
 	struct role_acl *role;
+
+	check_role_transitions();
 
 	for_each_role(role, current_role) {
 	if (role->roletype & GR_ROLE_SPECIAL)

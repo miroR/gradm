@@ -46,4 +46,7 @@
 #define for_each_allowed_ip(x, y) \
 	for(x = y; x; x = (x)->prev)
 
+#define for_each_transition(x, y) \
+	for(x = y; x; x = (x)->prev)
+
 #endif

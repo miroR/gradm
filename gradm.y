@@ -15,6 +15,7 @@ struct ip_acl ip;
 %token <string> ROLE ROLE_NAME ROLE_TYPE SUBJECT SUBJ_NAME OBJ_NAME 
 %token <string> RES_NAME RES_SOFTHARD CONNECT BIND IPADDR IPPORT IPTYPE
 %token <string> IPPROTO OBJ_MODE SUBJ_MODE IPNETMASK CAP_NAME ROLE_ALLOW_IP
+%token <string> ROLE_TRANSITION
 %type <long_int> subj_mode obj_mode ip_netmask
 %type <mode> role_type
 
@@ -26,6 +27,7 @@ compiled_acl:			various_acls
 
 various_acls:			role_label
 	|			role_allow_ip
+	|			role_transitions
 	|			subject_label
 	|			object_file_label
 	|			object_cap_label
@@ -95,6 +97,19 @@ obj_mode: /* empty */
 				{ $$ = proc_object_mode_conv(""); }
 	|			OBJ_MODE
 				{ $$ = proc_object_mode_conv($1); }
+	;
+
+role_transitions:		ROLE_TRANSITION role_names
+	;
+
+role_names:			ROLE_NAME
+				{
+					add_role_transition(current_role, $1);
+				}
+	|			role_names ROLE_NAME
+				{
+					add_role_transition(current_role, $2);
+				}
 	;
 
 role_allow_ip:			ROLE_ALLOW_IP IPADDR ip_netmask

@@ -24,7 +24,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 %option nounput
 
 %x ROLE_STATE SUBJECT_STATE IP_STATE RES_STATE COMMENT_STATE ROLETYPE_STATE
-%x INCLUDE_STATE IPNETMASK_STATE IPPORT_STATE
+%x INCLUDE_STATE IPNETMASK_STATE IPPORT_STATE ROLETRANS_STATE
 
 %%
 
@@ -42,6 +42,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 <ROLE_STATE>[_a-zA-Z0-9-]{1,30}		{
 					  BEGIN(ROLETYPE_STATE);
+					  gradmlval.string = strdup(yytext);
+					  return ROLE_NAME;
+					}
+<ROLETRANS_STATE>[_a-zA-Z0-9-]{1,30}	{
 					  gradmlval.string = strdup(yytext);
 					  return ROLE_NAME;
 					}
@@ -110,6 +114,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 "role_allow_ip"				{
 					  BEGIN(IP_STATE);
 					  return ROLE_ALLOW_IP;
+					}
+"role_transitions"			{
+					  BEGIN(ROLETRANS_STATE);
+					  return ROLE_TRANSITION;
 					}
 "subject"				{
 					  BEGIN(SUBJECT_STATE);

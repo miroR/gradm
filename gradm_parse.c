@@ -3,6 +3,28 @@
 extern FILE *gradmin;
 extern int gradmparse(void);
 
+void add_role_transition(struct role_acl *role, char *rolename)
+{
+        struct role_transition ** roletpp;
+        struct role_transition * roletp;
+
+        roletp = (struct role_transition *) calloc(1, sizeof(struct role_transition));
+        if(!roletp) failure("calloc");
+
+        roletpp = &(role->transitions);
+
+        if(*roletpp)
+                (*roletpp)->next = roletp;
+
+        roletp->prev = *roletpp;
+
+	roletp->rolename = rolename;
+
+        *roletpp = roletp;
+
+        return;
+}
+
 static struct deleted_file * is_deleted_file_dupe(const char *filename)
 {
 	struct deleted_file *tmp;
@@ -800,6 +822,7 @@ struct gr_arg * conv_user_to_kernel(struct gr_pw_entry * entry)
 	struct proc_acl *tmp = NULL;
 	struct file_acl *tmpf = NULL;
 	struct role_allowed_ip *atmp = NULL;
+	struct role_transition *trtmp = NULL;
 	struct ip_acl *tmpi = NULL;
 	struct ip_acl *i_tmp = NULL;
 	struct role_acl **r_tmp = NULL;
@@ -810,6 +833,7 @@ struct gr_arg * conv_user_to_kernel(struct gr_pw_entry * entry)
 	unsigned long iacls = 0;
 	unsigned long tiacls = 0;
 	unsigned long aacls = 0;
+	unsigned long tracls = 0;
 	unsigned long i = 0;
 	__u16 sproles = 0;
 	int err;
@@ -821,6 +845,9 @@ struct gr_arg * conv_user_to_kernel(struct gr_pw_entry * entry)
 
 		for_each_allowed_ip(atmp, rtmp->allowed_ips)
 			aacls++;
+
+		for_each_transition(trtmp, rtmp->transitions)
+			tracls++;
 
 		for_each_subject(tmp, rtmp) {
 			tpacls++;
@@ -862,6 +889,7 @@ struct gr_arg * conv_user_to_kernel(struct gr_pw_entry * entry)
 	role_db->i_entries = tiacls;
 	role_db->o_entries = facls;
 	role_db->a_entries = aacls;
+	role_db->t_entries = tracls;
 
 	if((r_tmp = role_db->r_table = (struct role_acl **) calloc(racls, sizeof(struct role_acl *))) == NULL)
 		failure("calloc");
