@@ -53,7 +53,7 @@ int write_pid_log(pid_t pid)
 		fd = open(GR_LEARN_PID_PATH, O_RDONLY);
 
 		if (fd < 0) {
-			fprintf(stderr, "Unable to open %s:\n"
+			fprintf(stdout, "Unable to open %s:\n"
 				"%s\n", GR_LEARN_PID_PATH, strerror(errno));
 			kill(pid, 9);
 			exit(EXIT_FAILURE);
@@ -68,15 +68,15 @@ int write_pid_log(pid_t pid)
 			goto start;
 		if (strcmp(pathname, GRLEARN_PATH))
 			goto start;
-		fprintf(stderr, "Learning daemon possibly running already...killing process.\n");
+		fprintf(stdout, "Learning daemon possibly running already...killing process.\n");
 
-		kill(learn_pid, 9);
+		kill(learn_pid, 15);
 	}
 start:		
 	fd = open(GR_LEARN_PID_PATH, O_WRONLY | O_CREAT | O_EXCL, 0600);
 
 	if (fd < 0) {
-		fprintf(stderr, "Unable to open %s:\n"
+		fprintf(stdout, "Unable to open %s:\n"
 			"%s\n", GR_LEARN_PID_PATH, strerror(errno));
 		kill(pid, 9);
 		exit(EXIT_FAILURE);
@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
 	fd = open(GRDEV_PATH, O_RDONLY);
 
 	if (fd < 0) {
-		fprintf(stderr, "Error opening %s:\n"
+		fprintf(stdout, "Error opening %s:\n"
 			"%s\n", GRDEV_PATH, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
 	fd2 = open(argv[1], O_WRONLY | O_APPEND | O_CREAT, 0600);
 
 	if (fd2 < 0) {
-		fprintf(stderr, "Error opening %s\n"
+		fprintf(stdout, "Error opening %s\n"
 			"%s\n", argv[1], strerror(errno));
 		exit(EXIT_FAILURE);
 	}
@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
 		close(1);
 		close(2);
 	} else {
-		fprintf(stderr, "Unable to fork.\n");
+		fprintf(stdout, "Unable to fork.\n");
 		exit(EXIT_FAILURE);
 	}
 
