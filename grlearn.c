@@ -168,12 +168,10 @@ __inline__ char * rewrite_learn_entry(char *p)
 	next = endobj;
 	while(*next++);
 	if (slash == NULL) {
-		/* we have a /proc/<pid> dir, convert to /proc */
 		len = next - endobj;
 		memmove(tmp + 5, endobj, len);
 		return p;
 	} else {
-		/* we have /proc/<pid>/something, convert to /proc/star/something */
 		len = next - slash;
 		*(tmp + 6) = '*';
 		memmove(tmp + 7, slash, len);
