@@ -237,3 +237,6 @@ subject /usr/X11R6/bin/XFree86
 
 subject /usr/bin/ssh
 	/etc/ssh/ssh_config r
+
+subject /sbin/klogd
+	+CAP_SYS_ADMIN
