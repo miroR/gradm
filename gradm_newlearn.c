@@ -507,7 +507,7 @@ int reduce_all_children(struct gr_learn_file_node *node)
 	tmp = node->leaves;
 	for (i = 0; i < num; i++) {
 		if (*(tmp + i) && !(*(tmp + i))->leaves) {
-			free(*(tmp + i));
+			/* free(*(tmp + i)); */
 			*(tmp + i) = NULL;
 			j = i;
 			while (*(tmp + j + 1)) {
@@ -519,7 +519,7 @@ int reduce_all_children(struct gr_learn_file_node *node)
 	}
 
 	if (!not_leaf) {
-		free(node->leaves);
+		/* free(node->leaves); */
 		node->leaves = NULL;
 		return 0;
 	}
@@ -548,11 +548,11 @@ int reduce_all_leaves(struct gr_learn_file_node *node)
 					node->subject->res[i].rlim_max = (*tmp)->subject->res[i].rlim_max;
 			}
 		}
-		free(*tmp);
+		/* free(*tmp); */
 		*tmp = NULL;
 		tmp++;
 	}
-	free(node->leaves);
+	/* free(node->leaves); */
 	node->leaves = NULL;
 
 	return 0;
@@ -765,7 +765,7 @@ int third_reduce_node(struct gr_learn_file_node *node,
 		    ((*tmp)->mode & GR_WRITE))) {
 			node->mode |= (*tmp)->mode;
 			tmp2 = tmp;
-			free(*tmp);
+			/* free(*tmp); */
 			*tmp = NULL;
 			while(*(tmp2 + 1)) {
 				*tmp2 = *(tmp2 + 1);
@@ -852,7 +852,7 @@ void do_insert_file(struct gr_learn_file_node **base, char *filename, __u32 mode
 	if (*node) {
 		(*node)->mode |= mode;
 		(*node)->dont_display = 0;
-		free(insert);
+		/* free(insert); */
 		return;
 	} else {
 		*node = insert;
@@ -1315,12 +1315,12 @@ void do_reduce_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node *a
 
 	while (tmpport && *tmpport) {
 		insert_port(actor, **tmpport);
-		free(*tmpport);
+		/* free(*tmpport); */
 		*tmpport = NULL;
 		tmpport++;
 	}
 	if (node->ports) {
-		free(node->ports);
+		/* free(node->ports); */
 		node->ports = NULL;
 	}
 
@@ -1329,7 +1329,7 @@ void do_reduce_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node *a
 	actor->ip_type |= node->ip_type;
 
 	if (!node->leaves) {
-		free(node);
+		/* free(node); */
 		return;
 	}
 
@@ -1340,7 +1340,7 @@ void do_reduce_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node *a
 		tmpip++;
 	}
 
-	free(node->leaves);
+	/* free(node->leaves); */
 	node->leaves = NULL;
 
 	return;
@@ -1510,7 +1510,7 @@ void insert_ip(struct gr_learn_ip_node **base, __u32 ip, __u16 port, __u8 proto,
 		(*node)->ip_proto[proto / 32] |= (1 << (proto % 32));
 		(*node)->ip_type |= (1 << socktype);
 		insert_port(*node, port);
-		free(insert);
+		/* free(insert); */
 		return;
 	} else {
 		*node = insert;
