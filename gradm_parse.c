@@ -734,10 +734,13 @@ proc_object_mode_conv(const char *mode)
 		case 'I':
 			retmode |= GR_AUDIT_INHERIT;
 			break;
+		case 'C':
+			retmode |= GR_AUDIT_SETID;
+			break;
 		case 's':
 			retmode |= GR_SUPPRESS;
 			break;
-		case 'S':
+		case 'c':
 			retmode |= GR_SETID;
 			break;
 		default:
