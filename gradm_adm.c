@@ -63,8 +63,6 @@ add_gradm_acl(struct role_acl *role)
 	struct ip_acl ip;
 	struct protoent *proto;
 
-	return;
-
 	find_gradm_path(gradm_realpath);
 
 	gradm_name = strdup(gradm_realpath);
