@@ -106,7 +106,7 @@ int add_role_acl(struct role_acl **role, char *rolename, __u8 type)
 		return 0;
 	}
 
-	if (strcmp(rolename, "default") || (type != GR_ROLE_DEFAULT)) {
+	if (strcmp(rolename, "default") || ((type != GR_ROLE_DEFAULT)) {
 		if (type == GR_ROLE_USER) {
 			pwd = getpwnam(rolename);
 
@@ -133,7 +133,8 @@ int add_role_acl(struct role_acl **role, char *rolename, __u8 type)
 			}
 
 			rtmp->uidgid = grp->gr_gid;
-		}
+		} else if (type == GR_ROLE_SPECIAL) {
+			rtmp->uidgid = 
 	}
 
 	if (is_role_dupe(*role, rtmp->uidgid, rtmp->roletype)) {
@@ -463,6 +464,7 @@ __u8 role_mode_conv(const char * mode)
 	switch(mode[0]) {
 	case 'u': return GR_ROLE_USER;
 	case 'g': return GR_ROLE_GROUP;
+	case 's': return GR_ROLE_SPECIAL;
 	default : return GR_ROLE_DEFAULT;
 	}
 }
@@ -590,9 +592,6 @@ __u32 proc_object_mode_conv(const char * mode)
 				break;
 			case 'T':
 				retmode |= GR_AUDIT_PTRACERD;
-				break;
-			case 'o':
-				retmode |= GR_OVERRIDE;
 				break;
 			default:
 				fprintf(stderr, "Invalid proc object mode "

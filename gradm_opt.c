@@ -1,23 +1,5 @@
 #include "gradm.h"
 
-static void compute_creds(struct file_acl *set, struct file_acl *cmp)
-{
-	__u32 mode = set->mode ^ cmp->mode;
-	__u32 drop_mode = set->mode & mode;
-
-	drop_mode &= ~GR_INHERIT;
-
-	if((set->mode & GR_APPEND) && (cmp->mode & GR_WRITE) && 
-					(mode & GR_APPEND))
-		drop_mode &= ~GR_APPEND;
-
-	if(!(set->mode & GR_OVERRIDE))
-		set->mode &= ~drop_mode;
-	else
-		set->mode &= ~GR_OVERRIDE;
-	return;
-}
-
 static void compute_cap_creds(struct proc_acl * set, struct proc_acl * cmp)
 {
 	__u32 cap_same;
@@ -57,9 +39,7 @@ static void expand_acl(struct proc_acl * proc)
 	    for_each_object(tmpf2, proc->proc_object)
 	     if(!strcmp(tmpf1->filename, tmpf2->filename))
 	      break;
-	    if(tmpf2) // don't allow a more permissive mode
-	     compute_creds(tmpf2, tmpf1);
-	    else  // add parent acl to current acl
+	    if(!tmpf2) // object not found in current subject
 	     add_proc_object_acl(proc, tmpf1->filename, tmpf1->mode, 0);
 	   }
 	  }
