@@ -301,10 +301,21 @@ void add_include(char *includename)
 
 	if (!stat(includename, &fstat)) {
 		if (S_ISDIR(fstat.st_mode)) {
-			fprintf(stderr, "Error while including %s: "
-				"Directories cannot be specified by an "
-				"include directive.\n", includename);
-			exit(EXIT_FAILURE);
+			struct dirent **namelist;
+			char path[PATH_MAX];
+			int n;
+
+			n = scandir(includename, &namelist, 0, alphasort);
+			if (n >= 0) {
+				while (n--) {
+					if (strcmp(namelist[n]->d_name, ".") && strcmp(namelist[n]->d_name, "..")) {
+						memset(&path, 0, sizeof(path));
+						snprintf(path, PATH_MAX - 1, "%s/%s", includename, namelist[n]->d_name);
+						add_include(path);
+					}
+				}
+			}
+			return;
 		}
 	}
 	tmpfile = fopen(includename, "r");
