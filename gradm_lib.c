@@ -401,7 +401,7 @@ void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
 		}
 
 		*curr = (struct file_acl *)entry;
-		insert_name_entry(hash, (*curr)->filename);
+		insert_name_entry(hash, *curr);
 		hash->used_size++;
 	} else if (hash->type == GR_HASH_SUBJECT) {
 		struct proc_acl *subject = (struct proc_acl *)entry;
@@ -418,7 +418,7 @@ void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
 		}
 
 		*curr = (struct proc_acl *)entry;
-		insert_name_entry(hash, (*curr)->filename);
+		insert_name_entry(hash, *curr);
 		hash->used_size++;
 	}
 }
