@@ -26,6 +26,9 @@ void * gr_dyn_realloc(void *addr, unsigned long len)
 {
 	void *ptr;
 
+	if (addr == NULL)
+		return gr_dyn_alloc(len);
+
 	ptr = realloc(addr, len);
 	if (ptr == NULL)
 		failure("realloc");
