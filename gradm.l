@@ -147,8 +147,12 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 
 <IPNETMASK_STATE>[0-9]{1,2}		{
+					  unsigned int bits = atoi(yytext);
 					  BEGIN(IP_STATE);
-					  gradmlval.string = strdup(yytext);
+					  if (!bits)
+						gradmlval.num = 0;
+					  else
+						gradmlval.num = 0xffffffff << (32 - bits);
 					  return IPNETMASK;
 					}
 <IPPORT_STATE>[0-9]{1,5}		{
