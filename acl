@@ -53,6 +53,15 @@
 # and the subject /bin/su
 # View the 1.9.x documentation for more information on
 # configuration inheritance
+#
+# new modes:
+# m -> allow creation of setuid/setgid files/directories
+#      and modification of files/directories to be setuid/setgid
+# M -> audit the setuid/setgid creation/modification
+# c -> allow creation of the file/directory
+# C -> audit the creation
+# d -> allow deletion of the file/directory
+# D -> audit the deletion
 
 role admin sA
 subject /
@@ -63,7 +72,7 @@ role_transitions admin
 subject /
 	/		r
 	/opt		rx
-	/home		rwx
+	/home		rwxcd
 	/mnt		rw
 	/dev
 	/dev/grsec	h
@@ -103,9 +112,9 @@ subject /
 	/proc/kcore	h
 	/proc/sys	r
 	/root		r
-	/tmp		rw
-	/var		rwx
-	/var/tmp	rw
+	/tmp		rwcd
+	/var		rwxcd
+	/var/tmp	rwcd
 	/var/log	r
 	/boot		r
 	/etc/grsec	h
