@@ -99,7 +99,7 @@ void check_acl_status(u_int16_t reqmode)
 
 	ioctl(0, TIOCEXCL);
 
-	wrapper.version = GRADM_VERSION;
+	wrapper.version = GRADM_VERSION | (KERNVER << 16);
 	wrapper.size = sizeof(struct gr_arg);
 	wrapper.arg = &arg;
 	arg.mode = GRADM_STATUS;
