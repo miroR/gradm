@@ -129,7 +129,7 @@ __inline__ char * rewrite_learn_entry(char *p)
 	int i;
 	char *tmp = p;
 	char *endobj;
-	char *slash;
+	//char *slash;
 	char *next;
 	unsigned int len;
 
