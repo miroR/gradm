@@ -70,16 +70,21 @@ static void show_ip_acl(struct ip_acl * ipp, FILE * stream)
 	addr.s_addr = ipp->addr;
 	netmask = netmask_to_int(ipp->netmask);
 
+	if (ipp->type == GR_IP_CONNECT)
+		fprintf(stream, "\tconnect ");
+	else if (ipp->type == GR_IP_BIND)
+		fprintf(stream, "\tbind ");
+
 	if((netmask == 32) && ipp->low == ipp->high)
-		fprintf(stream, "\t\t%s:%u", inet_ntoa(addr), ipp->low);
+		fprintf(stream, "%s:%u", inet_ntoa(addr), ipp->low);
 	else if(ipp->low == ipp->high)
-		fprintf(stream, "\t\t%s/%u:%u", inet_ntoa(addr), 
+		fprintf(stream, "%s/%u:%u", inet_ntoa(addr), 
 				netmask, ipp->low);
 	else if(netmask == 32)
-		fprintf(stream, "\t\t%s:%u-%u", inet_ntoa(addr), 
+		fprintf(stream, "%s:%u-%u", inet_ntoa(addr), 
 				ipp->low, ipp->high);
 	else
-		fprintf(stream, "\t\t%s/%u:%u-%u", inet_ntoa(addr), 
+		fprintf(stream, "%s/%u:%u-%u", inet_ntoa(addr), 
 				netmask, ipp->low, ipp->high);
 
 	for(i = 1; i < 5; i++) {
@@ -185,7 +190,8 @@ void pass_struct_to_human(FILE * stream)
 		proc->mode &= ~GR_LEARN;
 		conv_subj_mode_to_str(proc->mode,
 				modes, sizeof(modes));
-		fprintf(stream, "%s %so {\n", proc->filename, modes); 
+		fprintf(stream, "# learned subject for role %s\n", role->rolename);
+		fprintf(stream, "subject %s %so\n", proc->filename, modes); 
 		for_each_object(filp, proc->proc_object) {
 			conv_mode_to_str(filp->mode,
 				modes, sizeof(modes));
@@ -233,32 +239,18 @@ void pass_struct_to_human(FILE * stream)
 				b_cnt++;			
 		}
 
-		fprintf(stream, "\n\tconnect {\n");
 		for_each_object(ipp, proc->ip_object) {
-			if(ipp->mode == GR_IP_CONNECT) {
-				if(c_cnt == 1 && !ipp->type)
-					fprintf(stream, "\t\tdisabled\n");
-				else if(ipp->type)
-					show_ip_acl(ipp, stream);
-			}
+			if(ipp->mode == GR_IP_CONNECT && c_cnt == 1 && !ipp->type)
+				fprintf(stream, "\tconnect disabled\n");
+			else if(ipp->mode == GR_IP_BIND && c_cnt == 1 && !ipp->type)
+				fprintf(stream, "\tbind disabled\n");
+			else if (ipp->type)
+				show_ip_acl(ipp, stream);
 		}
 
-		fprintf(stream, "\t}\n\n");		
-		fprintf(stream, "\tbind {\n");
-		for_each_object(ipp, proc->ip_object) {
-			if(ipp->mode == GR_IP_BIND) {
-				if(b_cnt == 1 && !ipp->type)
-					fprintf(stream, "\t\tdisabled\n");
-				else if(ipp->type)
-					show_ip_acl(ipp, stream);
-			}
-		}
+	}
+	}
 
-		fprintf(stream, "\t}\n\n");		
 finish_acl:
-		fprintf(stream, "}\n");
-	}
-	}
-
 	return;
 }
