@@ -165,7 +165,7 @@ void add_fulllearn_acl(void)
 	add_fulllearn_admin_acl();
 
 	add_role_acl(&current_role, gr_strdup("default"), role_mode_conv("A"), 0);
-
+	add_role_transition(current_role, "admin");
 	add_proc_subject_acl(current_role, "/", proc_subject_mode_conv("ol"), 0);
 
 	add_proc_object_acl(current_subject, "/", proc_object_mode_conv("h"), GR_FEXIST);
