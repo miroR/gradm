@@ -117,7 +117,7 @@ add_kernel_acl(void)
 
 	add_proc_subject_acl(current_role, "/", proc_subject_mode_conv("o"), 0);
 
-	add_proc_object_acl(current_subject, "/", proc_object_mode_conv("rwxcd"), GR_FEXIST);
+	add_proc_object_acl(current_subject, "/", proc_object_mode_conv("rwxcdl"), GR_FEXIST);
 	add_proc_object_acl(current_subject, GRSEC_DIR, proc_object_mode_conv("h"), GR_FEXIST);
 
 	return;
