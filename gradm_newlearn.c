@@ -753,7 +753,7 @@ int *analyze_node_reduction(struct gr_learn_file_node *node)
 		reduction_level *= 2;
 	else {
 		if (reduction_level >= reduce_child_thresh) {
-			child_reduced = (int *)&reduce_children_mode;
+			child_reduced = reduce_children_mode(node);
 			if (child_reduced > (3 * child_num) / 4)
 				return 0;
 		}
