@@ -344,6 +344,14 @@ analyze_acls(void)
 		chk.u_modes = GR_FIND;
 		chk.w_modes = 0xffff;
 
+		if (!check_permission(role, def_acl, "/dev/grsec", &chk)) {
+			fprintf(stderr,
+				"Viewing access is allowed by role %s to /dev/grsec.\n"
+				"If you want this role to be able to authenticate to the kernel, add G to its role mode.\n\n",
+				role->rolename);
+			errs_found++;
+		}
+
 		if (!check_permission(role, def_acl, GRSEC_DIR, &chk)) {
 			fprintf(stderr,
 				"Viewing access is allowed by role %s to %s, the directory which "
@@ -404,7 +412,7 @@ analyze_acls(void)
 		if (!check_permission(role, def_acl, "/dev/log", &chk)) {
 			fprintf(stderr,
 				"Writing access is allowed by role %s to /dev/log.  This could in some cases allow an attacker"
-				" to spoof learning logs on your system.\n\n",
+				" to spoof syslog warnings on your system.\n\n",
 				role->rolename);
 			errs_found++;
 		}
