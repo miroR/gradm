@@ -603,6 +603,15 @@ role_mode_conv(const char *mode)
 		}
 	}
 
+	if (retmode & GR_ROLE_SPECIAL &&
+	    retmode & (GR_ROLE_USER | GR_ROLE_GROUP)) {
+		fprintf(stderr, "Error on line %lu of %s.  The role mode must be either "
+				"special, or user/group, not both.\n"
+				"The RBAC system will not load until this"
+				" error is fixed.\n", lineno, current_acl_file); 
+		exit(EXIT_FAILURE);
+	}
+
 	return retmode;
 }
 
