@@ -167,6 +167,8 @@ char * rewrite_learn_entry(char *p)
 		ourlen = 6;
 	} else if (!strncmp(tmp, "/tmp/", 5)) {
 		ourlen = 5;
+	} else if (!strncmp(tmp, "/dev/pts/", 9)) {
+		ourlen = 9;
 	} else {
 		*endobj = '\t';
 		return p;
