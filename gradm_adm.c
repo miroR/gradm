@@ -87,7 +87,7 @@ add_gradm_acl(struct role_acl *role)
 	memset(&ip, 0, sizeof (ip));
 	ip.low = 2049;
 	ip.high = 2049;
-	ip.type = SOCK_DGRAM;
+	ip.type = (1 << SOCK_DGRAM);
 	ip.proto[proto->p_proto / 32] |= (1 << (proto->p_proto % 32));
 	add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
 	memset(&ip, 0, sizeof (ip));
