@@ -5,6 +5,13 @@
 #Where <command> can be inherit-learn, no-learn, inherit-no-learn,
 #high-reduce-path, dont-reduce-path, protected-path, and high-protected-path.
 #
+#inherit-learn, no-learn, and inherit-no-learn operate only with
+#full learning
+#
+#high-reduce-path, dont-reduce-path, protected-path, and 
+#high-protected-path operate on both full and and regular learning 
+#(subject and role learning)
+#
 #inherit-learn changes the learning process for the specified path
 #by throwing all learned accesses for every binary executed by the
 #processes contained in the pathname into the subject specified
