@@ -27,7 +27,7 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 	for (i = 0; i < nestlen; i++)
 		namelen += strlen(nestednames[i]) + 1;
 
-	nestname = malloc(nestlen + 1);
+	nestname = malloc(namelen + 1);
 
 	if (!nestname) {
 		fprintf(stderr, "Out of memory.\n");
