@@ -52,7 +52,7 @@ add_gradm_acl(struct role_acl *role)
 	gradm_name = strdup(gradm_realpath);
 
 	if (!add_proc_subject_acl(role, gradm_name,
-				  proc_subject_mode_conv("tdo"), 0))
+				  proc_subject_mode_conv("do"), 0))
 		exit(EXIT_FAILURE);
 
 	if (!stat(GRDEV_PATH, &fstat)) {
