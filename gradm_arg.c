@@ -26,7 +26,7 @@ show_help(void)
 	       "			or a special role\n"
 	       "	-R, --reload	Reload the ACL system while in admin mode\n"
 	       "	-L <filename>, --learn\n"
-	       "			Compute new ACLs from learning log\n"
+	       "			Specify the pathname for learning logs\n"
 	       "	-O <filename>, --output\n"
 	       "			Specify where to place ACLs generated from learning mode\n"
 	       "	-M <filename|uid>, --modsegv\n"
@@ -69,6 +69,7 @@ parse_args(int argc, char *argv[])
 	char *learn_log = NULL;
 	int gr_learn = 0;
 	int gr_output = 0;
+	int gr_enable = 0;
 	struct gr_pw_entry entry;
 	struct gr_arg *grarg;
 	const char *const short_opts = "EDP::RL:O:M:a:n:hv";
@@ -102,18 +103,13 @@ parse_args(int argc, char *argv[])
 
 		switch (next_option) {
 		case 'E':
-			if (argc > 2)
+			if (argc > 5)
 				show_help();
 			entry.mode = GRADM_ENABLE;
 			parse_acls();
 			expand_acls();
 			analyze_acls();
-			start_grlearn(learn_log);
-			grarg = conv_user_to_kernel(&entry);
-			read_saltandpass(entry.rolename, grarg->salt,
-					 grarg->sum);
-			transmit_to_kernel(grarg, sizeof (struct gr_arg));
-			memset(grarg, 0, sizeof (struct gr_arg));
+			gr_enable = 1;
 			break;
 		case 'R':
 			if (argc > 2)
@@ -150,9 +146,12 @@ parse_args(int argc, char *argv[])
 			get_user_passwd(&entry, GR_PWONLY);
 			entry.mode = GRADM_DISABLE;
 			grarg = conv_user_to_kernel(&entry);
-			transmit_to_kernel(grarg, sizeof (struct gr_arg));
-			memset(grarg, 0, sizeof (struct gr_arg));
-			stop_grlearn();
+			if (transmit_to_kernel(grarg, sizeof (struct gr_arg)))
+				memset(grarg, 0, sizeof (struct gr_arg));
+			else {
+				memset(grarg, 0, sizeof (struct gr_arg));
+				stop_grlearn();
+			}
 			exit(EXIT_SUCCESS);
 			break;
 		case 'L':
@@ -228,7 +227,15 @@ parse_args(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if (gr_learn && gr_output) {
+	if (gr_enable) {
+		if (gr_learn)
+			start_grlearn(learn_log);
+		grarg = conv_user_to_kernel(&entry);
+		read_saltandpass(entry.rolename, grarg->salt,
+				 grarg->sum);
+		transmit_to_kernel(grarg, sizeof (struct gr_arg));
+		memset(grarg, 0, sizeof (struct gr_arg));
+	} else if (gr_learn && gr_output) {
 		FILE *stream;
 
 		if (!strcmp(output_log, "stdout"))

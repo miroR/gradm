@@ -13,10 +13,11 @@ open_acl_file(const char *filename)
 	return aclfile;
 }
 
-void
+int
 transmit_to_kernel(void *buf, unsigned long len)
 {
 	int fd;
+	int err = 0;
 
 	if ((fd = open("/dev/grsec", O_WRONLY)) < 0) {
 		fprintf(stderr, "Could not open /dev/grsec.\n");
@@ -24,6 +25,7 @@ transmit_to_kernel(void *buf, unsigned long len)
 	}
 
 	if (write(fd, buf, len) != len) {
+		err = 1;
 		switch (errno) {
 		case EFAULT:
 			fprintf(stderr, "Error copying structures to the "
@@ -55,7 +57,7 @@ transmit_to_kernel(void *buf, unsigned long len)
 
 	close(fd);
 
-	return;
+	return err;
 }
 
 void
