@@ -22,7 +22,7 @@ void write_user_passwd(struct gr_pw_entry * entry)
 	}
 
 	while((len = read(fd, total, sizeof(total))) == sizeof(total)) {
-		if (!memcmp(&total, entry.rolename, GR_SPROLE_LEN)) {
+		if (!memcmp(&total, entry->rolename, GR_SPROLE_LEN)) {
 			if ((offset = lseek(fd, -GR_SPROLE_LEN, SEEK_CUR)) == (off_t)-1) {
 				failure("lseek");
 			break;
@@ -163,7 +163,7 @@ int read_saltandpass(char *rolename, unsigned char *salt, unsigned char *pass)
 		}
 	}
 		
-	if (!found && !memcmp(rolename, &cmp, GR_SPROLE_LEN))
+	if (!found && !memcmp(rolename, &cmp, GR_SPROLE_LEN)) {
 		fprintf(stderr, "Your password file is not set up correctly.\n"
 			"Run gradm -P to set a password.\n");
 			exit(EXIT_FAILURE);

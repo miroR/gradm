@@ -179,7 +179,7 @@ void parse_args(int argc, char *argv[])
 				strncpy(entry.rolename, argv[2], GR_SPROLE_LEN);
 				entry.rolename[GR_SPROLE_LEN - 1] = '\0';
 				get_user_passwd(&entry, GR_PWONLY);
-				entry.mode = GRADM_ADMIN;
+				entry.mode = GRADM_SPROLE;
 				grarg = conv_user_to_kernel(&entry);
 				transmit_to_kernel(grarg, sizeof(struct gr_arg));
 				memset(grarg, 0, sizeof (struct gr_arg));
