@@ -86,10 +86,11 @@ struct var_object * differentiate_objects(struct var_object *var1, struct var_ob
 					found_dupe = 1;
 					if (tmpvar1->mode != tmpvar2->mode)
 						add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode &= ~tmpvar2->mode);
-					break;
+					goto done;
 				}
 			}
 		} while(parent_dir(tmpvar1->filename, &path));
+done:
 		if (!found_dupe)
 			add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode);
 		free(path);
