@@ -258,7 +258,8 @@ int main(int argc, char *argv[])
 		if (retval > 0) {
 			p = buf;
 			while (p < (buf + retval)) {
-				next = rewrite_learn_entry(p);
+				next = p;
+				/* next = rewrite_learn_entry(p); */
 				if (!check_cache(p)) {
 					insert_into_cache(p);
 					write(fd2, p, strlen(p));

@@ -300,7 +300,6 @@ struct gr_learn_subject_node {
 struct gr_learn_file_node {
 	char *filename;
 	__u32 mode;
-	unsigned char dont_display:1;
 	struct gr_learn_file_node **leaves;
 	struct gr_learn_file_node *parent;
 	struct gr_hash_struct *hash;
@@ -308,6 +307,7 @@ struct gr_learn_file_node {
 	struct gr_learn_ip_node *connect_list;
 	struct gr_learn_ip_node *bind_list;
 	struct gr_learn_subject_node *subject;
+	unsigned char dont_display:1;
 };
 
 struct gr_pw_entry {
