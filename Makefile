@@ -72,7 +72,7 @@ lex.learn.c: gradm_learner.l
 
 install: gradm gradm.8 acl
 	mkdir -p $(DESTDIR)/sbin
-	$(INSTALL) -m 0700 gradm $(DESTDIR)/sbin
+	$(INSTALL) -m 0755 gradm $(DESTDIR)/sbin
 	$(STRIP) $(DESTDIR)/sbin/gradm
 	mkdir -p -m 700 $(DESTDIR)/etc/grsec
 	@if [ ! -f $(DESTDIR)/etc/grsec/acl ] ; then \
