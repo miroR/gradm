@@ -68,7 +68,7 @@ void parse_args(int argc, char *argv[])
 	int gr_output = 0;
 	struct gr_pw_entry entry;
 	struct gr_arg * grarg;
-	const char * const short_opts = "EDP:RL::O:M:a:hv";
+	const char * const short_opts = "EDP::RL::O:M:a:hv";
 	const struct option long_opts[] = {
 		{ "help",	0,	NULL,	'h'	},
 		{ "version",	0,	NULL,	'v'	},
