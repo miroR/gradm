@@ -103,7 +103,7 @@ install: $(GRADM_BIN) gradm.8 policy grlearn
 	$(STRIP) $(DESTDIR)/sbin/grlearn
 	mkdir -p -m 700 $(DESTDIR)$(GRSEC_DIR)
 	@if [ ! -f $(DESTDIR)$(GRSEC_DIR)/policy ] ; then \
-		if [ ! -f $(DESTDIR)$(GRSEC_DIR)/acl ] ; then \
+		if [ -f $(DESTDIR)$(GRSEC_DIR)/acl ] ; then \
 			mv $(DESTDIR)$(GRSEC_DIR)/acl $(DESTDIR)$(GRSEC_DIR)/policy ; \
 		else \
 			$(INSTALL) -m 0600 policy $(DESTDIR)$(GRSEC_DIR) ; \
