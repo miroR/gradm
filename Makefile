@@ -23,9 +23,8 @@ STRIP=/usr/bin/strip
 #LIBS=
 LIBS=-lfl
 KERNVER=`uname -r | cut -d"." -f 2`
-#for sparc64
-#OPT_FLAGS=-O2 -m64 -mcpu=ultrasparc -mcmodel=medlow -ffixed-g4 \
-#	-fcall-used-g5 -fcall-used-g5 -fcall-used-g7 -Wno-sign-compare
+#for 64-bit archs
+#OPT_FLAGS=-O2 -m64
 OPT_FLAGS=-O2
 CFLAGS=$(OPT_FLAGS) -DGRSEC_DIR=\"$(GRSEC_DIR)\" -DKERNVER=$(KERNVER)
 LDFLAGS=
