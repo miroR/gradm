@@ -42,7 +42,7 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 		}
 
 		subject->user_trans_num++;
-		subject->user_transitions = gr_dyn_realloc(subject->user_transitions, subject->user_trans_num * sizeof(uid_t));
+		subject->user_transitions = gr_dyn_realloc(subject->user_transitions, subject->user_trans_num);
 		*(subject->user_transitions + subject->user_trans_num - 1) = pwd->pw_uid;
 	} else if (usergroup == GR_ID_GROUP) {
 		if (allowdeny == GR_ID_ALLOW) {
@@ -77,7 +77,7 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 		}
 
 		subject->group_trans_num++;
-		subject->group_transitions = gr_dyn_realloc(subject->group_transitions, subject->group_trans_num * sizeof(gid_t));
+		subject->group_transitions = gr_dyn_realloc(subject->group_transitions, subject->group_trans_num);
 		*(subject->group_transitions + subject->group_trans_num - 1) = grp->gr_gid;
 	}
 
