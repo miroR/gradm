@@ -42,13 +42,13 @@
 	for(x = y; x; x = (x)->prev)
 
 #define for_each_subject(x, y) \
-	for(x = (y)->proc_subject; x; x = (x)->prev)
+	for(x = (y)->hash->first; x; x = (x)->prev)
 
 #define for_each_include(x) \
 	for(x = includes; x; x = (x)->prev)
 
 #define for_each_object(x, y) \
-	for(x = y; x; x = (x)->prev)
+	for(x = (y)->hash->first; x; x = (x)->prev)
 
 #define for_each_allowed_ip(x, y) \
 	for(x = y; x; x = (x)->prev)

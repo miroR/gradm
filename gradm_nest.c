@@ -11,9 +11,6 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 	struct file_acl *otmp = NULL;
 	struct stat fstat;
 
-	int subj_found = 0;
-	int nest_found = 0;
-
 	if (nestmode & GR_LEARN) {
 		fprintf(stderr, "Error on line %lu of %s:\n", lineno,
 			current_acl_file);
@@ -37,14 +34,8 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 	for (i = 0; i < nestlen; i++)
 		sprintf(nestname + strlen(nestname), ":%s", nestednames[i]);
 
-	for_each_subject(stmp, role) {
-		if (!strcmp(mainsubjname, stmp->filename)) {
-			subj_found = 1;
-			break;
-		}
-	}
-
-	if (!subj_found) {
+	stmp = lookup_acl_subject_by_name(role, mainsubjname);
+	if (stmp == NULL) {
 		fprintf(stderr,
 			"No subject %s found for nested subject %s specified on line %lu of %s.\n",
 			mainsubjname, nestname, lineno, current_acl_file);
@@ -52,14 +43,8 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 	}
 
 	for (i = 0; i < nestlen; i++) {
-		nest_found = 0;
-		for_each_object(otmp, stmp->proc_object) {
-			if (!strcmp(nestednames[i], otmp->filename)) {
-				nest_found = 1;
-				break;
-			}
-		}
-		if (!nest_found) {
+		otmp = lookup_acl_object_by_name(stmp, nestednames[i]);
+		if (otmp == NULL) {
 			fprintf(stderr,
 				"No object %s found for nested subject %s "
 				"specified on line %lu of %s.\n",
@@ -87,7 +72,7 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 	add_proc_subject_acl(role, nestednames[i - 1], nestmode, GR_FFAKE);
 
 	namelen = strlen(nestednames[i-1]);
-	for_each_object(otmp, stmp->proc_object) {
+	for_each_object(otmp, stmp) {
 		if (!strncmp(nestednames[i-1], otmp->filename, namelen) && (otmp->filename[namelen] == '/' || otmp->filename[namelen] == '\0'))
 			if (otmp->mode & GR_EXEC)
 				otmp->nested = current_subject;

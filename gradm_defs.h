@@ -189,7 +189,7 @@ struct role_acl {
 	unsigned long expires;
 
 	struct proc_acl *root_label;
-	struct proc_acl *proc_subject;
+	struct gr_hash_struct *hash;
 
 	struct role_acl *prev;
 	struct role_acl *next;
@@ -221,7 +221,7 @@ struct proc_acl {
 	unsigned long expires;
 
 	struct proc_acl *parent_subject;
-	struct file_acl *proc_object;
+	struct gr_hash_struct *hash;
 	struct ip_acl *ip_object;
 	struct proc_acl *prev;
 	struct proc_acl *next;
@@ -320,6 +320,20 @@ struct role_acl *current_role;
 struct proc_acl *current_subject;
 
 char *current_acl_file;
+
+enum {
+	GR_HASH_SUBJECT,
+	GR_HASH_OBJECT,
+};
+
+struct gr_hash_struct {
+	void **table;
+	void **nametable;
+	void *first;
+	__u32 table_size;
+	__u32 used_size;
+	int type;
+};
 
 struct user_acl_role_db {
 	struct role_acl **r_table;

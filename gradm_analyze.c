@@ -22,8 +22,8 @@ check_permission(struct role_acl *role, struct proc_acl *def_acl,
 		do {
 			tmpp = def_acl;
 			do {
-				for_each_object(tmpf, tmpp->proc_object)
-				    if (!strcmp(tmpf->filename, tmpname)) {
+				tmpf = lookup_acl_object_by_name(tmpp, tmpname);
+				if (tmpf) {
 					/* check globbed objects */
 					for_each_globbed(tmpg, tmpf) {
 						if (!fnmatch(tmpg->filename, filename, 0)) {
@@ -107,7 +107,6 @@ check_subjects(struct role_acl *role)
 static void
 check_default_objects(struct role_acl *role)
 {
-	int def_notfound = 1;
 	struct proc_acl *tmp;
 	struct file_acl *tmpf;
 
@@ -115,17 +114,14 @@ check_default_objects(struct role_acl *role)
 		/* skip all inherited subjects */
 		if (tmp->parent_subject != NULL)
 			continue;
-		for_each_object(tmpf, tmp->proc_object)
-		    if (!strcmp(tmpf->filename, "/"))
-			def_notfound = 0;
-		if (def_notfound) {
+		tmpf = lookup_acl_object_by_name(tmp, "/");
+		if (tmpf == NULL) {
 			fprintf(stderr, "Default object not found for "
 				"role %s subject %s\nThe RBAC system will "
 				"not load until you correct this "
 				"error.\n", role->rolename, tmp->filename);
 			exit(EXIT_FAILURE);
 		}
-		def_notfound = 1;
 	}
 
 	return;
@@ -261,7 +257,7 @@ handle_notrojan_mode(void)
 		for_each_subject(subj, role) {
 			if (!(subj->mode & GR_NOTROJAN))
 				continue;
-			for_each_object(obj, subj->proc_object) {
+			for_each_object(obj, subj) {
 				if (!(obj->mode & GR_EXEC))
 					continue;
 				if ((objname =
@@ -276,38 +272,19 @@ handle_notrojan_mode(void)
 								filename[0] !=
 								'/'))
 								continue;
-							for_each_object(obj2,
-									subj2->
-									proc_object)
-							{
-								if (!strcmp
-								    (obj2->
-								     filename,
-								     objname)) {
-									if (obj2->mode & GR_WRITE) {
-										ret++;
-										fprintf
-										    (stderr,
-										     "\'T\' specified in mode for %s."
-										     "  %s's executable object %s is "
-										     "writable by %s, due to its "
-										     "writable object %s.\nThis would "
-										     "allow %s to execute trojaned code.\n\n",
-										     subj->
-										     filename,
-										     subj->
-										     filename,
-										     obj->
-										     filename,
-										     subj2->
-										     filename,
-										     obj2->
-										     filename,
-										     subj->
-										     filename);
-									}
-									break;
-								}
+							obj2 = lookup_acl_object_by_name(subj2, objname);
+							if (obj2 && obj2->mode & GR_WRITE) {
+								ret++;
+								fprintf(stderr,
+								     "\'T\' specified in mode for %s."
+								     "  %s's executable object %s is "
+								     "writable by %s, due to its "
+								     "writable object %s.\nThis would "
+								     "allow %s to execute trojaned code.\n\n",
+								     subj->filename, subj->filename,
+								     obj->filename, subj2->filename,
+								     obj2->filename, subj->filename);
+								break;
 							}
 						}
 					}

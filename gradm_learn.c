@@ -125,10 +125,10 @@ void merge_acl_rules()
 					if (subject->res[i].rlim_max > matchsubj->subject->res[i].rlim_max)
 						matchsubj->subject->res[i].rlim_max = subject->res[i].rlim_max;
 				}
-				for_each_object(object, subject->proc_object) {
+				for_each_object(object, subject) {
 					insert_temp_file(&(matchsubj->tmp_object_list), object->filename, object->mode);
 				}
-				for_each_object(ipp, subject->ip_object) {
+				for (ipp = subject->ip_object; ipp; ipp = ipp->prev) {
 					if (ipp->mode == GR_IP_CONNECT) {
 						for (i = ipp->low; i <= ipp->high; i++)
 						for (x = 0; x < 5; x++)

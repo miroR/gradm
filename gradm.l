@@ -345,13 +345,13 @@ int main(int argc, char *argv[])
 	for (rolet = rolp->transitions; rolet; rolet=rolet->prev)
 		printf(" %s", rolet->rolename);
 	printf("\n");
-	for (proc = rolp->proc_subject;proc;proc=proc->prev) {
+	for (proc = rolp->hash->first;proc;proc=proc->prev) {
 		printf("\tSUBJECT: %s dev:%d inode:%lu mode:%d c_raise:%x c_drop:%x\n",
 			proc->filename, proc->dev, proc->inode, proc->mode, proc->cap_raise,
 			proc->cap_drop);
 		if (!proc->ip_object)
 			printf("\t\tNo socket restrictions\n");
-		for (filp = proc->proc_object;filp;filp=filp->prev)
+		for (filp = proc->hash->first;filp;filp=filp->prev)
                         printf("\t\tOBJECT: %s dev:%d inode:%lu mode:%d\n", filp->filename, filp->dev, filp->inode, filp->mode);
 		for (i=0;i<GR_NLIMITS;i++)
 			if (proc->resmask & (1 << i))

@@ -89,26 +89,30 @@ is_role_dupe(struct role_acl *role, const char *rolename, const __u16 type)
 }
 
 static struct file_acl *
-is_proc_object_dupe(struct file_acl *filp, struct file_acl *filp2)
+is_proc_object_dupe(struct proc_acl *subject, struct file_acl *object)
 {
 	struct file_acl *tmp;
 
-	for_each_object(tmp, filp)
-	    if (((tmp->inode == filp2->inode) && (tmp->dev == filp2->dev)) ||
-		!strcmp(tmp->filename, filp2->filename))
+	tmp = lookup_acl_object_by_name(subject, object->filename);
+	if (tmp)
+		return tmp;
+	tmp = lookup_acl_object(subject, object);
+	if (tmp)
 		return tmp;
 
 	return NULL;
 }
 
 static struct proc_acl *
-is_proc_subject_dupe(struct role_acl *role, struct proc_acl *proc)
+is_proc_subject_dupe(struct role_acl *role, struct proc_acl *subject)
 {
 	struct proc_acl *tmp;
 
-	for_each_subject(tmp, role)
-	    if (((tmp->inode == proc->inode) && (tmp->dev == proc->dev)) ||
-		!strcmp(tmp->filename, proc->filename))
+	tmp = lookup_acl_subject_by_name(role, subject->filename);
+	if (tmp)
+		return tmp;
+	tmp = lookup_acl_subject(role, subject);
+	if (tmp)
 		return tmp;
 
 	return NULL;
@@ -227,10 +231,7 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 	else
 		*p2 = '\0';
 
-	for_each_object(anchor, subject->proc_object) {
-		if (!strcmp(anchor->filename, basepoint))
-			break;
-	}
+	anchor = lookup_acl_object_by_name(subject, basepoint);
 
 	if (!anchor) {
 		fprintf(stderr, "Error on line %lu of %s:\n"
@@ -265,11 +266,11 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 static void
 display_all_dupes(struct proc_acl *subject, struct file_acl *filp2)
 {
-	struct file_acl *tmp = subject->proc_object;
+	struct file_acl *tmp;
 	struct stat fstat;
 	struct file_acl ftmp;
 
-	for_each_object(tmp, subject->proc_object)
+	for_each_object(tmp, subject)
 	    if (!stat(tmp->filename, &fstat)) {
 		ftmp.inode = fstat.st_ino;
 		ftmp.dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
@@ -286,7 +287,6 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 {
 	struct file_acl *p;
 	struct file_acl *p2;
-	struct file_acl **filp;
 	struct stat fstat;
 	struct deleted_file *dfile;
 	unsigned int file_len = strlen(filename) + 1;
@@ -298,8 +298,6 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 			"error is fixed.\n", lineno, current_acl_file);
 		return 0;
 	}
-
-	filp = &(subject->proc_object);
 
 	if (!filename) {
 		fprintf(stderr, "Out of memory.\n");
@@ -326,11 +324,6 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	     (struct file_acl *) calloc(1, sizeof (struct file_acl))) == NULL)
 		failure("calloc");
 
-	if (*filp)
-		(*filp)->next = p;
-
-	p->prev = *filp;
-
 	if ((filename[file_len - 2] == '/') && file_len != 2)
 		filename[file_len - 2] = '\0';
 
@@ -346,17 +339,19 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	p->dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
 
 	if (type & GR_FLEARN) {
-		struct file_acl *tmp = *filp;
+		struct file_acl *tmp;
 
-		for_each_object(tmp, *filp) {
-			if (!strcmp(tmp->filename, p->filename) ||
-			    ((tmp->inode == p->inode)
-			     && (tmp->dev == p->dev))) {
-				tmp->mode |= mode;
-				return 1;
-			}
+		tmp = lookup_acl_object_by_name(subject, p->filename);
+		if (tmp) {
+			tmp->mode |= mode;
+			return 1;
 		}
-	} else if ((p2 = is_proc_object_dupe(*filp, p))) {
+		tmp = lookup_acl_object(subject, p);
+		if (tmp) {
+			tmp->mode |= mode;
+			return 1;
+		}
+	} else if ((p2 = is_proc_object_dupe(subject, p))) {
 		if (type & GR_SYMLINK)
 			return 1;
 		fprintf(stderr, "Duplicate object found for \"%s\""
@@ -372,7 +367,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 		return 0;
 	}
 
-	*filp = p;
+	insert_acl_object(subject, p);
 
 	return 1;
 }
@@ -382,7 +377,6 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 {
 	struct proc_acl *p;
 	struct proc_acl *p2;
-	struct proc_acl *oldp;
 	struct deleted_file *dfile;
 	struct stat fstat;
 	unsigned int file_len;
@@ -394,8 +388,6 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 			"error is fixed.\n", lineno, current_acl_file);
 		return 0;
 	}
-
-	oldp = role->proc_subject;
 
 	if (!filename) {
 		fprintf(stderr, "Out of memory.\n");
@@ -414,11 +406,6 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 	if ((p =
 	     (struct proc_acl *) calloc(1, sizeof (struct proc_acl))) == NULL)
 		failure("calloc");
-
-	if (oldp)
-		oldp->next = p;
-
-	p->prev = oldp;
 
 	if (!strcmp(filename, "/") && !(flag & GR_FFAKE))
 		role->root_label = p;
@@ -450,7 +437,7 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 		return 0;
 	}
 
-	role->proc_subject = p;
+	insert_acl_subject(role, p);
 	current_subject = p;
 
 	return 1;
@@ -790,9 +777,9 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 
 		for_each_subject(tmp, rtmp) {
 			tpacls++;
-			for_each_object(tmpi, tmp->ip_object)
+			for (tmpi = tmp->ip_object; tmpi; tmpi = tmpi->prev)
 			    tiacls++;
-			for_each_object(tmpf, tmp->proc_object) {
+			for_each_object(tmpf, tmp) {
 			    facls++;
 			    for_each_globbed(tmpg, tmpf)
 				gacls++;
@@ -850,7 +837,7 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 		*r_tmp = rtmp;
 		for_each_subject(tmp, rtmp) {
 			iacls = 0;
-			for_each_object(tmpi, tmp->ip_object)
+			for (tmpi = tmp->ip_object; tmpi; tmpi = tmpi->prev)
 			    iacls++;
 			if (iacls) {
 				i_table =
@@ -861,7 +848,7 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 				if (!i_table)
 					failure("calloc");
 				i = 0;
-				for_each_object(tmpi, tmp->ip_object) {
+				for (tmpi = tmp->ip_object; tmpi; tmpi = tmpi->prev) {
 					i_tmp =
 					    (struct ip_acl *) calloc(1,
 								     sizeof

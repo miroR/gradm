@@ -108,3 +108,15 @@ int ensure_subject_security(struct gr_learn_file_node *subject,
 			FILE *unused2);
 
 void check_acl_status(__u16 reqmode);
+struct file_acl *lookup_acl_object_by_name(struct proc_acl *subject, char *name);
+struct proc_acl *lookup_acl_subject_by_name(struct role_acl *role, char *name);
+struct file_acl *lookup_acl_object(struct proc_acl *subject, struct file_acl *object);
+struct proc_acl *lookup_acl_subject(struct role_acl *role, struct proc_acl *subject);
+
+void * gr_dyn_alloc(unsigned long len);
+void * gr_stat_alloc(unsigned long len);
+void * gr_dyn_realloc(void *addr, unsigned long len);
+
+void insert_acl_object(struct proc_acl *subject, struct file_acl *object);
+void insert_acl_subject(struct role_acl *role, struct proc_acl *subject);
+

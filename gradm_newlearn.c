@@ -221,7 +221,7 @@ struct gr_learn_group_node **find_insert_group(struct gr_learn_group_node ***gro
 	unsigned long num = 0;
 
 	if (!tmp) {
-		*grouplist = gr_dyn_alloc(2 * sizeof(struct gr_learn_group_node *));
+		*grouplist = (struct gr_learn_group_node **)gr_dyn_alloc(2 * sizeof(struct gr_learn_group_node *));
 		return (*grouplist);
 	}
 
@@ -232,7 +232,7 @@ struct gr_learn_group_node **find_insert_group(struct gr_learn_group_node ***gro
 		num++;
 	}
 
-	*grouplist = gr_dyn_realloc(*grouplist, (num + 2) * sizeof(struct gr_learn_group_node *));
+	*grouplist = (struct gr_learn_group_node **)gr_dyn_realloc(*grouplist, (num + 2) * sizeof(struct gr_learn_group_node *));
 	memset(*grouplist + num, 0, 2 * sizeof(struct gr_learn_group_node *));
  
 	return (*grouplist + num);
@@ -287,21 +287,21 @@ void insert_user(struct gr_learn_group_node ***grouplist, char *username, char *
 		}
 		num = count_users(*group);
 
-		(*group)->users = gr_dyn_realloc((*group)->users, (num + 2) * sizeof(struct gr_learn_user_node *));
+		(*group)->users = (struct gr_learn_user_node **)gr_dyn_realloc((*group)->users, (num + 2) * sizeof(struct gr_learn_user_node *));
 		memset((*group)->users + num, 0, 2 * sizeof(struct gr_learn_user_node *));
 
 		tmpuser = ((*group)->users + num);
-		*tmpuser = gr_stat_alloc(sizeof(struct gr_learn_user_node));
+		*tmpuser = (struct gr_learn_user_node *)gr_stat_alloc(sizeof(struct gr_learn_user_node));
 		(*tmpuser)->rolename = username;
 		(*tmpuser)->uid = uid;
 		(*tmpuser)->group = *group;
 	} else {
-		*group = gr_stat_alloc(sizeof(struct gr_learn_group_node));
+		*group = (struct gr_learn_group_node *)gr_stat_alloc(sizeof(struct gr_learn_group_node));
 		(*group)->rolename = groupname;
 		(*group)->gid = gid;
-		(*group)->users = gr_dyn_alloc(2 * sizeof(struct gr_learn_user_node *));
+		(*group)->users = (struct gr_learn_user_node **)gr_dyn_alloc(2 * sizeof(struct gr_learn_user_node *));
 		tmpuser = (*group)->users;
-		*tmpuser = gr_stat_alloc(sizeof(struct gr_learn_user_node));
+		*tmpuser = (struct gr_learn_user_node *)gr_stat_alloc(sizeof(struct gr_learn_user_node));
 		(*tmpuser)->rolename = username;
 		(*tmpuser)->uid = uid;
 		(*tmpuser)->group = *group;
@@ -807,7 +807,7 @@ struct gr_learn_file_node **find_insert_file(struct gr_learn_file_node **base,
 	if (!node && (baselen < filelen) && !strncmp((*base)->filename, insert->filename, baselen) && 
 	    (baselen == 1 || insert->filename[baselen] == '/')) {
 		*parent = *base;
-		(*base)->leaves = node = gr_dyn_alloc(2 * sizeof(struct gr_learn_file_node *));
+		(*base)->leaves = node = (struct gr_learn_file_node **)gr_dyn_alloc(2 * sizeof(struct gr_learn_file_node *));
 		return node;
 	} else if (!node)
 		return NULL;
@@ -827,7 +827,7 @@ struct gr_learn_file_node **find_insert_file(struct gr_learn_file_node **base,
 
 	*parent = *base;
 	num_leaves = count_nodes(node);
-	(*base)->leaves = node = gr_dyn_realloc((*base)->leaves, (num_leaves + 2) * sizeof(struct gr_learn_file_node *));
+	(*base)->leaves = node = (struct gr_learn_file_node **)gr_dyn_realloc((*base)->leaves, (num_leaves + 2) * sizeof(struct gr_learn_file_node *));
 	memset(node + num_leaves, 0, 2 * sizeof(struct gr_learn_file_node *));
 	return (node + num_leaves);
 }
@@ -840,7 +840,7 @@ void do_insert_file(struct gr_learn_file_node **base, char *filename, __u32 mode
 	struct gr_learn_file_node *parent = NULL;
 	struct gr_learn_file_node *insert;
 
-	insert = gr_stat_alloc(sizeof(struct gr_learn_file_node));
+	insert = (struct gr_learn_file_node *)gr_stat_alloc(sizeof(struct gr_learn_file_node));
 
 	insert->filename = filename;
 	insert->mode = mode;
@@ -1276,13 +1276,13 @@ void insert_port(struct gr_learn_ip_node *node, __u16 port)
 	}
 
 	if (!num) {
-		node->ports = gr_dyn_alloc(2 * sizeof(__u16 *));
-		*(node->ports) = gr_stat_alloc(sizeof(__u16));
+		node->ports = (__u16 **)gr_dyn_alloc(2 * sizeof(__u16 *));
+		*(node->ports) = (__u16 *)gr_stat_alloc(sizeof(__u16));
 		**(node->ports) = port;
 	} else {
-		node->ports = gr_dyn_realloc(node->ports, (num + 2) * sizeof(__u16 *));
+		node->ports = (__u16 **)gr_dyn_realloc(node->ports, (num + 2) * sizeof(__u16 *));
 		memset(node->ports + num, 0, 2 * sizeof(__u16 *));
-		*(node->ports + num) = gr_stat_alloc(sizeof(__u16));
+		*(node->ports + num) = (__u16 *)gr_stat_alloc(sizeof(__u16));
 		**(node->ports + num) = port;
 	}
 
@@ -1450,7 +1450,7 @@ struct gr_learn_ip_node ** find_insert_ip(struct gr_learn_ip_node **base, __u32 
 	int match = 0;
 
 	if (!(*base)) {
-		(*base) = gr_stat_alloc(sizeof(struct gr_learn_ip_node));
+		(*base) = (struct gr_learn_ip_node *)gr_stat_alloc(sizeof(struct gr_learn_ip_node));
 		(*base)->root_node = 1;
 	}
 
@@ -1472,14 +1472,14 @@ struct gr_learn_ip_node ** find_insert_ip(struct gr_learn_ip_node **base, __u32 
 		return tmpip;
 	else {
 		num_ips = count_ips(*node);
-		(*node) = gr_dyn_realloc((*node), (2 + num_ips) * sizeof(struct gr_learn_ip_node *));
+		(*node) = (struct gr_learn_ip_node **)gr_dyn_realloc((*node), (2 + num_ips) * sizeof(struct gr_learn_ip_node *));
 		memset((*node) + num_ips, 0, 2 * sizeof(struct gr_learn_ip_node *));
 
 		if (depth == 3) {
 			*parent = *base;
 			return ((*node) + num_ips);
 		} else {
-			(*((*node) + num_ips)) = gr_stat_alloc(sizeof(struct gr_learn_ip_node));
+			(*((*node) + num_ips)) = (struct gr_learn_ip_node *)gr_stat_alloc(sizeof(struct gr_learn_ip_node));
 			(*((*node) + num_ips))->ip_node = extract_ip_field(ip, depth);
 			(*((*node) + num_ips))->parent = *base;
 			return find_insert_ip(((*node) + num_ips), ip, parent);
@@ -1496,7 +1496,7 @@ void insert_ip(struct gr_learn_ip_node **base, __u32 ip, __u16 port, __u8 proto,
 	struct gr_learn_ip_node *insert;
 	__u8 ip_node[4];
 
-	insert = gr_stat_alloc(sizeof(struct gr_learn_ip_node));
+	insert = (struct gr_learn_ip_node *)gr_stat_alloc(sizeof(struct gr_learn_ip_node));
 
 	insert_port(insert, port);
 	insert->ip_proto[proto / 32] = (1 << (proto % 32));
@@ -1549,7 +1549,7 @@ void insert_temp_file(struct gr_learn_file_tmp_node ***file_list, char *filename
 	unsigned long num = 0;
 
 	if (!(*file_list)) {
-		*file_list = gr_dyn_alloc(2 * sizeof(struct gr_learn_file_tmp_node *));
+		*file_list = (struct gr_learn_file_tmp_node **)gr_dyn_alloc(2 * sizeof(struct gr_learn_file_tmp_node *));
 	} else {
 		struct gr_learn_file_tmp_node **tmp;
 
@@ -1562,11 +1562,11 @@ void insert_temp_file(struct gr_learn_file_tmp_node ***file_list, char *filename
 			num++;
 			tmp++;
 		}
-		*file_list = gr_dyn_realloc(*file_list, (2 + num) * sizeof(struct gr_learn_file_tmp_node *));
+		*file_list = (struct gr_learn_file_tmp_node **)gr_dyn_realloc(*file_list, (2 + num) * sizeof(struct gr_learn_file_tmp_node *));
 		memset(*file_list + num, 0, 2 * sizeof(struct gr_learn_file_tmp_node *));
 	}
 
-	(*((*file_list) + num)) = gr_stat_alloc(sizeof(struct gr_learn_file_tmp_node));
+	(*((*file_list) + num)) = (struct gr_learn_file_tmp_node *)gr_stat_alloc(sizeof(struct gr_learn_file_tmp_node));
 	(*((*file_list) + num))->filename = filename;
 	(*((*file_list) + num))->mode = mode;
 	
@@ -1579,7 +1579,7 @@ insert_learn_role(struct gr_learn_role_entry ***role_list, char *rolename, __u16
 	unsigned long num = 0;
 
 	if (!(*role_list)) {
-		*role_list = gr_dyn_alloc(2 * sizeof(struct gr_learn_role_entry *));
+		*role_list = (struct gr_learn_role_entry **)gr_dyn_alloc(2 * sizeof(struct gr_learn_role_entry *));
 	} else {
 		struct gr_learn_role_entry **tmp;
 
@@ -1592,11 +1592,11 @@ insert_learn_role(struct gr_learn_role_entry ***role_list, char *rolename, __u16
 			num++;
 			tmp++;
 		}
-		*role_list = gr_dyn_realloc(*role_list, (2 + num) * sizeof(struct gr_learn_role_entry *));
+		*role_list = (struct gr_learn_role_entry **)gr_dyn_realloc(*role_list, (2 + num) * sizeof(struct gr_learn_role_entry *));
 		memset(*role_list + num, 0, 2 * sizeof(struct gr_learn_role_entry *));
 	}
 
-	(*((*role_list) + num)) = gr_stat_alloc(sizeof(struct gr_learn_role_entry));
+	(*((*role_list) + num)) = (struct gr_learn_role_entry *)gr_stat_alloc(sizeof(struct gr_learn_role_entry));
 	(*((*role_list) + num))->rolename = rolename;
 	(*((*role_list) + num))->rolemode = rolemode;
 	
