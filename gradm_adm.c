@@ -122,7 +122,7 @@ add_grlearn_acl(struct role_acl *role)
 		exit(EXIT_FAILURE);
 	}
 
-	add_proc_subject_acl(role, GRLEARN_PATH, proc_subject_mode_conv("hpdo"), 0))
+	add_proc_subject_acl(role, GRLEARN_PATH, proc_subject_mode_conv("hpdo"), 0);
 
 	memset(&ip, 0, sizeof (ip));
 	add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
