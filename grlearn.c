@@ -168,7 +168,7 @@ __inline__ char * rewrite_learn_entry(char *p)
 		while(*next++);
 		len = next - slash;
 		*(tmp + 6) = '*';
-		memmov(tmp + 7, slash, len);
+		memmove(tmp + 7, slash, len);
 		return next;
 	}
 
