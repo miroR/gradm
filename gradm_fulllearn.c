@@ -183,15 +183,15 @@ int full_reduce_id_node(struct gr_learn_file_node *subject,
 {
 	if (subject->subject == NULL ||
 	    !(subject->subject->cap_raise & cap_conv("CAP_SETUID")))
-		free_subject_uids(&(subject->user_trans_list), 0);
+		free_subject_ids(&(subject->user_trans_list), 0);
 	else
-		free_subject_uids(&(subject->user_trans_list), 3);
+		free_subject_ids(&(subject->user_trans_list), 3);
 
 	if (subject->subject == NULL ||
 	    !(subject->subject->cap_raise & cap_conv("CAP_SETGID")))
-		free_subject_gids(&(subject->group_trans_list), 0);
+		free_subject_ids(&(subject->group_trans_list), 0);
 	else
-		free_subject_gids(&(subject->group_trans_list), 3);
+		free_subject_ids(&(subject->group_trans_list), 3);
 	
 	return 0;
 }	
@@ -298,8 +298,8 @@ void free_subject_full(struct gr_learn_file_node *subject)
 		free(subject->hash);
 	}
 
-	free_subject_uids(subject, 0);
-	free_subject_gids(subject, 0);
+	free_subject_ids(&(subject->user_trans_list), 0);
+	free_subject_ids(&(subject->group_trans_list), 0);
 
 	free_subject_objects(subject->object_list);
 
