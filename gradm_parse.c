@@ -100,7 +100,7 @@ int add_role_acl(struct role_acl **role, char *rolename, __u8 type)
 	rtmp->roletype = type;
 	rtmp->rolename = rolename;
 
-	if (strcmp(rolename, "default") && (type == GR_ROLE_DEFAULT)) {
+	if (strcmp(rolename, "default") && (type & GR_ROLE_DEFAULT)) {
 		fprintf(stderr, "No role type specified for %s on line %lu "
 			"of %s.\nThe ACL system will not be allowed to be "
 			"enabled until this error is fixed.\n", rolename,
@@ -116,8 +116,8 @@ int add_role_acl(struct role_acl **role, char *rolename, __u8 type)
 		return 0;
 	}
 
-	if (strcmp(rolename, "default") || (type != GR_ROLE_DEFAULT)) {
-		if (type == GR_ROLE_USER) {
+	if (strcmp(rolename, "default") || !(type & GR_ROLE_DEFAULT)) {
+		if (type & GR_ROLE_USER) {
 			pwd = getpwnam(rolename);
 
 			if (!pwd) {
@@ -130,7 +130,7 @@ int add_role_acl(struct role_acl **role, char *rolename, __u8 type)
 			}
 
 			rtmp->uidgid = pwd->pw_uid;
-		} else if (type == GR_ROLE_GROUP) {
+		} else if (type & GR_ROLE_GROUP) {
 			grp = getgrnam(rolename);
 
 			if (!grp) {
@@ -143,7 +143,7 @@ int add_role_acl(struct role_acl **role, char *rolename, __u8 type)
 			}
 
 			rtmp->uidgid = grp->gr_gid;
-		} else if (type == GR_ROLE_SPECIAL) {
+		} else if (type & GR_ROLE_SPECIAL) {
 			rtmp->uidgid = special_role_uid++;
 		}
 	}
@@ -154,6 +154,9 @@ int add_role_acl(struct role_acl **role, char *rolename, __u8 type)
 	rtmp->prev = *role;
 
 	*role = rtmp;
+
+	if (type & GR_ROLE_AUTH)
+		add_gradm_acl(*role);
 
 	return 1;
   }
@@ -561,12 +564,30 @@ void rem_proc_subject_acl(struct proc_acl * proc)
 
 __u8 role_mode_conv(const char * mode)
 {
-	switch(mode[0]) {
-	case 'u': return GR_ROLE_USER;
-	case 'g': return GR_ROLE_GROUP;
-	case 's': return GR_ROLE_SPECIAL;
-	default : return GR_ROLE_DEFAULT;
+	unsigned int len = strlen(mode);
+	__u8 retmode = GR_ROLE_DEFAULT;
+
+	for (; len >= 0; len--) {
+		switch(mode[len]) {
+		case 'u': 
+			retmode &= ~GR_ROLE_DEFAULT;
+			retmode |= GR_ROLE_USER;
+			break;
+		case 'g':
+			retmode &= ~GR_ROLE_DEFAULT;
+			retmode |= GR_ROLE_GROUP;
+			break;
+		case 's':
+			retmode &= ~GR_ROLE_DEFAULT;
+			retmode |= GR_ROLE_SPECIAL;
+			break;
+		case 'G':
+			retmode |= GR_ROLE_AUTH;
+			break;
+		}
 	}
+
+	return retmode;
 }
 
 __u32 proc_subject_mode_conv(const char * mode)

@@ -37,7 +37,7 @@ static void find_gradm_path(char * gradm_realpath)
 	return;
 }
 
-void add_gradm_acl(void)
+void add_gradm_acl(struct role_acl *role)
 {
 	struct stat fstat;	
 	char gradm_realpath[PATH_MAX] = {0};
@@ -48,7 +48,7 @@ void add_gradm_acl(void)
 
 	gradm_name = strdup(gradm_realpath);
 	
-	if(!add_proc_subject_acl(current_role, gradm_name, 
+	if(!add_proc_subject_acl(role, gradm_name, 
 			proc_subject_mode_conv("do")))
 		exit(EXIT_FAILURE);
 
@@ -81,6 +81,8 @@ void add_gradm_acl(void)
 
 void add_admin_acl(void)
 {
+	if(!add_role_acl(&current_role, strdup(":::admin:::"), role_mode_conv("u")))
+		exit(EXIT_FAILURE);
 	if(!add_proc_subject_acl(current_role, "god", proc_subject_mode_conv("kvo")))
 		exit(EXIT_FAILURE);
 	if(!add_proc_object_acl(current_subject, "/", proc_object_mode_conv("rwxi"), GR_FEXIST))
@@ -92,6 +94,8 @@ void add_admin_acl(void)
 
 void add_kernel_acl(void)
 {
+	if(!add_role_acl(&current_role, strdup(":::kernel:::"), role_mode_conv("u")))
+		exit(EXIT_FAILURE);
 	if(!add_proc_subject_acl(current_role, "kernel", proc_subject_mode_conv("o")))
 		exit(EXIT_FAILURE);
 	if(!add_proc_object_acl(current_subject, "/", proc_object_mode_conv(""), GR_FEXIST))

@@ -36,7 +36,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 <*>[ \t]+				;
 <COMMENT_STATE>.*			;
 
-<ROLETYPE_STATE>[ugs]			{
+<ROLETYPE_STATE>[ugs][G]?		{
 					  gradmlval.string = strdup(yytext);
 					  return ROLE_TYPE;
 					}
