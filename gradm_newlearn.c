@@ -1766,7 +1766,7 @@ void insert_learn_id_transition(unsigned int ***list, int real, int eff, int fs)
 	unsigned int **p;
 
 	if (*list == NULL)
-		*list = (unsigned int **)gr_dyn_alloc(2 * sizeof(unsigned int));
+		*list = (unsigned int **)gr_dyn_alloc(2 * sizeof(unsigned int *));
 
 
 	for (x = 0; x < sizeof(ids)/sizeof(ids[0]); x++) {
@@ -1784,7 +1784,7 @@ void insert_learn_id_transition(unsigned int ***list, int real, int eff, int fs)
 				p++;
 				num++;
 			}
-			*list = (unsigned int **)gr_dyn_realloc(*list, (num + 1) * sizeof(unsigned int));
+			*list = (unsigned int **)gr_dyn_realloc(*list, (num + 2) * sizeof(unsigned int *));
 			memset(*list + num, 0, 2 * sizeof(unsigned int *));
 			*(*list + num) = (unsigned int *)gr_stat_alloc(sizeof(unsigned int));
 			**(*list + num) = ids[x];

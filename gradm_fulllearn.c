@@ -148,15 +148,14 @@ int full_reduce_ip_node(struct gr_learn_file_node *subject,
 	return 0;
 }	
 
-void free_subject_uids(struct gr_learn_file_node *subject, int thresh)
+void free_subject_ids(unsigned int ***list, int thresh)
 {
-	unsigned int **uid_list = subject->user_trans_list;
 	unsigned int **p;
 	unsigned int size;
 	int i;
 
 	size = 0;
-	p = uid_list;
+	p = *list;
 
 	if (p == NULL)
 		return;
@@ -167,40 +166,12 @@ void free_subject_uids(struct gr_learn_file_node *subject, int thresh)
 
 	if (size > thresh) {
 		for (i = 0; i < size; i++)
-			free(*(uid_list + i));
-		free(uid_list);
-		subject->user_trans_list = NULL;
+			free(*(*list + i));
+		free(*list);
+		*list = NULL;
 	} else if (thresh == 0) {
-		free(uid_list);
-		subject->user_trans_list = NULL;
-	}
-
-	return;
-}
-
-void free_subject_gids(struct gr_learn_file_node *subject, int thresh)
-{
-	unsigned int **group_list = subject->group_trans_list;
-	unsigned int **p;
-	unsigned int size;
-	int i;
-
-	size = 0;
-	p = group_list;
-	if (p == NULL)
-		return;
-	while (*p) {
-		p++;
-		size++;
-	}
-	if (size > thresh) {
-		for (i = 0; i < size; i++)
-			free(*(group_list + i));
-		free(group_list);
-		subject->group_trans_list = NULL;
-	} else if (thresh == 0) {
-		free(group_list);
-		subject->group_trans_list = NULL;
+		free(*list);
+		*list = NULL;
 	}
 
 	return;
@@ -210,8 +181,16 @@ int full_reduce_id_node(struct gr_learn_file_node *subject,
 			struct gr_learn_file_node *unused1,
 			FILE *unused2)
 {
-	free_subject_uids(subject, 3);
-	free_subject_gids(subject, 3);
+	if (subject->subject == NULL ||
+	    !(subject->subject->cap_raise & cap_conv("CAP_SETUID")))
+		free_subject_uids(&(subject->user_trans_list), 0);
+	else
+		free_subject_uids(&(subject->user_trans_list), 3);
+	if (subject->subject == NULL ||
+	    !(subject->subject->cap_raise & cap_conv("CAP_SETGID")))
+		free_subject_gids(&(subject->group_trans_list, 0);
+	else
+		free_subject_gids(&(subject->group_trans_list, 3);
 	
 	return 0;
 }	
