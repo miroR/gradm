@@ -7,8 +7,8 @@
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
 #define GR_LEARN_CONFIG_PATH	GRSEC_DIR "/learn_config"
 
-#define GR_VERSION		"2.1.2"
-#define GRADM_VERSION		0x212
+#define GR_VERSION		"2.1.3"
+#define GRADM_VERSION		0x213
 
 #define GR_PWONLY		0
 #define GR_PWANDSUM		1
@@ -128,7 +128,8 @@ enum {
 	GR_PROCACCT 	= 0x00010000,
 	GR_RELAXPTRACE  = 0x00020000,
 	GR_NESTED	= 0x00040000,
-	GR_INHERITLEARN = 0x00080000
+	GR_INHERITLEARN = 0x00080000,
+	GR_PROCFIND	= 0x00100000
 };
 
 /* internal use only.  not to be modified */

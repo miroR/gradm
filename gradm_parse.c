@@ -810,7 +810,7 @@ proc_subject_mode_conv(const char *mode)
 	int i;
 	u_int32_t retmode = 0;
 
-	retmode |= GR_FIND;
+	retmode |= GR_PROCFIND;
 
 	for (i = 0; i < strlen(mode); i++) {
 		switch (mode[i]) {
@@ -842,6 +842,7 @@ proc_subject_mode_conv(const char *mode)
 			retmode |= GR_PAXGCC;
 			break;
 		case 'O':
+			printf("wtf!\n");
 			retmode |= GR_IGNORE;
 			break;
 		case 'o':

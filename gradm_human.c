@@ -54,7 +54,7 @@ static struct subj_mode_name_table {
 	GR_PROTECTED, 'p'}, {
 	GR_VIEW, 'v'}, {
 	GR_IGNORE, 'O'}, {
-	GR_FIND, 'h'}, {
+	GR_PROCFIND, 'h'}, {
 	GR_PROTSHM, 'A'}, {
 	GR_PAXPAGE, 'P'}, {
 	GR_PAXSEGM, 'S'}, {
@@ -124,11 +124,11 @@ conv_subj_mode_to_str(u_int32_t mode, char *modestr, unsigned short len)
 	     && x <
 	     (sizeof (subj_mode_table) / sizeof (struct subj_mode_name_table));
 	     x++) {
-		if (subj_mode_table[x].modeint == GR_FIND && !(mode & GR_FIND)) {
+		if (subj_mode_table[x].modeint == GR_PROCFIND && !(mode & GR_PROCFIND)) {
 			modestr[i] = 'h';
 			i++;
 			continue;
-		} else if (subj_mode_table[x].modeint == GR_FIND)
+		} else if (subj_mode_table[x].modeint == GR_PROCFIND)
 			continue;
 
 		if (mode & subj_mode_table[x].modeint) {
