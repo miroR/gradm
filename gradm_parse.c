@@ -651,6 +651,14 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 		exit(EXIT_FAILURE);
 	}
 
+	if (mode & GR_LEARN && mode & GR_INHERITLEARN) {
+		fprintf(stderr, "Error on line %lu of %s.  Subject mode "
+			"may not include both learn and inherit-learn.\n"
+			"The RBAC system will not load until this "
+			"error is fixed.\n", lineno, current_acl_file);
+		exit(EXIT_FAILURE);
+	}
+
 	if (!strncmp(filename, "$HOME", 5))
 		filename = parse_homedir(filename);
 

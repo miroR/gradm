@@ -108,7 +108,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(gr_line);
 					  return SUBJ_NAME;
 					}
-<SUBJECT_STATE>[TKCAPRMSGXOolhpkvdbr]+	{
+<SUBJECT_STATE>[TKCAPRMSGXOolhpkvdbri]+	{
 					  gradmlval.num = proc_subject_mode_conv(yytext);
 					  return SUBJ_MODE;
 					}
