@@ -561,6 +561,8 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 
 	str = filename;
 	file_len = 0;
+	if (!strncmp(filename, "/SYSV", 5))
+		return add_globbing_file(subject, filename, mode, type);
 	while (*str) {
 		file_len++;
 		if (*str == '?' || *str == '*')
