@@ -16,6 +16,8 @@
 
 
 #define GR_LEARN_PID_PATH "/etc/grsec/.grlearn.pid"
+#define LEARN_BUFFER_SLOTS 64
+#define LEARN_BUFFER_SIZE 16384
 
 int stop_daemon(void)
 {
@@ -154,14 +156,14 @@ int main(int argc, char *argv[])
 
 	mlockall(MCL_CURRENT | MCL_FUTURE);
 
-	buf = calloc(16, 16384);
+	buf = calloc(LEARN_BUFFER_SLOTS, LEARN_BUFFER_SIZE);
 	if (!buf)
 		return 1;
 	for(i = 0; i < 640; i++) {
 		cache[i] = calloc(1, sizeof(struct cache_entry));
 		if (!cache[i])
 			return 1;
-		cache[i]->entryname = calloc(1, 16384);
+		cache[i]->entryname = calloc(1, LEARN_BUFFER_SIZE);
 		if (!cache[i]->entryname)
 			return 1;
 	}
@@ -208,11 +210,11 @@ int main(int argc, char *argv[])
 	fds.events = POLLIN;
 
 	while (poll(&fds, 1, -1) > 0) {
-		memset(buf, 0, 16 * 16384);
-		retval = read(fd, buf, 16 * 16384);
+		memset(buf, 0, LEARN_BUFFER_SLOTS * LEARN_BUFFER_SIZE);
+		retval = read(fd, buf, LEARN_BUFFER_SLOTS * LEARN_BUFFER_SIZE);
 
-		for(i = 0; i < 16; i++) {
-			tmpaddr = buf + (i * 16384);
+		for(i = 0; i < LEARN_BUFFER_SLOTS; i++) {
+			tmpaddr = buf + (i * LEARN_BUFFER_SIZE);
 			if (*tmpaddr == 0)
 				continue;
 			if (!check_cache(tmpaddr)) {
