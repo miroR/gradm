@@ -81,7 +81,8 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 				nestname, lineno, current_acl_file);
 			exit(EXIT_FAILURE);
 		}
-		stmp = otmp->nested;
+		if (i != nestlen - 1)
+			stmp = otmp->nested;
 	}
 
 	add_proc_subject_acl(role, nestednames[i - 1], nestmode, GR_FFAKE);
