@@ -103,14 +103,6 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return IPPORT;
 					}
 
-<INCLUDE_STATE>[<][/].*[>]		{
-					  gr_line = yytext;
-					  gr_line++;
-					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  add_include(gr_line);					  
-					  BEGIN(INITIAL);
-					}
-
 "role"					{
 					  BEGIN(ROLE_STATE);
 					  return ROLE;
@@ -127,8 +119,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  BEGIN(IP_STATE);
 					  return BIND;
 					}
-"include"				{
-					  BEGIN(INCLUDE_STATE);
+"include"[ \t]+[<][/].*[>]		{
+					  gr_line = strchr(yytext, '/');
+					  *(gr_line + strlen(gr_line) - 1) = '\0';
+					  add_include(gr_line);					  
 					}
 [+-]"CAP_"[_A-Z]+			{
 					  gradmlval.string = strdup(yytext);
