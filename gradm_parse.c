@@ -1058,7 +1058,7 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 	     (struct gr_arg_wrapper *) calloc(1, sizeof (struct gr_arg_wrapper))) == NULL)
 		failure("calloc");
 
-	wrapper->version = GRADM_VERSION;
+	wrapper->version = GRADM_VERSION | (KERNVER << 16);
 	wrapper->size = sizeof(struct gr_arg);
 	wrapper->arg = retarg;
 
