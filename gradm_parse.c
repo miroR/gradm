@@ -194,6 +194,8 @@ add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 		add_gradm_acl(*role);
 	if (!(type & GR_ROLE_SPECIAL))
 		add_grlearn_acl(*role);
+	if (type & GR_ROLE_LEARN)
+		add_rolelearn_acl();
 
 	return 1;
 }
@@ -591,14 +593,17 @@ role_mode_conv(const char *mode)
 			retmode &= ~GR_ROLE_DEFAULT;
 			retmode |= GR_ROLE_SPECIAL;
 			break;
-		case 'A':
-			retmode |= GR_ROLE_GOD;
+		case 'l':
+			retmode |= GR_ROLE_LEARN;
+			break;
+		case 'G':
+			retmode |= GR_ROLE_AUTH;
 			break;
 		case 'N':
 			retmode |= GR_ROLE_NOPW;
 			break;
-		case 'G':
-			retmode |= GR_ROLE_AUTH;
+		case 'A':
+			retmode |= GR_ROLE_GOD;
 			break;
 		}
 	}
@@ -607,6 +612,22 @@ role_mode_conv(const char *mode)
 	    retmode & (GR_ROLE_USER | GR_ROLE_GROUP)) {
 		fprintf(stderr, "Error on line %lu of %s.  The role mode must be either "
 				"special, or user/group, not both.\n"
+				"The RBAC system will not load until this"
+				" error is fixed.\n", lineno, current_acl_file); 
+		exit(EXIT_FAILURE);
+	}
+
+	if ((retmode & (GR_ROLE_USER | GR_ROLE_GROUP)) && (retmode & GR_ROLE_NOPW)) {
+		fprintf(stderr, "Error on line %lu of %s.  The role mode \"N\" can only "
+				"be used with a special role.\n"
+				"The RBAC system will not load until this"
+				" error is fixed.\n", lineno, current_acl_file); 
+		exit(EXIT_FAILURE);
+	}
+	if ((retmode & (GR_ROLE_USER | GR_ROLE_GROUP)) ==
+		(GR_ROLE_USER | GR_ROLE_GROUP)) {
+		fprintf(stderr, "Error on line %lu of %s.  The role mode cannot be both "
+				"user or group, you must choose one.\n"
 				"The RBAC system will not load until this"
 				" error is fixed.\n", lineno, current_acl_file); 
 		exit(EXIT_FAILURE);
@@ -809,8 +830,8 @@ setup_special_roles(struct gr_arg *grarg)
 			"structure in physical memory.\n");
 
 	for_each_role(rtmp, current_role) {
-		if (rtmp->roletype & GR_ROLE_SPECIAL
-		    && !(rtmp->roletype & GR_ROLE_NOPW)) {
+		if (rtmp->roletype & GR_ROLE_SPECIAL &&
+		    !(rtmp->roletype & GR_ROLE_NOPW)) {
 			strncpy(entry.rolename, rtmp->rolename, GR_SPROLE_LEN);
 			entry.rolename[GR_SPROLE_LEN - 1] = '\0';
 			if (!read_saltandpass
@@ -863,8 +884,8 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 
 	for_each_role(rtmp, current_role) {
 		racls++;
-		if (rtmp->roletype & GR_ROLE_SPECIAL
-		    && !(rtmp->roletype & GR_ROLE_NOPW))
+		if (rtmp->roletype & GR_ROLE_SPECIAL &&
+		    !(rtmp->roletype & GR_ROLE_NOPW))
 			sproles++;
 
 		for_each_allowed_ip(atmp, rtmp->allowed_ips)

@@ -32,8 +32,6 @@
 #define MAX_INCLUDE_DEPTH	10
 #define MAX_NEST_DEPTH		8
 
-#define GR_LEARN_THRESH		4
-
 #define GR_NLIMITS	(RLIM_NLIMITS + 1)
 
 enum {
@@ -79,7 +77,8 @@ enum {
 	GR_ROLE_SPECIAL = 0x0008,
 	GR_ROLE_AUTH = 0x0010,
 	GR_ROLE_NOPW = 0x0020,
-	GR_ROLE_GOD = 0x0040
+	GR_ROLE_GOD = 0x0040,
+	GR_ROLE_LEARN = 0x0080
 };
 
 enum {
@@ -117,26 +116,6 @@ struct capability_set {
 struct rlimconv {
 	const char *name;
 	unsigned short val;
-};
-
-struct learn_info {
-	char *rolename;
-	__u16 roletype;
-	char *subjname;
-	char *obj_name;
-	__u32 res_cur, res_max;
-	__u32 mode;
-};
-
-struct ip_learn_info {
-	char *rolename;
-	__u16 roletype;
-	char *subjname;
-	__u32 addr;
-	__u16 port;
-	__u16 sock;
-	__u16 proto;
-	__u16 mode;
 };
 
 struct chk_perm {
@@ -244,6 +223,69 @@ struct proc_acl {
 	__u32 obj_hash_size;
 };
 
+struct gr_learn_ip_node {
+	__u8 ip_node;
+	__u16 **ports;
+	__u32 ip_proto[8];
+	__u32 ip_type;
+	unsigned char root_node:1;
+	unsigned char all_low_ports:1;
+	unsigned char all_high_ports:1;
+	struct gr_learn_ip_node *parent;
+	struct gr_learn_ip_node **leaves;
+};
+
+struct gr_learn_role_entry {
+	char *rolename;
+	__u16 rolemode;
+	unsigned int id;
+	struct gr_learn_file_tmp_node **tmp_subject_list;
+	struct gr_learn_file_node *subject_list;
+	struct gr_learn_ip_node *allowed_ips;
+};	
+
+struct gr_learn_group_node {
+	char *rolename;
+	gid_t gid;
+	struct gr_learn_user_node **users;
+	struct gr_learn_file_tmp_node ** tmp_subject_list;
+	struct gr_learn_file_node *subject_list;
+	struct gr_learn_ip_node *allowed_ips;
+};
+
+struct gr_learn_file_tmp_node {
+	char *filename;
+	__u32 mode;
+};
+
+struct gr_learn_user_node {
+	char *rolename;
+	uid_t uid;
+	struct gr_learn_group_node *group;
+	struct gr_learn_file_tmp_node ** tmp_subject_list;
+	struct gr_learn_file_node *subject_list;
+	struct gr_learn_ip_node *allowed_ips;
+};
+
+struct gr_learn_subject_node {
+	__u32 cap_raise;
+	struct rlimit res[GR_NLIMITS];
+	__u16 resmask;
+};
+
+struct gr_learn_file_node {
+	char *filename;
+	__u32 mode;
+	unsigned char dont_display:1;
+	struct gr_learn_file_node **leaves;
+	struct gr_learn_file_node *parent;
+	struct gr_learn_file_tmp_node ** tmp_object_list;
+	struct gr_learn_file_node *object_list;
+	struct gr_learn_ip_node *connect_list;
+	struct gr_learn_ip_node *bind_list;
+	struct gr_learn_subject_node *subject;
+};
+
 struct gr_pw_entry {
 	unsigned char rolename[GR_SPROLE_LEN];
 	unsigned char passwd[GR_PW_LEN];
@@ -301,11 +343,6 @@ struct gr_arg {
 	uid_t segv_uid;
 	__u16 mode;
 };
-
-struct learn_info **learn_db;
-struct ip_learn_info **ip_learn_db;
-unsigned long learn_num;
-unsigned long ip_learn_num;
 
 struct capability_set capability_list[30];
 struct rlimconv rlim_table[12];

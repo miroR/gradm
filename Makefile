@@ -37,11 +37,14 @@ MANDIR=/usr/share/man
 #MANDIR=/usr/man
 DESTDIR=
 
-OBJECTS=gradm.tab.o lex.gradm.o learn.tab.o lex.learn.o gradm_misc.o \
-	gradm_parse.o gradm_arg.o gradm_pw.o gradm_opt.o gradm_cap.o \
-	gradm_sha256.o gradm_adm.o gradm_analyze.o gradm_res.o \
+OBJECTS=gradm.tab.o lex.gradm.o learn_pass1.tab.o learn_pass2.tab.o \
+	fulllearn_pass1.tab.o fulllearn_pass2.tab.o fulllearn_pass3.tab.o \
+	gradm_misc.o gradm_parse.o gradm_arg.o gradm_pw.o gradm_opt.o \
+	gradm_cap.o gradm_sha256.o gradm_adm.o gradm_analyze.o gradm_res.o \
 	gradm_human.o gradm_learn.o gradm_net.o gradm_nest.o \
-	gradm_sym.o
+	gradm_sym.o gradm_newlearn.o gradm_fulllearn.o \
+	lex.fulllearn_pass1.o lex.fulllearn_pass2.o \
+	lex.fulllearn_pass3.o lex.learn_pass1.o lex.learn_pass2.o
 
 all: $(USE_YACC) $(USE_LEX) $(GRADM_BIN) grlearn
 
@@ -73,18 +76,36 @@ gradm.tab.c: gradm.y
 lex.gradm.c: gradm.l
 	$(USE_LEX) $(LEXFLAGS) -Pgradm ./gradm.l
 
-learn.tab.c: gradm_learner.y
-	$(USE_YACC) -b learn -p learn -d ./gradm_learner.y
+fulllearn_pass1.tab.c: gradm_fulllearn_pass1.y
+	$(USE_YACC) -b fulllearn_pass1 -p fulllearn_pass1 -d ./gradm_fulllearn_pass1.y
+fulllearn_pass2.tab.c: gradm_fulllearn_pass2.y
+	$(USE_YACC) -b fulllearn_pass2 -p fulllearn_pass2 -d ./gradm_fulllearn_pass2.y
+fulllearn_pass3.tab.c: gradm_fulllearn_pass3.y
+	$(USE_YACC) -b fulllearn_pass3 -p fulllearn_pass3 -d ./gradm_fulllearn_pass3.y
 
-lex.learn.c: gradm_learner.l
-	$(USE_LEX) $(LEXFLAGS) -Plearn ./gradm_learner.l
+lex.fulllearn_pass1.c: gradm_fulllearn_pass1.l
+	$(USE_LEX) $(LEXFLAGS) -Pfulllearn_pass1 ./gradm_fulllearn_pass1.l
+lex.fulllearn_pass2.c: gradm_fulllearn_pass2.l
+	$(USE_LEX) $(LEXFLAGS) -Pfulllearn_pass2 ./gradm_fulllearn_pass2.l
+lex.fulllearn_pass3.c: gradm_fulllearn_pass3.l
+	$(USE_LEX) $(LEXFLAGS) -Pfulllearn_pass3 ./gradm_fulllearn_pass3.l
+
+learn_pass1.tab.c: gradm_learn_pass1.y
+	$(USE_YACC) -b learn_pass1 -p learn_pass1 -d ./gradm_learn_pass1.y
+learn_pass2.tab.c: gradm_learn_pass2.y
+	$(USE_YACC) -b learn_pass2 -p learn_pass2 -d ./gradm_learn_pass2.y
+
+lex.learn_pass1.c: gradm_learn_pass1.l
+	$(USE_LEX) $(LEXFLAGS) -Plearn_pass1 ./gradm_learn_pass1.l
+lex.learn_pass2.c: gradm_learn_pass2.l
+	$(USE_LEX) $(LEXFLAGS) -Plearn_pass2 ./gradm_learn_pass2.l
 
 install: $(GRADM_BIN) gradm.8 acl grlearn
 	mkdir -p $(DESTDIR)/sbin
 	$(INSTALL) -m 0755 $(GRADM_BIN) $(DESTDIR)/sbin
-	$(STRIP) $(DESTDIR)/sbin/$(GRADM_BIN)
+#	$(STRIP) $(DESTDIR)/sbin/$(GRADM_BIN)
 	$(INSTALL) -m 0700 grlearn $(DESTDIR)/sbin
-	$(STRIP) $(DESTDIR)/sbin/grlearn
+#	$(STRIP) $(DESTDIR)/sbin/grlearn
 	mkdir -p -m 700 $(DESTDIR)$(GRSEC_DIR)
 	@if [ ! -f $(DESTDIR)$(GRSEC_DIR)/acl ] ; then \
 		$(INSTALL) -m 0600 acl $(DESTDIR)$(GRSEC_DIR) ; \

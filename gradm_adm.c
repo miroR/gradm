@@ -136,6 +136,49 @@ add_grlearn_acl(struct role_acl *role)
 	return;
 }
 
+void add_fulllearn_acl(void)
+{
+	struct ip_acl ip;
+
+	if (!add_role_acl
+	    (&current_role, strdup("default"), role_mode_conv("A"), 0))
+		exit(EXIT_FAILURE);
+	if (!add_proc_subject_acl
+	    (current_role, "/", proc_subject_mode_conv("ol"), 0))
+		exit(EXIT_FAILURE);
+	if (!add_proc_object_acl
+	    (current_subject, "/", proc_object_mode_conv("h"), GR_FEXIST))
+		exit(EXIT_FAILURE);
+	add_cap_acl(current_subject, "-CAP_ALL");
+
+	memset(&ip, 0, sizeof (ip));
+	add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
+	add_ip_acl(current_subject, GR_IP_BIND, &ip);
+
+	add_kernel_acl();
+	expand_acls();
+	return;
+}
+
+void add_rolelearn_acl(void)
+{
+	struct ip_acl ip;
+
+	if (!add_proc_subject_acl
+	    (current_role, "/", proc_subject_mode_conv("ol"), 0))
+		exit(EXIT_FAILURE);
+	if (!add_proc_object_acl
+	    (current_subject, "/", proc_object_mode_conv("h"), GR_FEXIST))
+		exit(EXIT_FAILURE);
+	add_cap_acl(current_subject, "-CAP_ALL");
+
+	memset(&ip, 0, sizeof (ip));
+	add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
+	add_ip_acl(current_subject, GR_IP_BIND, &ip);
+
+	return;
+}
+
 void start_grlearn(char *logfile)
 {
 	pid_t pid;

@@ -1,6 +1,6 @@
 #sample default process acl for grsecurity
 # Role flags:
-# A -> This role is a "god" role, thus it has special privilege normal
+# A -> This role is an administrative role, thus it has special privilege normal
 #      roles do not have.  In particular, this role bypasses the 
 #      additional ptrace restrictions
 # N -> Don't require authentication for this role.  To access

@@ -45,7 +45,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 <*>[ \t]+				;
 <COMMENT_STATE>.*			;
 
-<ROLETYPE_STATE>[ugsGNA]*		{
+<ROLETYPE_STATE>[ugslGNA]*		{
 					  gradmlval.string = strdup(yytext);
 					  return ROLE_TYPE;
 					}
@@ -87,6 +87,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return RES_SOFTHARD;
 					}
 
+<IP_STATE>"disabled"			{
+					  gradmlval.string = strdup(yytext);
+					  return DISABLED;
+					}
 <IP_STATE>{IP}				{
 					  gradmlval.string = strdup(yytext);
 					  return IPADDR;

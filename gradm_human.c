@@ -1,5 +1,18 @@
 #include "gradm.h"
 
+static struct role_name_table {
+	__u16 modeint;
+	char modechar;
+} role_mode_table[] = {
+	{
+	GR_ROLE_USER, 'u'}, {
+	GR_ROLE_GROUP, 'g'}, {
+	GR_ROLE_SPECIAL, 's'}, {
+	GR_ROLE_AUTH, 'G'}, {
+	GR_ROLE_NOPW, 'N'}, {
+	GR_ROLE_GOD, 'A'}
+};
+
 static struct mode_name_table {
 	__u32 modeint;
 	char modechar;
@@ -32,6 +45,7 @@ static struct subj_mode_name_table {
 	char modechar;
 } subj_mode_table[] = {
 	{
+	GR_OVERRIDE, 'o'}, {
 	GR_KILL, 'k'}, {
 	GR_PROTECTED, 'p'}, {
 	GR_VIEW, 'v'}, {
@@ -51,88 +65,7 @@ static struct subj_mode_name_table {
 	GR_PROCACCT, 'b'}
 };
 
-static int
-netmask_to_int(unsigned long netmask)
-{
-	unsigned short i;
-	unsigned long net;
-
-	if (!netmask)
-		return 0;
-
-	if (netmask == 0xffffffff)
-		return 32;
-
-	for (i = 0; i <= 32; i++) {
-		net = 0xffffffff << (32 - i);
-		if (net == netmask)
-			return i;
-	}
-
-	return 0;
-}
-
-static void
-show_ip_acl(struct ip_acl *ipp, FILE * stream)
-{
-	struct in_addr addr;
-	unsigned short netmask;
-	unsigned short i;
-	struct protoent *proto;
-
-	addr.s_addr = ipp->addr;
-	netmask = netmask_to_int(ipp->netmask);
-
-	if (ipp->type == GR_IP_CONNECT)
-		fprintf(stream, "\tconnect ");
-	else if (ipp->type == GR_IP_BIND)
-		fprintf(stream, "\tbind ");
-
-	if ((netmask == 32) && ipp->low == ipp->high)
-		fprintf(stream, "%s:%u", inet_ntoa(addr), ipp->low);
-	else if (ipp->low == ipp->high)
-		fprintf(stream, "%s/%u:%u", inet_ntoa(addr), netmask, ipp->low);
-	else if (netmask == 32)
-		fprintf(stream, "%s:%u-%u", inet_ntoa(addr),
-			ipp->low, ipp->high);
-	else
-		fprintf(stream, "%s/%u:%u-%u", inet_ntoa(addr),
-			netmask, ipp->low, ipp->high);
-
-	for (i = 1; i < 5; i++) {
-		if (ipp->type & (1 << i)) {
-			switch (i) {
-			case SOCK_RAW:
-				fprintf(stream, " raw_sock");
-				break;
-			case SOCK_DGRAM:
-				fprintf(stream, " dgram");
-				break;
-			case SOCK_STREAM:
-				fprintf(stream, " stream");
-				break;
-			case SOCK_RDM:
-				fprintf(stream, " rdm");
-				break;
-			}
-		}
-	}
-	for (i = 0; i < 256; i++) {
-		if (ipp->proto[i / 32] & (1 << (i % 32))) {
-			if (i == IPPROTO_RAW) {
-				fprintf(stream, " raw_proto");
-			} else {
-				proto = getprotobynumber(i);
-				fprintf(stream, " %s", proto->p_name);
-			}
-		}
-	}
-
-	fprintf(stream, "\n");
-	return;
-}
-
-static void
+void
 conv_mode_to_str(__u32 mode, char *modestr, unsigned short len)
 {
 	unsigned short i;
@@ -173,7 +106,7 @@ conv_mode_to_str(__u32 mode, char *modestr, unsigned short len)
 	return;
 }
 
-static void
+void
 conv_subj_mode_to_str(__u32 mode, char *modestr, unsigned short len)
 {
 	unsigned short i;
@@ -203,119 +136,23 @@ conv_subj_mode_to_str(__u32 mode, char *modestr, unsigned short len)
 }
 
 void
-pass_struct_to_human(FILE * stream)
+conv_role_mode_to_str(__u16 mode, char *modestr, unsigned short len)
 {
 	unsigned short i;
-	char modes[33];
-	struct role_acl *role;
-	struct proc_acl *proc;
-	struct file_acl *filp;
-	struct ip_acl *ipp;
-	unsigned int drop_num;
-	unsigned long c_cnt;
-	unsigned long b_cnt;
+	unsigned short x;
 
-	for_each_role(role, current_role) {
-		for_each_subject(proc, role) {
-			if (!(proc->mode & GR_LEARN))
-				continue;
-			proc->mode &= ~GR_LEARN;
-			conv_subj_mode_to_str(proc->mode,
-					      modes, sizeof (modes));
-			fprintf(stream, "# learned subject for role %s\n",
-				role->rolename);
-			fprintf(stream, "subject %s %so\n", proc->filename,
-				modes);
-			for_each_object(filp, proc->proc_object) {
-				conv_mode_to_str(filp->mode,
-						 modes, sizeof (modes));
-				fprintf(stream, "\t%s %s\n", filp->filename,
-					modes);
-			}
+	memset(modestr, 0, len);
 
-			for (i = drop_num = 0;
-			     i <
-			     ((sizeof (capability_list) /
-			       sizeof (struct capability_set)) - 1); i++)
-				if (proc->
-				    cap_drop & (1 << capability_list[i].
-						cap_val))
-					drop_num++;
-
-			if (!drop_num)
-				fprintf(stream, "\t+CAP_ALL\n");
-			else if (drop_num ==
-				 ((sizeof (capability_list) /
-				   sizeof (struct capability_set)) - 1))
-				fprintf(stream, "\t-CAP_ALL\n");
-			else if (drop_num <
-				 ((sizeof (capability_list) /
-				   sizeof (struct capability_set)) - 1) / 2) {
-				fprintf(stream, "\t+CAP_ALL\n");
-				for (i = 0;
-				     i <
-				     ((sizeof (capability_list) /
-				       sizeof (struct capability_set)) - 1);
-				     i++)
-					if (proc->
-					    cap_drop & (1 << capability_list[i].
-							cap_val))
-						fprintf(stream, "\t-%s\n",
-							capability_list[i].
-							cap_name);
-			} else {
-				fprintf(stream, "\t-CAP_ALL\n");
-				for (i = 0;
-				     i <
-				     ((sizeof (capability_list) /
-				       sizeof (struct capability_set)) - 1);
-				     i++)
-					if (!
-					    (proc->
-					     cap_drop & (1 <<
-							 capability_list[i].
-							 cap_val)))
-						fprintf(stream, "\t+%s\n",
-							capability_list[i].
-							cap_name);
-			}
-
-			for (i = 0;
-			     i <
-			     (sizeof (rlim_table) / sizeof (struct rlimconv));
-			     i++)
-				if (proc->resmask & (1 << rlim_table[i].val))
-					fprintf(stream, "\t%s %lu %lu\n",
-						rlim_table[i].name,
-						proc->res[i].rlim_cur,
-						proc->res[i].rlim_max);
-			if (!proc->ip_object)
-				goto finish_acl;
-
-			c_cnt = 0;
-			b_cnt = 0;
-
-			for_each_object(ipp, proc->ip_object) {
-				if (ipp->mode == GR_IP_CONNECT)
-					c_cnt++;
-				else if (ipp->mode == GR_IP_BIND)
-					b_cnt++;
-			}
-
-			for_each_object(ipp, proc->ip_object) {
-				if (ipp->mode == GR_IP_CONNECT && c_cnt == 1
-				    && !ipp->type)
-					fprintf(stream, "\tconnect disabled\n");
-				else if (ipp->mode == GR_IP_BIND && c_cnt == 1
-					 && !ipp->type)
-					fprintf(stream, "\tbind disabled\n");
-				else if (ipp->type)
-					show_ip_acl(ipp, stream);
-			}
-
+	for (x = 0, i = 0;
+	     i < len
+	     && x <
+	     (sizeof (role_mode_table) / sizeof (struct role_name_table));
+	     x++) {
+		if (mode & role_mode_table[x].modeint) {
+			modestr[i] = role_mode_table[x].modechar;
+			i++;
 		}
 	}
 
-      finish_acl:
 	return;
 }

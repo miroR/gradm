@@ -21,6 +21,7 @@ show_help(void)
 	       "Options:\n"
 	       "	-E, --enable	Enable the grsecurity RBAC system\n"
 	       "	-D, --disable	Disable the grsecurity RBAC system\n"
+	       "	-F, --fulllearn Enable full system learning\n"
 	       "	-P [rolename], --passwd\n"
 	       "			Create password for RBAC administration\n"
 	       "			or a special role\n"
@@ -70,9 +71,10 @@ parse_args(int argc, char *argv[])
 	int gr_learn = 0;
 	int gr_output = 0;
 	int gr_enable = 0;
+	int gr_fulllearn = 0;
 	struct gr_pw_entry entry;
 	struct gr_arg *grarg;
-	const char *const short_opts = "EDP::RL:O:M:a:n:hv";
+	const char *const short_opts = "EFDP::RL:O:M:a:n:hv";
 	const struct option long_opts[] = {
 		{"help", 0, NULL, 'h'},
 		{"version", 0, NULL, 'v'},
@@ -84,6 +86,7 @@ parse_args(int argc, char *argv[])
 		{"reload", 0, NULL, 'R'},
 		{"modsegv", 1, NULL, 'M'},
 		{"learn", 1, NULL, 'L'},
+		{"fulllearn", 0, NULL, 'F'},
 		{"output", 1, NULL, 'O'},
 		{NULL, 0, NULL, 0}
 	};
@@ -109,6 +112,13 @@ parse_args(int argc, char *argv[])
 			parse_acls();
 			expand_acls();
 			analyze_acls();
+			gr_enable = 1;
+			break;
+		case 'F':
+			if (argc > 6)
+				show_help();
+			entry.mode = GRADM_ENABLE;
+			gr_fulllearn = 1;
 			gr_enable = 1;
 			break;
 		case 'R':
@@ -155,14 +165,14 @@ parse_args(int argc, char *argv[])
 			exit(EXIT_SUCCESS);
 			break;
 		case 'L':
-			if (argc > 5 || argc < 3)
+			if (argc > 6 || argc < 3)
 				show_help();
 			gr_learn = 1;
 			if (optarg)
 				learn_log = strdup(optarg);
 			break;
 		case 'O':
-			if (argc > 5 || argc < 3)
+			if (argc > 6 || argc < 3)
 				show_help();
 			gr_output = 1;
 			if (optarg)
@@ -227,7 +237,17 @@ parse_args(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	if ((gr_fulllearn && !gr_learn)) {
+		fprintf(stderr, "-L and -F must be used together.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (gr_fulllearn && gr_learn && gr_output)
+		gr_enable = 0;
+
 	if (gr_enable) {
+		if (gr_fulllearn)
+			add_fulllearn_acl();
 		if (gr_learn)
 			start_grlearn(learn_log);
 		grarg = conv_user_to_kernel(&entry);
@@ -253,7 +273,10 @@ parse_args(int argc, char *argv[])
 			}
 		}
 
-		handle_learn_logs(learn_log, stream);
+		if (gr_fulllearn)
+			generate_full_learned_acls(learn_log, stream);
+		else
+			handle_learn_logs(learn_log, stream);
 
 	}
 	return;

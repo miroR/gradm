@@ -10,6 +10,9 @@ gradm \- Administration program for the grsecurity RBAC system
 .B \-R
 ]
 [
+.B \-F
+]
+[
 .B \-L <logfile>
 ]
 [
@@ -62,6 +65,14 @@ Enable the RBAC system
 Reload the RBAC system (only valid while in admin mode)
 .TP
 
+.B \-F
+Toggle full learning mode.
+If used only with -L, it enables the RBAC system in full learning
+mode.
+If used with -L and -O, it parses the full learning logs and
+generates a complete ruleset.
+.TP
+
 .B \-M <filename|uid>
 Remove an execution ban on a given uid or filename that has been
 put in place by the RES_CRASH resource restriction of the RBAC system.
@@ -70,12 +81,12 @@ put in place by the RES_CRASH resource restriction of the RBAC system.
 .B \-L <logfile>
 Parses the learning logs.  Accepts an argument which
 specifies the logfile to scan for the learning logs.
-This option can be used with -E or -O.
+This option can be used with -E, -O, or -F.
 .TP
 
 .B \-O <filename|stream>
 Specifies output mode.  Requires a single argument that can be
-"stdout", "stderr", or a regular file.  Only used with -L.
+"stdout", "stderr", or a regular file.  Only used with -L or -F.
 .TP
 
 .B \-D
