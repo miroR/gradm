@@ -50,7 +50,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(yytext);
 					  return ROLE_TYPE;
 					}
-<DOMAINTYPE_STATE>[ug]			{
+<DOMAINTYPE_STATE>([ug]l?)|(l?[ug])	{
 					  BEGIN(DOMAINLIST_STATE);
 					  gradmlval.string = strdup(yytext);
 					  return DOMAIN_TYPE;
