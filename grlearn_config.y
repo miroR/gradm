@@ -40,6 +40,5 @@ learn_config:
 			add_proc_subject_acl(current_role, $2, proc_subject_mode_conv("o"), 0);
 			add_proc_object_acl(current_subject, "/", proc_object_mode_conv("rwxcdmi"), GR_FEXIST);
 		}
-	|	CACHESIZE NUM
 	;
 %%
