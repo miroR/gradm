@@ -377,10 +377,10 @@ struct gr_arg {
 	unsigned char sum[GR_SHA_SUM_SIZE];
 	unsigned char sp_role[GR_SPROLE_LEN];
 	struct sprole_pw *sprole_pws;
-	__u16 num_sprole_pws;
 	unsigned short segv_dev;
 	ino_t segv_inode;
 	uid_t segv_uid;
+	__u16 num_sprole_pws;
 	__u16 mode;
 };
 
