@@ -109,6 +109,14 @@ add_domain_child(struct role_acl *role, char *idname)
 	struct passwd *pwd;
 	struct group *grp;
 
+	if (is_role_dupe(current_role, idname, role->roletype)) {
+		fprintf(stderr, "Duplicate role on line %lu of %s.\n"
+			"The RBAC system will not be allowed to be "
+			"enabled until this error is fixed.\n",
+			lineno, current_acl_file);
+		exit(EXIT_FAILURE);
+	}
+
 	/* reason for this is that in the kernel, the hash table which is keyed by UID/GID
 	   has a size dependent on the number of roles.  Since we want to fake a domain
 	   as being a real role for each of those users/groups by providing a pointer
