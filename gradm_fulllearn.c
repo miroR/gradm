@@ -107,6 +107,8 @@ int full_reduce_object_node(struct gr_learn_file_node *subject,
 
 	if (subject->hash == NULL)
 		return 0;
+	printf("Beginning full learning object reduction for subject %s...", subject->filename);
+	fflush(stdout);
 	sort_file_list(subject->hash);
 	tmptable = (struct gr_learn_file_tmp_node **)subject->hash->table;
 	table_size = subject->hash->table_size;
@@ -122,7 +124,8 @@ int full_reduce_object_node(struct gr_learn_file_node *subject,
 	enforce_high_protected_paths(subject);
 
 	third_stage_reduce_tree(subject->object_list);
-
+	printf("done.\n");
+	fflush(stdout);
 	return 0;
 }
 
