@@ -1,6 +1,6 @@
 #include "gradm.h"
 
-#define GR_LEARN_PID_PATH "/etc/grsec/.grlearn.pid"
+#define GR_LEARN_PID_PATH GRSEC_DIR "/.grlearn.pid"
 #define LEARN_BUFFER_SIZE (1024 * 1024)
 #define MAX_ENTRY_SIZE 16384
 
