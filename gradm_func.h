@@ -1,7 +1,7 @@
 void yyerror(const char *s);
 FILE *open_acl_file(const char *filename);
 void get_user_passwd(struct gr_pw_entry *entry, int mode);
-int transmit_to_kernel(void *buf, unsigned long len);
+int transmit_to_kernel(struct gr_arg *buf);
 void generate_salt(struct gr_pw_entry *entry);
 void write_user_passwd(struct gr_pw_entry *entry);
 void parse_acls(void);

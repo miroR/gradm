@@ -14,17 +14,18 @@ open_acl_file(const char *filename)
 }
 
 int
-transmit_to_kernel(void *buf, unsigned long len)
+transmit_to_kernel(struct gr_arg *buf)
 {
 	int fd;
 	int err = 0;
+	void *pbuf = buf;
 
 	if ((fd = open(GRDEV_PATH, O_WRONLY)) < 0) {
 		fprintf(stderr, "Could not open %s.\n", GRDEV_PATH);
 		failure("open");
 	}
 
-	if (write(fd, buf, len) != len) {
+	if (write(fd, &pbuf, sizeof(struct gr_arg *)) != sizeof(struct gr_arg *)) {
 		err = 1;
 		switch (errno) {
 		case EFAULT:
@@ -65,6 +66,7 @@ void check_acl_status(__u16 reqmode)
 	int fd;
 	int retval;
 	struct gr_arg arg;
+	struct gr_arg *parg = arg;
 
 	arg.mode = GRADM_STATUS;
 
@@ -73,7 +75,7 @@ void check_acl_status(__u16 reqmode)
 		failure("open");
 	}
 
-	retval = write(fd, &arg, sizeof(arg));
+	retval = write(fd, &parg, sizeof(struct gr_arg *));
 	close(fd);
 
 	switch (reqmode) {

@@ -141,7 +141,7 @@ parse_args(int argc, char *argv[])
 			entry.mode = GRADM_UNSPROLE;
 			check_acl_status(entry.mode);
 			grarg = conv_user_to_kernel(&entry);
-			transmit_to_kernel(grarg, sizeof (struct gr_arg));
+			transmit_to_kernel(grarg);
 			memset(grarg, 0, sizeof (struct gr_arg));
 			break;
 		case 'R':
@@ -156,7 +156,7 @@ parse_args(int argc, char *argv[])
 			grarg = conv_user_to_kernel(&entry);
 			read_saltandpass(entry.rolename, grarg->salt,
 					 grarg->sum);
-			transmit_to_kernel(grarg, sizeof (struct gr_arg));
+			transmit_to_kernel(grarg);
 			memset(grarg, 0, sizeof (struct gr_arg));
 			break;
 		case 'M':
@@ -173,7 +173,7 @@ parse_args(int argc, char *argv[])
 				conv_name_to_num(optarg, &entry.segv_dev,
 						 &entry.segv_inode);
 			grarg = conv_user_to_kernel(&entry);
-			transmit_to_kernel(grarg, sizeof (struct gr_arg));
+			transmit_to_kernel(grarg);
 			memset(grarg, 0, sizeof (struct gr_arg));
 			exit(EXIT_SUCCESS);
 			break;
@@ -184,7 +184,7 @@ parse_args(int argc, char *argv[])
 			check_acl_status(entry.mode);
 			get_user_passwd(&entry, GR_PWONLY);
 			grarg = conv_user_to_kernel(&entry);
-			if (transmit_to_kernel(grarg, sizeof (struct gr_arg)))
+			if (transmit_to_kernel(grarg))
 				memset(grarg, 0, sizeof (struct gr_arg));
 			else {
 				memset(grarg, 0, sizeof (struct gr_arg));
@@ -245,7 +245,7 @@ parse_args(int argc, char *argv[])
 			check_acl_status(entry.mode);
 			get_user_passwd(&entry, GR_PWONLY);
 			grarg = conv_user_to_kernel(&entry);
-			transmit_to_kernel(grarg, sizeof (struct gr_arg));
+			transmit_to_kernel(grarg);
 			memset(grarg, 0, sizeof (struct gr_arg));
 			exit(EXIT_SUCCESS);
 			break;
@@ -257,7 +257,7 @@ parse_args(int argc, char *argv[])
 			entry.mode = GRADM_SPROLE;
 			check_acl_status(entry.mode);
 			grarg = conv_user_to_kernel(&entry);
-			transmit_to_kernel(grarg, sizeof (struct gr_arg));
+			transmit_to_kernel(grarg);
 			memset(grarg, 0, sizeof (struct gr_arg));
 			exit(EXIT_SUCCESS);
 			break;
@@ -297,7 +297,7 @@ parse_args(int argc, char *argv[])
 		grarg = conv_user_to_kernel(&entry);
 		read_saltandpass(entry.rolename, grarg->salt,
 				 grarg->sum);
-		transmit_to_kernel(grarg, sizeof (struct gr_arg));
+		transmit_to_kernel(grarg);
 		memset(grarg, 0, sizeof (struct gr_arg));
 	} else if (gr_learn && gr_output) {
 		FILE *stream;
