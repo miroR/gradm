@@ -107,6 +107,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  BEGIN(ROLE_STATE);
 					  return ROLE;
 					}
+"role_allow_ip"				{
+					  BEGIN(IP_STATE);
+					  return ROLE_ALLOW_IP;
+					}
 "subject"				{
 					  BEGIN(SUBJECT_STATE);
 					  return SUBJECT;

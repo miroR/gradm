@@ -25,6 +25,7 @@ compiled_acl:			various_acls
 	;
 
 various_acls:			role_label
+	|			role_allow_ip
 	|			subject_label
 	|			object_file_label
 	|			object_cap_label
@@ -96,9 +97,16 @@ obj_mode: /* empty */
 				{ $$ = proc_object_mode_conv($1); }
 	;
 
+role_allow_ip:			ROLE_ALLOW_IP IPADDR ip_netmask
+				{
+					add_role_allow_ip(current_role, get_ip($2), $3);
+				}
+	;
+
 object_connect_ip_label:	CONNECT IPADDR ip_netmask ip_ports ip_typeproto
 				{
 				 ip.addr = get_ip($2);
+				 ip.netmask = $3;
 				 add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
 				 memset(&ip, 0, sizeof(ip));
 				}
@@ -107,21 +115,22 @@ object_connect_ip_label:	CONNECT IPADDR ip_netmask ip_ports ip_typeproto
 object_bind_ip_label:		BIND IPADDR ip_netmask ip_ports ip_typeproto
 				{
 				 ip.addr = get_ip($2);
+				 ip.netmask = $3;
 				 add_ip_acl(current_subject, GR_IP_BIND, &ip);
 				 memset(&ip, 0, sizeof(ip));
 				}
 	;
 
 ip_netmask: /* emtpy */
-				{ ip.netmask = 0xffffffff; }
+				{ $$ = 0xffffffff; }
 	|			'/' IPNETMASK
 				{
 				  unsigned int bits = atoi($2);
 
 				  if (!bits)
-					ip.netmask = 0UL;
+					$$ = 0UL;
 				  else
-					ip.netmask = 0xffffffff << (32 - bits);
+					$$ = 0xffffffff << (32 - bits);
 				}
 	;
 

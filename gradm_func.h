@@ -182,3 +182,5 @@ __u8 role_mode_conv(const char *mode);
 __u32 get_ip(char *p);
 
 void conv_name_to_type(struct ip_acl *ip, char * name);
+
+void add_role_allowed_ip(struct role_acl *role, __u32 addr, __u32 netmask);

@@ -142,6 +142,14 @@ struct chk_perm {
 |  process acl.								 |
 \************************************************************************/
 
+struct role_allowed_ip {
+	__u32 addr;
+	__u32 netmask;
+
+	struct role_allow_ip *prev;
+	struct role_allow_ip *next;
+};
+
 struct ip_acl {
 	__u32 addr;
 	__u32 netmask;
@@ -181,6 +189,8 @@ struct role_acl {
 
 	struct role_acl *prev;
         struct role_acl *next;
+
+	struct role_allowed_ip **allowed_ips;
 
 	struct proc_acl **subj_hash;
 	__u32 subj_hash_size;

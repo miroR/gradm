@@ -1,5 +1,28 @@
 #include "gradm.h"
 
+void add_role_allowed_ip(struct role_acl *role, __u32 addr, __u32 netmask)
+{
+	struct role_allowed_ip ** roleipp;
+	struct role_allowed_ip * roleip;
+
+	roleip = (struct role_allowed_ip *) calloc(1, sizeof(struct role_allowed_ip));
+	if(!roleip) failure("calloc");
+
+	roleipp = &(role->allowed_ips);
+	
+	if(*roleipp)
+		(*roleipp)->next = roleip;
+
+	roleip->prev = *roleipp;
+
+	roleip->addr = addr;
+	roleip->netmask = netmask;
+
+	*roleipp = roleip;
+
+	return;
+}
+
 void add_ip_acl (struct proc_acl * subject, __u8 mode, struct ip_acl *acl_tmp)
 {
 	struct ip_acl **ipp;
