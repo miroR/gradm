@@ -70,11 +70,13 @@ add_cap_acl(struct proc_acl *subject, const char *cap)
 		exit(EXIT_FAILURE);
 	}
 
-	if (*cap == '+')
-		subject->cap_raise |= kcap;
-	else
+	if (*cap == '+') {
+		subject->cap_drop &= ~kcap;
+		subject->cap_mask |= kcap;
+	} else {
 		subject->cap_drop |= kcap;
-
+		subject->cap_mask |= kcap;
+	}
 	return;
 }
 
@@ -83,11 +85,8 @@ modify_caps(struct proc_acl *proc, int cap)
 {
 	__u32 cap_same;
 
-	proc->cap_raise |= (1 << cap);
-
-	cap_same = proc->cap_raise & proc->cap_drop;
-	proc->cap_raise &= ~cap_same;
-	proc->cap_drop &= ~cap_same;
+	proc->cap_drop &= ~(1 << cap);
+	proc->cap_mask |= (1 << cap);
 
 	return;
 }

@@ -347,7 +347,7 @@ int main(int argc, char *argv[])
 	printf("\n");
 	for (proc = rolp->hash->first;proc;proc=proc->prev) {
 		printf("\tSUBJECT: %s dev:%d inode:%lu mode:%d c_raise:%x c_drop:%x\n",
-			proc->filename, proc->dev, proc->inode, proc->mode, proc->cap_raise,
+			proc->filename, proc->dev, proc->inode, proc->mode, ~proc->cap_drop,
 			proc->cap_drop);
 		if (!proc->ip_object)
 			printf("\t\tNo socket restrictions\n");

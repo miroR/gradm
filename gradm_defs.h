@@ -206,7 +206,7 @@ struct proc_acl {
 	ino_t inode;
 	unsigned short dev;
 	__u32 mode;
-	__u32 cap_raise;
+	__u32 cap_mask;
 	__u32 cap_drop;
 
 	struct rlimit res[GR_NLIMITS];

@@ -8,15 +8,10 @@ check_permission(struct role_acl *role, struct proc_acl *def_acl,
 	struct proc_acl *tmpp = def_acl;
 	struct file_acl *tmpg = NULL;
 	char *tmpname;
-	__u32 cap_raised = 0, old_r = 0;
-	__u32 cap_lowered = 0, old_l = 0;
-	__u32 cap_same;
+	__u32 cap_drop = 0, cap_mask = 0;
 
 	if (chk->type == CHK_FILE) {
-		if ((tmpname =
-		     calloc(strlen(filename) + 1, sizeof (char))) == NULL)
-			failure("calloc");
-
+		tmpname = alloca(strlen(filename) + 1);
 		strcpy(tmpname, filename);
 
 		do {
@@ -31,10 +26,8 @@ check_permission(struct role_acl *role, struct proc_acl *def_acl,
 							     || (tmpg->mode & chk->w_modes))
 							    && ((chk->u_modes == 0xffff)
 								|| !(tmpg->mode & chk->u_modes))) {
-								free(tmpname);
 								return 1;
 							} else {
-								free(tmpname);
 								return 0;
 							}
 						}
@@ -43,34 +36,26 @@ check_permission(struct role_acl *role, struct proc_acl *def_acl,
 					     || (tmpf->mode & chk->w_modes))
 					    && ((chk->u_modes == 0xffff)
 						|| !(tmpf->mode & chk->u_modes))) {
-						free(tmpname);
 						return 1;
 					} else {
-						free(tmpname);
 						return 0;
 					}
 				}
 			} while ((tmpp = tmpp->parent_subject));
 		} while (parent_dir(filename, &tmpname));
-
-		free(tmpname);
 	} else if (chk->type == CHK_CAP) {
-		do {
-			cap_lowered = tmpp->cap_drop;
-			cap_raised = tmpp->cap_raise;
-			cap_raised &= ~old_l;
-			cap_lowered &= ~old_r;
-			old_l = cap_lowered;
-			old_r = cap_raised;
-		} while ((tmpp = tmpp->parent_subject));
+		cap_mask = tmpp->cap_mask;
+		cap_drop = tmpp->cap_drop;
 
-		cap_same = cap_raised & cap_lowered;
-		cap_lowered &= ~cap_same;
-		cap_raised &= ~cap_same;
+		while ((tmpp = tmpp->parent_subject)) {
+			cap_drop |= tmpp->cap_drop & (tmpp->cap_mask & ~cap_mask);
+			cap_mask |= tmpp->cap_mask;
+		}
+
 		if (((chk->w_caps == 0xffffffff)
-		     || !(cap_lowered & chk->w_caps))
+		     || !(cap_drop & chk->w_caps))
 		    && ((chk->u_caps == 0xffffffff)
-			|| (cap_lowered & chk->u_caps)))
+			|| (cap_drop & chk->u_caps)))
 			return 1;
 	}
 
