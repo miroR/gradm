@@ -87,13 +87,13 @@ void check_acl_status(__u16 reqmode)
 		}
 		break;
 	case GRADM_ENABLE:
-	case GRADM_RELOAD:
 		if (retval == 1) {
 			printf("The operation you requested cannot be performed "
 				"because the RBAC system is currently enabled.\n");
 			exit(EXIT_FAILURE);
 		}
 		break;
+	case GRADM_RELOAD:
 	case GRADM_DISABLE:
 	case GRADM_SPROLE:
 	case GRADM_MODSEGV:
