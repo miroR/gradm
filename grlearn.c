@@ -136,13 +136,13 @@ __inline__ char * rewrite_learn_entry(char *p)
 	for (i = 0; i < 8; i++) {
 		tmp = strchr(tmp, '\t');
 		if (!tmp)
-			return;
+			return p;
 		tmp++;
 	}
 	/* now we have a pointer to the object name */
 	endobj = strchr(tmp, '\t');
 	if (!endobj)
-		return;
+		return p;
 	*endobj = '\0';
 	/* now we have separated the string */
 
