@@ -105,7 +105,7 @@ enum {
 };
 
 enum {
-	GR_DELETED = 0x00400000
+	GR_DELETED = 0x80000000
 };
 
 enum {
