@@ -21,7 +21,7 @@ void learn_pass1(FILE *stream)
 	learn_pass1parse();
 
 	if (default_role_entry) {
-		tmptable = default_role_entry->hash->table;
+		tmptable = (struct gr_learn_file_tmp_node **)default_role_entry->hash->table;
 		table_size = default_role_entry->hash->table_size;
 		sort_file_list(default_role_entry->hash);
 		for (i = 0; i < table_size; i++) {
@@ -38,7 +38,7 @@ void learn_pass1(FILE *stream)
 
 	tmp = group_role_list;
 	while (tmp && *tmp) {
-		tmptable = (*tmp)->hash->table;
+		tmptable = (struct gr_learn_file_tmp_node **)(*tmp)->hash->table;
 		table_size = (*tmp)->hash->table_size;
 		sort_file_list((*tmp)->hash);
 		for (i = 0; i < table_size; i++) {
@@ -56,7 +56,7 @@ void learn_pass1(FILE *stream)
 
 	tmp = user_role_list;
 	while (tmp && *tmp) {
-		tmptable = (*tmp)->hash->table;
+		tmptable = (struct gr_learn_file_tmp_node **)(*tmp)->hash->table;
 		table_size = (*tmp)->hash->table_size;
 		sort_file_list((*tmp)->hash);
 		for (i = 0; i < table_size; i++) {
@@ -74,7 +74,7 @@ void learn_pass1(FILE *stream)
 
 	tmp = special_role_list;
 	while (tmp && *tmp) {
-		tmptable = (*tmp)->hash->table;
+		tmptable = (struct gr_learn_file_tmp_node **)(*tmp)->hash->table;
 		table_size = (*tmp)->hash->table_size;
 		sort_file_list((*tmp)->hash);
 		for (i = 0; i < table_size; i++) {

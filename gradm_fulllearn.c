@@ -29,7 +29,7 @@ int full_reduce_subjects(struct gr_learn_group_node *group,
 			insert_file(&(user->subject_list), "/", GR_FIND, 1);
 		else {
 			sort_file_list(user->hash);
-			tmptable = user->hash->table;
+			tmptable = (struct gr_learn_file_tmp_node **)user->hash->table;
 			table_size = user->hash->table_size;
 			for (i = 0; i < table_size; i++) {
 				if (tmptable[i] == NULL)
@@ -42,7 +42,7 @@ int full_reduce_subjects(struct gr_learn_group_node *group,
 			insert_file(&(group->subject_list), "/", GR_FIND, 1);
 		else {
 			sort_file_list(group->hash);
-			tmptable = group->hash->table;
+			tmptable = (struct gr_learn_file_tmp_node **)group->hash->table;
 			table_size = group->hash->table_size;
 			for (i = 0; i < table_size; i++) {
 				if (tmptable[i] == NULL)
@@ -88,7 +88,7 @@ int full_reduce_object_node(struct gr_learn_file_node *subject,
 	if (subject->hash == NULL)
 		return 0;
 	sort_file_list(subject->hash);
-	tmptable = subject->hash->table;
+	tmptable = (struct gr_learn_file_tmp_node **)subject->hash->table;
 	table_size = subject->hash->table_size;
 	for (i = 0; i < table_size; i++) {
 		if (tmptable[i] == NULL)

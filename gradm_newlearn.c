@@ -89,17 +89,15 @@ void enforce_high_protected_paths(struct gr_learn_file_node *subject)
 	unsigned long i;
 
 	tmp = high_protected_paths;
-	tmptable = subject->hash->table;
+	tmptable = (struct gr_learn_file_tmp_node **)subject->hash->table;
 
 	while (*tmp) {
 		len = strlen(*tmp);
 		for (i = 0; i < subject->hash->table_size; i++) {
 			if (tmptable[i] == NULL)
 				continue;
-			if (!tmptable[i]->mode) {
-				tmpfile++;
+			if (!tmptable[i]->mode)
 				continue;
-			}
 			if (!strncmp(tmptable[i]->filename, *tmp, len) &&
 			    (tmptable[i]->filename[len] == '\0' || tmptable[i]->filename[len] == '/'))
 				goto next;
@@ -1545,15 +1543,10 @@ static int strcompare(const void *x, const void *y)
 
 void sort_file_list(struct gr_hash_struct *hash)
 {
-	struct gr_learn_file_tmp_node **tmp;
-	unsigned long num;
-
 	if (hash == NULL)
 		return;
 
-	num = hash->used_size;
-
-	return qsort(file_list, num, sizeof (struct gr_learn_file_tmp_node *), strcompare);
+	return qsort(hash->table, hash->table_size, sizeof (struct gr_learn_file_tmp_node *), strcompare);
 }
 
 struct gr_learn_file_tmp_node *conv_filename_to_struct(char *filename, __u32 mode)
