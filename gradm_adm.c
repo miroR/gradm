@@ -114,7 +114,13 @@ add_kernel_acl(void)
 void
 add_grlearn_acl(struct role_acl *role)
 {
+	struct stat fstat;
 	struct ip_acl ip;
+
+	if (stat(GRLEARN_PATH, &fstat)) {
+		fprintf("%s does not exist.  Please reinstall gradm.\n", GRLEARN_PATH);
+		exit(EXIT_FAILURE);
+	}
 
 	if (!add_proc_subject_acl(role, GRLEARN_PATH,
 				  proc_subject_mode_conv("hpdo"), 0))
