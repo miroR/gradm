@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 	pid_t pid;
 	struct sched_param schedulerparam;
 	char *tmpaddr;
-	int i, j;
+	int i;
 
 	if (argc != 2)
 		return 1;

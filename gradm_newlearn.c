@@ -494,7 +494,7 @@ unsigned long count_nested_depth(struct gr_learn_file_node *node)
 
 int reduce_all_children(struct gr_learn_file_node *node)
 {
-	unsigned long num, not_leaf;
+	unsigned long num, not_leaf = 0;
 	unsigned long i, j;
 	struct gr_learn_file_node **tmp;
 	

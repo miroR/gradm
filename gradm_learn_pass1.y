@@ -41,6 +41,8 @@ learn_log:
 			__u32 addr;
 
 			rolemode = atoi($3);
+			res1 = atoi($13);
+			res2 = atoi($15);
 
 			if (inet_aton($21, &ip))
 				addr = ip.s_addr;

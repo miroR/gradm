@@ -112,8 +112,6 @@ role_type: /* empty */
 
 subject_label:			SUBJECT SUBJ_NAME subj_mode
 				{
-				 struct stat fstat;
-
 				 if (current_role->roletype & GR_ROLE_LEARN) {
 					fprintf(stderr, "Error on line %lu of %s.\n"
 							"Subjects are not allowed for a role with learning enabled, as "
