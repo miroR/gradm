@@ -8,7 +8,7 @@ int fulllearn_pass1wrap(void);
 
 ROLENAME [_a-zA-Z0-9-]{1,30}
 NUM [0-9]+
-FILENAME [/][A-Za-z0-9@\-_#., /]*
+FILENAME [/][^\t\n]*
 IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
 %option nounput
@@ -33,7 +33,7 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  fulllearn_pass1lval.string = strdup(yytext);
 					  return IPADDR;
 					}
-:					{ return ':'; }
+[\t]					{ return ':'; }
 .					;
 %%
 

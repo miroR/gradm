@@ -138,7 +138,6 @@ int main(int argc, char *argv[])
 	struct pollfd fds;
 	int fd, fd2;
 	pid_t pid;
-	int curr_cpus = 1;
 	struct sched_param schedulerparam;
 	char *tmpaddr;
 	int i, j;
@@ -155,7 +154,7 @@ int main(int argc, char *argv[])
 
 	mlockall(MCL_CURRENT | MCL_FUTURE);
 
-	buf = calloc(80 * curr_cpus, 16384);
+	buf = calloc(16, 16384);
 	if (!buf)
 		return 1;
 	for(i = 0; i < 640; i++) {
@@ -209,24 +208,16 @@ int main(int argc, char *argv[])
 	fds.events = POLLIN;
 
 	while (poll(&fds, 1, -1) > 0) {
-		memset(buf, 0, 80 * curr_cpus * 16384);
-		retval = read(fd, buf, 80 * curr_cpus * 16384);
-		if (retval == -1 && errno == EINVAL) {/* buffer too small */
-			curr_cpus++;
-			buf = realloc(buf, 80 * curr_cpus * 16384);
-			if (!buf)
-				return 1;
-		} else {
-			for(i = 0; i < 80; i++) {
-				for (j = 0; j < curr_cpus; j++) {
-					tmpaddr = buf + (j * 80 * 16384) + (i * 16384);
-					if (*tmpaddr == 0)
-						continue;
-					if (!check_cache(tmpaddr)) {
-						insert_into_cache(tmpaddr);
-						write(fd2, tmpaddr, strlen(tmpaddr));
-					}
-				}
+		memset(buf, 0, 16 * 16384);
+		retval = read(fd, buf, 16 * 16384);
+
+		for(i = 0; i < 16; i++) {
+			tmpaddr = buf + (i * 16384);
+			if (*tmpaddr == 0)
+				continue;
+			if (!check_cache(tmpaddr)) {
+				insert_into_cache(tmpaddr);
+				write(fd2, tmpaddr, strlen(tmpaddr));
 			}
 		}
 	}
