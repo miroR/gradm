@@ -206,7 +206,7 @@ void display_roles(struct gr_learn_group_node **grouplist, FILE *stream)
 {
 	fprintf(stream, "role default\n");
 	fprintf(stream, "subject / {\n");
-	fprintf(stream, "\t/\t\t\th\n");
+	fprintf(stream, "\t/\t\t\t\th\n");
 	fprintf(stream, "\t-CAP_ALL\n");
 	fprintf(stream, "\tconnect\tdisabled\n");
 	fprintf(stream, "\tbind\tdisabled\n");
@@ -1038,12 +1038,19 @@ show_ips:
 		conv_mode_to_str(node->mode, modes, sizeof(modes));
 		i = strlen(node->filename);
 		if (strchr(node->filename, ' ')) {
-				fprintf(stream, "\t\"%s\"\t\t\t%s\n", node->filename, modes);
+				if (i < 10)
+					fprintf(stream, "\t\"%s\"\t\t\t%s\n", node->filename, modes);
+				else if (i < 20)
+					fprintf(stream, "\t\"%s\"\t\t%s\n", node->filename, modes);
+				else
+					fprintf(stream, "\t\"%s\"\t%s\n", node->filename, modes);
 		} else {
-			if (i < 50)
+			if (i < 10)
 				fprintf(stream, "\t%s\t\t\t%s\n", node->filename, modes);
+			else if (i < 20)
+				fprintf(stream, "\t%s\t\t%s\n", node->filename, modes);
 			else
-				fprintf(stream, "\t%s\t\t\t%s\n", node->filename, modes);
+				fprintf(stream, "\t%s\t%s\n", node->filename, modes);
 		}
 	}
 	return 0;
