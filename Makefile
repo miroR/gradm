@@ -10,6 +10,8 @@ LEXFLAGS=-B
 YACC=/usr/bin/yacc
 BYACC=/usr/bin/byacc
 BISON=/usr/bin/bison
+#for dietlibc
+#CC=/usr/bin/diet /usr/bin/gcc
 CC=/usr/bin/gcc
 FIND=/usr/bin/find
 STRIP=/usr/bin/strip
@@ -17,9 +19,10 @@ STRIP=/usr/bin/strip
 #LIBS=
 LIBS=-lfl
 #for sparc64
-#CFLAGS=-static -O2 -m64 -mcpu=ultrasparc -mcmodel=medlow -ffixed-g4 \
+#CFLAGS=-O2 -m64 -mcpu=ultrasparc -mcmodel=medlow -ffixed-g4 \
 #	-fcall-used-g5 -fcall-used-g5 -fcall-used-g7 -Wno-sign-compare
-CFLAGS=-static -O2          # must be left as static,otherwise requires 
+CFLAGS=-O2
+LDFLAGS=-static		    # must be left as static,otherwise requires 
 		            # modification in gradm_adm.c
 INSTALL = /usr/bin/install -c
 
@@ -52,7 +55,8 @@ USE_LEX = $(shell if [ -x $(FLEX) ]; then echo $(FLEX); \
 	fi;fi)
 
 gradm: $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $(OBJECTS) $(LIBS)
+	$(CC) $(CFLAGS) -o $@ $(OBJECTS) $(LIBS) $(LDFLAGS)
+
 
 gradm.tab.c: gradm.y
 	$(USE_YACC) -b gradm -p gradm -d ./gradm.y

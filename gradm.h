@@ -19,6 +19,7 @@
 #include <grp.h>
 #include <sys/resource.h>
 #include <sys/mman.h>
+#include <asm/posix_types.h>
 #include <linux/elf.h>
 #include <linux/capability.h>
 
