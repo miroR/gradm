@@ -135,15 +135,29 @@ subject /
 	/var/log	r
 	/boot		r
 	/etc/grsec	h
+	/etc/ssh	h
 	
+	-CAP_SYS_TTY_CONFIG
 	-CAP_LINUX_IMMUTABLE
 	-CAP_NET_RAW
 	-CAP_MKNOD
+	-CAP_SYS_ADMIN
 	-CAP_SYS_RAWIO
 	-CAP_SYS_MODULE
+	-CAP_SYS_PTRACE
+	-CAP_NET_ADMIN
+	-CAP_NET_BIND_SERVICE
+	-CAP_SYS_CHROOT
 
 #	RES_AS 100M 100M
 
 #	connect 192.168.1.0/24:22 stream tcp
 #	bind	0.0.0.0 stream dgram tcp udp
+
+# the d flag protects /proc fd and mem entries for sshd
+subject /usr/sbin/sshd dp
+	/etc/ssh r
+	/dev/log rw
+	+CAP_SYS_TTY_CONFIG
+	+CAP_SYS_CHROOT
 
