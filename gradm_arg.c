@@ -75,6 +75,7 @@ parse_args(int argc, char *argv[])
 	int gr_fulllearn = 0;
 	struct gr_pw_entry entry;
 	struct gr_arg *grarg;
+	char cwd[PATH_MAX];
 	const char *const short_opts = "SEFDP::RL:O:M:a:n:hv";
 	const struct option long_opts[] = {
 		{"help", 0, NULL, 'h'},
@@ -92,6 +93,8 @@ parse_args(int argc, char *argv[])
 		{"output", 1, NULL, 'O'},
 		{NULL, 0, NULL, 0}
 	};
+
+	getcwd(cwd, PATH_MAX - 1);
 
 	err = mlock(&entry, sizeof (entry));
 	if (err && !getuid())
@@ -187,11 +190,12 @@ parse_args(int argc, char *argv[])
 				if (*optarg == '/')
 					learn_log = strdup(optarg);
 				else {
-					getcwd(pathbuf, PATH_MAX - 1);
-					if (strlen(optarg) + strlen(pathbuf) + 1 > PATH_MAX) {
+					strcpy(pathbuf, cwd);
+					if (strlen(optarg) + strlen(pathbuf) + 2 > PATH_MAX) {
 						fprintf(stderr, "Unable to open %s for learning logs.\n", optarg);
 						exit(EXIT_FAILURE);
 					}
+					strcat(pathbuf, "/");
 					strcat(pathbuf, optarg);
 					learn_log = strdup(pathbuf);
 				}
