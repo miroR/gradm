@@ -471,7 +471,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 		}
 	} else if ((p2 = is_proc_object_dupe(*filp, p))) {
 		if (type & GR_SYMLINK)
-			return 0;
+			return 1;
 		fprintf(stderr, "Duplicate ACL entry found for \"%s\""
 			" on line %lu of %s.\n"
 			"\"%s\" references the same object as the following object(s):\n",
