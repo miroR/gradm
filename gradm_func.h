@@ -124,6 +124,7 @@ void * gr_stat_alloc(unsigned long len);
 void * gr_dyn_realloc(void *addr, unsigned long len);
 void gr_dyn_free(void *addr);
 void gr_stat_free(void *addr);
+char * gr_strdup(char *str);
 
 void insert_acl_object(struct proc_acl *subject, struct file_acl *object);
 void insert_acl_subject(struct role_acl *role, struct proc_acl *subject);
