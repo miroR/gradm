@@ -1652,7 +1652,10 @@ insert_learn_role(struct gr_learn_role_entry ***role_list, char *rolename, __u16
 	(*((*role_list) + num)) = (struct gr_learn_role_entry *)gr_stat_alloc(sizeof(struct gr_learn_role_entry));
 	(*((*role_list) + num))->rolename = rolename;
 	(*((*role_list) + num))->rolemode = rolemode;
-	
+
+	/* give every learned role a / subject */
+	insert_learn_role_subject(*((*role_list) + num), conv_filename_to_struct("/", GR_FIND));
+
 	return (*((*role_list) + num));
 }
 

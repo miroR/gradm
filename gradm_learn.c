@@ -38,10 +38,8 @@ void learn_pass1(FILE *stream)
 
 	tmp = group_role_list;
 	while (tmp && *tmp) {
-		if ((*tmp)->hash == NULL) {
-			tmp++;
-			continue;
-		}
+		if ((*tmp)->hash == NULL)
+			printf("%s is null!\n", (*tmp)->rolename);
 		tmptable = (struct gr_learn_file_tmp_node **)(*tmp)->hash->table;
 		table_size = (*tmp)->hash->table_size;
 		sort_file_list((*tmp)->hash);
@@ -60,10 +58,8 @@ void learn_pass1(FILE *stream)
 
 	tmp = user_role_list;
 	while (tmp && *tmp) {
-		if ((*tmp)->hash == NULL) {
-			tmp++;
-			continue;
-		}
+		if ((*tmp)->hash == NULL)
+			printf("%s is null!\n", (*tmp)->rolename);
 		tmptable = (struct gr_learn_file_tmp_node **)(*tmp)->hash->table;
 		table_size = (*tmp)->hash->table_size;
 		sort_file_list((*tmp)->hash);
@@ -82,10 +78,6 @@ void learn_pass1(FILE *stream)
 
 	tmp = special_role_list;
 	while (tmp && *tmp) {
-		if ((*tmp)->hash == NULL) {
-			tmp++;
-			continue;
-		}
 		tmptable = (struct gr_learn_file_tmp_node **)(*tmp)->hash->table;
 		table_size = (*tmp)->hash->table_size;
 		sort_file_list((*tmp)->hash);
