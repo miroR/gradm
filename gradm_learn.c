@@ -57,11 +57,12 @@ static int
 have_common_dir(const char *fname, char *common_dir, unsigned int len)
 {
 	unsigned int i;
+	unsigned int namelen = strlen(fname);
 
-	if (!strlen(fname))
+	if (!namelen)
 		return 0;
 
-	for (i = strlen(fname) - 1; i >= 0; i--)
+	for (i = namelen - 1; i >= 0; i--)
 		if (fname[i] == '/')
 			break;
 
@@ -181,7 +182,7 @@ insert_reduced_acl(unsigned long offset, char *common_dir,
 	if (!reduced_dir)
 		failure("calloc");
 
-	strncpy(reduced_dir, common_dir, strlen(common_dir));
+	strcpy(reduced_dir, common_dir);
 
 	if (learn_is_dupe
 	    (rolename, roletype, subjname, res_cur, res_max, reduced_dir,

@@ -50,19 +50,20 @@ conv_res(const char *lim)
 	unsigned long res;
 	char *p;
 	int i;
+	unsigned int len = strlen(lim);
 
 	if (!strcmp("unlimited", lim))
 		return ~0UL;
 
-	if (isdigit(lim[strlen(lim) - 1]))
+	if (isdigit(lim[len - 1]))
 		return atol(lim);
 
-	if ((p = (char *) calloc(strlen(lim) + 1, sizeof (char))) == NULL)
+	if ((p = (char *) calloc(len + 1, sizeof (char))) == NULL)
 		failure("calloc");
 
-	strncpy(p, lim, strlen(lim));
+	strcpy(p, lim);
 
-	for (i = 0; i < strlen(lim) - 1; i++) {
+	for (i = 0; i < len - 1; i++) {
 		if (!isdigit(lim[i])) {
 			fprintf(stderr, "Invalid resource limit: %s "
 				"found on line %lu of %s.\n", lim, lineno,

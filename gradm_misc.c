@@ -83,7 +83,7 @@ change_current_acl_file(const char *filename)
 	if ((p = (char *) calloc(strlen(filename) + 1, sizeof (char))) == NULL)
 		failure("calloc");
 
-	strncpy(p, filename, strlen(filename));
+	strcpy(p, filename);
 
 	current_acl_file = p;
 

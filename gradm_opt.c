@@ -30,7 +30,7 @@ expand_acl(struct proc_acl *proc, struct role_acl *role)
 	     calloc(strlen(proc->filename) + 1, sizeof (char))) == NULL)
 		failure("calloc");
 
-	strncpy(tmpproc, proc->filename, strlen(proc->filename));
+	strcpy(tmpproc, proc->filename);
 
 	while (parent_dir(proc->filename, &tmpproc)) {
 		for_each_subject(tmpp, role) {
