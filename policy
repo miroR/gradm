@@ -199,8 +199,9 @@ subject /usr/sbin/sshd dpo
 	/proc
 	/proc/kcore	h
 	/proc/sys	h
-	/usr/lib
+	/usr/lib	rx
 	/var/log
+	/var/mail
 	/var/log/lastlog	rw
 	/var/log/wtmp		w
 	/var/run/sshd
