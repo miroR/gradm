@@ -564,7 +564,7 @@ void rem_proc_subject_acl(struct proc_acl * proc)
 
 __u8 role_mode_conv(const char * mode)
 {
-	unsigned int len = strlen(mode);
+	int len = strlen(mode);
 	__u8 retmode = GR_ROLE_DEFAULT;
 
 	for (; len >= 0; len--) {

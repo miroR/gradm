@@ -40,7 +40,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = strdup(yytext);
 					  return ROLE_TYPE;
 					}
-<ROLE_STATE>[_a-zA-Z0-9-]+		{
+<ROLE_STATE>[_a-zA-Z0-9-]{1,30}		{
 					  BEGIN(ROLETYPE_STATE);
 					  gradmlval.string = strdup(yytext);
 					  return ROLE_NAME;
