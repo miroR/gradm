@@ -14,7 +14,7 @@ struct ip_acl ip;
 
 %token <string> ROLE ROLE_NAME ROLE_TYPE SUBJECT SUBJ_NAME OBJ_NAME 
 %token <string> RES_NAME RES_SOFTHARD CONNECT BIND IPADDR IPPORT IPTYPE
-%token <string> IPPROTO OBJ_MODE SUBJ_MODE IPNETMASK CAP_NAME
+%token <string> IPPROTO OBJ_MODE SUBJ_MODE IPNETMASK CAP_NAME ROLE_ALLOW_IP
 %type <long_int> subj_mode obj_mode ip_netmask
 %type <mode> role_type
 
