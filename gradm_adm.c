@@ -42,13 +42,14 @@ void add_gradm_acl(void)
 	struct stat fstat;	
 	char gradm_realpath[PATH_MAX] = {0};
 	char * gradm_name;
+	struct ip_acl ip;
 
 	find_gradm_path(gradm_realpath);
 
 	gradm_name = strdup(gradm_realpath);
 	
 	if(!add_proc_subject_acl(current_role, gradm_name, 
-			proc_subject_mode_conv("o")))
+			proc_subject_mode_conv("do")))
 		exit(EXIT_FAILURE);
 
 	if(!stat("/proc/sys/kernel/grsecurity/acl", &fstat)) {
@@ -61,6 +62,11 @@ void add_gradm_acl(void)
 				"grsecurity's ACL system.\n");
 		exit(EXIT_FAILURE);
 	}
+
+	memset(&ip, 0, sizeof(ip));
+	add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
+	add_ip_acl(current_subject, GR_IP_BIND, &ip);
+
 	if(!add_proc_object_acl(current_subject, "/", 
 			proc_object_mode_conv("h"), 0))
 		exit(EXIT_FAILURE);
