@@ -10,6 +10,7 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 	struct role_acl *rtmp;
 	struct proc_acl *stmp;
 	struct file_acl *otmp;
+	struct stat fstat;
 
 	int subj_found = 0;
 	int nest_found = 0;
@@ -88,6 +89,17 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 
 	otmp->nested = current_subject;
 	current_subject->parent_subject = stmp;
+
+
+	if (!stat(nestednames[i - 1], &fstat) && S_ISREG(fstat.st_mode)) {
+		if (is_valid_elf_binary(nestednames[i - 1])) {
+			if (!add_proc_object_acl(current_subject, nestednames[i - 1], proc_object_mode_conv("x"), GR_FLEARN))
+				exit(EXIT_FAILURE);
+		} else {
+			if (!add_proc_object_acl(current_subject, nestednames[i - 1], proc_object_mode_conv("rx"), GR_FLEARN))
+				exit(EXIT_FAILURE);
+		}
+	}
 
 	return;
 }
