@@ -444,9 +444,7 @@ struct gr_hash_struct *create_hash_table(int type)
 
 void insert_acl_object(struct proc_acl *subject, struct file_acl *object)
 {
-	if (subject->hash == NULL) {
-		/* create object hash table */
-		subject->hash = create_hash_table(GR_HASH_OBJECT);
+	if (subject->hash->first == NULL) {
 		subject->hash->first = object;
 	} else {
 		((struct file_acl *)subject->hash->first)->next = object;
@@ -470,7 +468,9 @@ void insert_acl_subject(struct role_acl *role, struct proc_acl *subject)
 		subject->prev = role->hash->first;
 		role->hash->first = subject;
 	}
-
+	/* force every subject to have a hash table whether or not they
+	   have any objects */
+	subject->hash = create_hash_table(GR_HASH_OBJECT);
 	insert_hash_entry(role->hash, subject);
 
 	return;
