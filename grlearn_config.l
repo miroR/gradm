@@ -30,19 +30,19 @@ FILENAME [/][^\t\n]*
 "no-learn"				{
 					  return NOLEARN;
 					}
-"dont-reduce"				{
+"dont-reduce-path"			{
 					  return DONTREDUCE;
 					}
-"high-reduce"				{
+"high-reduce-path"			{
 					  return HIGHREDUCE;
 					}
-"always-reduce"				{
+"always-reduce-path"			{
 					  return ALWAYSREDUCE;
 					}
-"protected"				{
+"protected-path"			{
 					  return PROTECTED;
 					}
-"high-protected"			{
+"high-protected-path"			{
 					  return HIGHPROTECTED;
 					}
 {NUM}					{
