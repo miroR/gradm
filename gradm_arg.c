@@ -23,7 +23,7 @@ static void show_help(void)
 		"Options:\n"
 		"	-E, --enable	Enable the grsecurity ACL system\n"
 		"	-D, --disable	Disable the grsecurity ACL system\n"
-		"	-P [rolename], --passwd\n
+		"	-P [rolename], --passwd\n"
 		"			Create password for ACL administration\n"
 		"			or a special role\n"
 		"	-R, --reload	Reload the ACL system while in admin mode\n"

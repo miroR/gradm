@@ -139,7 +139,7 @@ void generate_salt(struct gr_pw_entry * entry)
 	return;
 }
 
-int read_saltandpass(char *rolename, char *salt, char *pass)
+int read_saltandpass(char *rolename, unsigned char *salt, unsigned char *pass)
 {
 	int fd;
 	int len;
