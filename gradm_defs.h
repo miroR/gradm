@@ -33,6 +33,9 @@
 #define MAX_INCLUDE_DEPTH	10
 #define MAX_NEST_DEPTH		8
 
+#ifndef RLIMIT_LOCKS
+#define RLIMIT_LOCKS 10
+#endif
 #define GR_NLIMITS	(RLIMIT_LOCKS + 2)
 
 enum {
