@@ -311,7 +311,22 @@ void add_include(char *includename)
 					if (strcmp(namelist[n]->d_name, ".") && strcmp(namelist[n]->d_name, "..")) {
 						memset(&path, 0, sizeof(path));
 						snprintf(path, PATH_MAX - 1, "%s/%s", includename, namelist[n]->d_name);
-						add_include(path);
+						tmpfile = fopen(path, "r");
+
+						if (!tmpfile) {
+							fprintf(stderr, "Unable to open included file: %s\n",
+								path);
+							exit(EXIT_FAILURE);
+						}
+
+						lineno_stack[include_stack_ptr] = lineno;
+						lineno = 1;
+						include_in[include_stack_ptr] = yyin;
+						current_acl[include_stack_ptr] = current_acl_file;
+						change_current_acl_file(path);
+						include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
+						yyin = tmpfile;
+						yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
 					}
 				}
 			}
