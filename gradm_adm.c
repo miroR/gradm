@@ -82,6 +82,14 @@ add_gradm_acl(struct role_acl *role)
 				 proc_object_mode_conv("rx"), GR_FEXIST))
 		exit(EXIT_FAILURE);
 
+	if (!add_proc_object_acl(current_subject, "/lib64",
+				 proc_object_mode_conv("rx"), GR_FEXIST))
+		exit(EXIT_FAILURE);
+
+	if (!add_proc_object_acl(current_subject, "/usr/lib64",
+				 proc_object_mode_conv("rx"), GR_FEXIST))
+		exit(EXIT_FAILURE);
+
 	if (!add_proc_object_acl(current_subject, gradm_name,
 				 proc_object_mode_conv("x"), GR_FEXIST))
 		exit(EXIT_FAILURE);
