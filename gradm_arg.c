@@ -112,13 +112,13 @@ void verbose_stats(void)
 
 	printf("Policy statistics:\n");
 	printf("-----------------------------------------------\n");
-	printf("\tRole summary:\n");
+	printf("Role summary:\n");
 	printf("\t%d user roles\n", uroles);
 	printf("\t%d group roles\n", groles);
 	printf("\t%d special roles with authentication\n", saroles);
 	printf("\t%d special roles without authentication\n", snroles);
 	printf("\t%d total roles\n\n", troles);
-	printf("\tSubject summary:\n");
+	printf("Subject summary:\n");
 	printf("\t%d subjects in user roles\n", usubjs);
 	printf("\t%d subjects in group roles\n", gsubjs);
 	printf("\t%d subjects in special roles with authentication\n", sasubjs);
@@ -127,7 +127,7 @@ void verbose_stats(void)
 	printf("\t%d subjects can be killed by outside processes\n", ksubjs);
 	printf("\t%d subjects have unprotected shared memory\n", smsubjs);
 	printf("\t%d total subjects\n\n", tsubjs);
-	printf("\tObject summary:\n");
+	printf("Object summary:\n");
 	printf("\t%d objects in non-admin roles allow chmod +s\n", chsobjs);
 	printf("\t%d total objects\n", tobjs);
 
