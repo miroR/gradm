@@ -179,6 +179,7 @@ init_variables(void)
 	num_pointers = 0;
 
 	dont_reduce_dirs = NULL;
+	always_reduce_dirs = NULL;
 	protected_paths = NULL;
 	high_reduce_dirs = NULL;
 	high_protected_paths = NULL;

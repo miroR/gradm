@@ -690,11 +690,6 @@ int *analyze_node_reduction(struct gr_learn_file_node *node)
 	if (!node->leaves)
 		return NULL;
 
-	node_num = count_leaf_nodes(node->leaves);
-	child_num = count_total_leaves(node);
-	depth_num = count_max_depth(node);
-	nested_num = count_nested_depth(node);
-
 	tmp = dont_reduce_dirs;
 	if (tmp) {
 		while (*tmp) {
@@ -703,6 +698,20 @@ int *analyze_node_reduction(struct gr_learn_file_node *node)
 			tmp++;
 		}
 	}
+
+	tmp = always_reduce_dirs;
+	if (tmp) {
+		while (*tmp) {
+			if (!strcmp(node->filename, *tmp))
+				return (int *)&reduce_all_leaves;
+			tmp++;
+		}
+	}
+
+	node_num = count_leaf_nodes(node->leaves);
+	child_num = count_total_leaves(node);
+	depth_num = count_max_depth(node);
+	nested_num = count_nested_depth(node);
 
 	if (node_num > 3)
 		reduction_level++;

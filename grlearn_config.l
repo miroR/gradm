@@ -36,6 +36,9 @@ FILENAME [/][^\t\n]*
 "high-reduce"				{
 					  return HIGHREDUCE;
 					}
+"always-reduce"				{
+					  return ALWAYSREDUCE;
+					}
 "protected"				{
 					  return PROTECTED;
 					}

@@ -58,6 +58,10 @@ learn_config:
 		{
 			add_to_string_array(&high_reduce_dirs, $2);
 		}
+	|	ALWAYSREDUCE FILENAME
+		{
+			add_to_string_array(&always_reduce_dirs, $2);
+		}
 	|	HIGHPROTECTED FILENAME
 		{
 			add_to_string_array(&high_protected_paths, $2);
