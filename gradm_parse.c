@@ -232,7 +232,7 @@ out2:
 			ftmp.inode = 0;
 			ftmp.dev = 0;
 
-			if(stat(ftmp.filename, &fstat)) {
+			if(!stat(ftmp.filename, &fstat)) {
 				ftmp.inode = fstat.st_ino;
 				ftmp.dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
 			}
@@ -272,7 +272,7 @@ out2:
 			ftmp.inode = 0;
 			ftmp.dev = 0;
 
-			if(stat(ftmp.filename, &fstat)) {
+			if(!stat(ftmp.filename, &fstat)) {
 				ftmp.inode = fstat.st_ino;
 				ftmp.dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
 			}
