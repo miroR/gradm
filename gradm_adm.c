@@ -48,7 +48,7 @@ void add_gradm_acl(void)
 	gradm_name = strdup(gradm_realpath);
 	
 	if(!add_proc_subject_acl(current_role, gradm_name, 
-			proc_object_mode_conv("o")))
+			proc_subject_mode_conv("o")))
 		exit(EXIT_FAILURE);
 
 	if(!stat("/proc/sys/kernel/grsecurity/acl", &fstat)) {
