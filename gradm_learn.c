@@ -20,17 +20,19 @@ void learn_pass1(FILE *stream)
 	learn_pass1in = stream;
 	learn_pass1parse();
 
-	if (default_role_entry) {
-		tmptable = (struct gr_learn_file_tmp_node **)default_role_entry->hash->table;
-		table_size = default_role_entry->hash->table_size;
-		sort_file_list(default_role_entry->hash);
-		for (i = 0; i < table_size; i++) {
-			if (tmptable[i] == NULL)
-				continue;
-			if (default_role_entry->rolemode & GR_ROLE_LEARN)
-				insert_file(&(default_role_entry->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
-			else
-				insert_file(&(default_role_entry->subject_list), tmptable[i]->filename, tmptable[i]->mode, 2);
+	if (default_role_entry && default_role_entry->hash) {
+		if (default_role_entry->hash) {
+			tmptable = (struct gr_learn_file_tmp_node **)default_role_entry->hash->table;
+			table_size = default_role_entry->hash->table_size;
+			sort_file_list(default_role_entry->hash);
+			for (i = 0; i < table_size; i++) {
+				if (tmptable[i] == NULL)
+					continue;
+				if (default_role_entry->rolemode & GR_ROLE_LEARN)
+					insert_file(&(default_role_entry->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
+				else
+					insert_file(&(default_role_entry->subject_list), tmptable[i]->filename, tmptable[i]->mode, 2);
+			}
 		}
 		if (default_role_entry->rolemode & GR_ROLE_LEARN)
 			reduce_ip_tree(default_role_entry->allowed_ips);
@@ -38,16 +40,18 @@ void learn_pass1(FILE *stream)
 
 	tmp = group_role_list;
 	while (tmp && *tmp) {
-		tmptable = (struct gr_learn_file_tmp_node **)(*tmp)->hash->table;
-		table_size = (*tmp)->hash->table_size;
-		sort_file_list((*tmp)->hash);
-		for (i = 0; i < table_size; i++) {
-			if (tmptable[i] == NULL)
-				continue;
-			if ((*tmp)->rolemode & GR_ROLE_LEARN)
-				insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
-			else
-				insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 2);
+		if ((*tmp)->hash) {
+			tmptable = (struct gr_learn_file_tmp_node **)(*tmp)->hash->table;
+			table_size = (*tmp)->hash->table_size;
+			sort_file_list((*tmp)->hash);
+			for (i = 0; i < table_size; i++) {
+				if (tmptable[i] == NULL)
+					continue;
+				if ((*tmp)->rolemode & GR_ROLE_LEARN)
+					insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
+				else
+					insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 2);
+			}
 		}
 		if ((*tmp)->rolemode & GR_ROLE_LEARN)
 			reduce_ip_tree((*tmp)->allowed_ips);
@@ -56,16 +60,18 @@ void learn_pass1(FILE *stream)
 
 	tmp = user_role_list;
 	while (tmp && *tmp) {
-		tmptable = (struct gr_learn_file_tmp_node **)(*tmp)->hash->table;
-		table_size = (*tmp)->hash->table_size;
-		sort_file_list((*tmp)->hash);
-		for (i = 0; i < table_size; i++) {
-			if (tmptable[i] == NULL)
-				continue;
-			if ((*tmp)->rolemode & GR_ROLE_LEARN)
-				insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
-			else
-				insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 2);
+		if ((*tmp)->hash) {
+			tmptable = (struct gr_learn_file_tmp_node **)(*tmp)->hash->table;
+			table_size = (*tmp)->hash->table_size;
+			sort_file_list((*tmp)->hash);
+			for (i = 0; i < table_size; i++) {
+				if (tmptable[i] == NULL)
+					continue;
+				if ((*tmp)->rolemode & GR_ROLE_LEARN)
+					insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
+				else
+					insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 2);
+			}
 		}
 		if ((*tmp)->rolemode & GR_ROLE_LEARN)
 			reduce_ip_tree((*tmp)->allowed_ips);
@@ -74,16 +80,18 @@ void learn_pass1(FILE *stream)
 
 	tmp = special_role_list;
 	while (tmp && *tmp) {
-		tmptable = (struct gr_learn_file_tmp_node **)(*tmp)->hash->table;
-		table_size = (*tmp)->hash->table_size;
-		sort_file_list((*tmp)->hash);
-		for (i = 0; i < table_size; i++) {
-			if (tmptable[i] == NULL)
-				continue;
-			if ((*tmp)->rolemode & GR_ROLE_LEARN)
-				insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
-			else
-				insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 2);
+		if ((*tmp)->hash) {
+			tmptable = (struct gr_learn_file_tmp_node **)(*tmp)->hash->table;
+			table_size = (*tmp)->hash->table_size;
+			sort_file_list((*tmp)->hash);
+			for (i = 0; i < table_size; i++) {
+				if (tmptable[i] == NULL)
+					continue;
+				if ((*tmp)->rolemode & GR_ROLE_LEARN)
+					insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
+				else
+					insert_file(&((*tmp)->subject_list), tmptable[i]->filename, tmptable[i]->mode, 2);
+			}
 		}
 		if ((*tmp)->rolemode & GR_ROLE_LEARN)
 			reduce_ip_tree((*tmp)->allowed_ips);
