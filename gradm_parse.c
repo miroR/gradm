@@ -48,7 +48,7 @@ static struct deleted_file * add_deleted_file(char *filename)
 	return deleted_files;
 }
 
-static int is_role_dupe(struct role_acl *role, const char *rolename, const __u8 type)
+static int is_role_dupe(struct role_acl *role, const char *rolename, const __u16 type)
 {
 	struct role_acl *tmp;
 
@@ -83,7 +83,7 @@ static struct proc_acl * is_proc_subject_dupe(struct role_acl *role, struct proc
         return NULL;
 }
 
-int add_role_acl(struct role_acl **role, char *rolename, __u8 type, int ignore)
+int add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 {
 	struct role_acl *rtmp;
 	struct passwd *pwd;
@@ -564,10 +564,10 @@ void rem_proc_subject_acl(struct proc_acl * proc)
 }
 */
 
-__u8 role_mode_conv(const char * mode)
+__u16 role_mode_conv(const char * mode)
 {
 	int len = strlen(mode) - 1;
-	__u8 retmode = GR_ROLE_DEFAULT;
+	__u16 retmode = GR_ROLE_DEFAULT;
 
 	for (; len >= 0; len--) {
 		switch(mode[len]) {

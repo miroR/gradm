@@ -64,13 +64,13 @@ enum {
 };
 
 enum {
-	GR_ROLE_USER	= 0x01,
-	GR_ROLE_GROUP	= 0x02,
-	GR_ROLE_DEFAULT = 0x04,
-	GR_ROLE_SPECIAL = 0x08,
-	GR_ROLE_AUTH	= 0x10,
-	GR_ROLE_NOPW	= 0x20,
-	GR_ROLE_GOD	= 0x40
+	GR_ROLE_USER	= 0x0001,
+	GR_ROLE_GROUP	= 0x0002,
+	GR_ROLE_DEFAULT = 0x0004,
+	GR_ROLE_SPECIAL = 0x0008,
+	GR_ROLE_AUTH	= 0x0010,
+	GR_ROLE_NOPW	= 0x0020,
+	GR_ROLE_GOD	= 0x0040
 };
 
 enum {
@@ -112,7 +112,7 @@ struct rlimconv {
 
 struct learn_info {
 	char * rolename;
-	__u8 roletype;
+	__u16 roletype;
 	char *subjname;
 	char * obj_name;
 	__u32 res_cur, res_max;
@@ -121,7 +121,7 @@ struct learn_info {
 
 struct ip_learn_info {
 	char *rolename;
-	__u8 roletype;
+	__u16 roletype;
 	char *subjname;
 	__u32 addr;
 	__u16 port;
@@ -158,7 +158,7 @@ struct ip_acl {
 	__u32 addr;
 	__u32 netmask;
 	__u16 low, high;
-	__u8 mode; // connect or bind
+	__u8  mode; // connect or bind
 	__u32 type; // stream, dgram, raw..etc
 	__u32 proto[8];  // we have to support all 255 protocols
 
@@ -186,7 +186,7 @@ struct file_acl {
 struct role_acl {
 	char * rolename;
 	uid_t uidgid;
-	__u8 roletype;
+	__u16 roletype;
 
 	__u16 auth_attempts;
 	unsigned long expires;

@@ -28,7 +28,7 @@ learn_log:
 		error
 	|	DATE ROLENAME ':' NUM ':' filename ':' NUM ':' NUM ':' filename ':' NUM
 		{
-			__u8 rolemode;
+			__u16 rolemode;
 			__u32 l2, l3, l4;
 
 			rolemode = atoi($4);
@@ -39,7 +39,7 @@ learn_log:
 		}		
 	|	DATE ROLENAME ':' NUM ':' filename ':' IPADDR ':' NUM ':' NUM ':' NUM ':' NUM
 		{
-			__u8 rolemode;
+			__u16 rolemode;
 			__u16 s2, s3, s4, s5;
 			__u32 addr;
 			struct in_addr ip;

@@ -109,7 +109,7 @@ static void clear_remove_queue(void)
 	return;
 }
 
-static int learn_is_dupe(char *rolename, __u8 roletype, char *subjname,
+static int learn_is_dupe(char *rolename, __u16 roletype, char *subjname,
 			 unsigned long res_cur, unsigned long res_max,
 			 char * obj_name, __u32 mode)
 {
@@ -157,7 +157,7 @@ static int learn_is_dupe(char *rolename, __u8 roletype, char *subjname,
 
 static void insert_reduced_acl(unsigned long offset, char * common_dir,
 				unsigned long res_cur, unsigned long res_max,
-			       char *rolename, __u8 roletype, char *subjname, __u32 mode)
+			       char *rolename, __u16 roletype, char *subjname, __u32 mode)
 {
 	char * reduced_dir;
 
@@ -256,7 +256,7 @@ static void reduce_acls(void)
 	return;
 }
 
-int learn_ip_is_dupe(char *rolename, __u8 roletype, char *subjname,
+int learn_ip_is_dupe(char *rolename, __u16 roletype, char *subjname,
 			unsigned long ip, __u16 port, __u16 sock, __u16 proto,
 			__u16 mode)
 {
@@ -280,7 +280,7 @@ int learn_ip_is_dupe(char *rolename, __u8 roletype, char *subjname,
 	return 0;
 }
 
-void add_learn_ip_info(char *rolename, __u8 roletype, char *subjname,
+void add_learn_ip_info(char *rolename, __u16 roletype, char *subjname,
 			__u32 ip, __u16 port, __u16 sock, __u16 proto,
 			__u16 mode)
 {
@@ -310,7 +310,7 @@ void add_learn_ip_info(char *rolename, __u8 roletype, char *subjname,
 
 	return;
 }
-void add_learn_file_info(char *rolename, __u8 roletype, char *subjname,
+void add_learn_file_info(char *rolename, __u16 roletype, char *subjname,
 			unsigned long res_cur, unsigned long res_max,
 			char * obj_name, __u32 mode)
 {

@@ -9,7 +9,7 @@ struct ip_acl ip;
 %union {
 	char *string;
 	__u32 long_int;
-	__u8 mode;
+	__u16 mode;
 }
 
 %token <string> ROLE ROLE_NAME ROLE_TYPE SUBJECT SUBJ_NAME OBJ_NAME 
