@@ -307,6 +307,11 @@ int main(int argc, char *argv[])
 	extern struct rlimconv rlim_table[];
 	int i;
 #endif
+	if (geteuid() != getuid()) {
+		fprintf(stderr, "gradm is not meant to run suid root.\n");
+		exit(EXIT_FAILURE);
+	}
+
 	special_role_uid = 0;
 	
 	no_coredump();
