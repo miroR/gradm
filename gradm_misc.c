@@ -44,7 +44,10 @@ transmit_to_kernel(struct gr_arg_wrapper *buf)
 				"please check the kernel logs for more "
 				"info.\n");
 		case EPERM:
-			fprintf(stderr, "Invalid password.\n");
+			if (buf->arg->mode != GRADM_UNSPROLE)
+				fprintf(stderr, "Invalid password.\n");
+			else
+				fprintf(stderr, "You are not in a special role.\n");
 			break;
 		case EINVAL:
 		default:
