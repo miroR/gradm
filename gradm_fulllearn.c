@@ -231,7 +231,9 @@ int ensure_role_security(struct gr_learn_group_node *group,
 
 void fulllearn_finalpass(void)
 {
+	printf("Beginning full learning final pass...");
 	traverse_roles(role_list, &ensure_role_security, NULL);
+	printf("done.\n");
 	return;
 }
 
