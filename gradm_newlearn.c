@@ -562,16 +562,15 @@ int reduce_children_mode(struct gr_learn_file_node *node)
 	greatest_occurring_modes(node, (u_int32_t *)&modes);
 
 	node->mode |= modes[0];
-	if (modes[0] == (GR_FIND | GR_WRITE) &&
-	    modes[1] == (GR_FIND | GR_READ | GR_WRITE | GR_CREATE | GR_DELETE))
-		node->mode |= modes[1];
+	node->mode |= modes[1];
 
 	if (node->mode == (GR_FIND | GR_READ | GR_WRITE | GR_CREATE | GR_DELETE))
 		tmpdir = 1;
 
 	while (*tmp) {
 		if (((tmpdir && !((*tmp)->mode & GR_EXEC)) ||
-		     ((*tmp)->mode == modes[0])) && !(*tmp)->leaves) {
+		     ((*tmp)->mode == modes[0] || (*tmp)->mode == modes[1]))
+		    && !(*tmp)->leaves) {
 			tmp2 = tmp;
 			cachednode = NULL;
 			cachednode = 0;
