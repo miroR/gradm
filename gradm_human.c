@@ -40,7 +40,7 @@ static struct subj_mode_name_table {
 	{ GR_KILLIPPROC, 'C' },
 	{ GR_NOTROJAN, 'T' },
 	{ GR_PROTPROCFD, 'd' },
-	( GR_PROCACCT, 'b' }
+	{ GR_PROCACCT, 'b' }
 };
 	
 static int netmask_to_int(unsigned long netmask)

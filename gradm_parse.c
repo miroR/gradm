@@ -298,7 +298,7 @@ out2:
 						ftmp2.inode = fstat.st_ino;
 						ftmp2.dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
 
-						if (is_proc_object_dupe(subject->proc_objectp, &ftmp2))
+						if (is_proc_object_dupe(subject->proc_object, &ftmp2))
 							continue;
 						if (!add_proc_object_acl(subject, strdup(buf), mode, type | GR_GLOB))
 							return 0;
