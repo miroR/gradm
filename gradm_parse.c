@@ -502,7 +502,8 @@ parse_homedir(char *filename)
 	unsigned int newlen;
 	char *newfilename;
 
-	if (!(current_role->roletype & GR_ROLE_USER)) {
+	if (!(current_role->roletype & GR_ROLE_USER) ||
+	     (current_role->roletype & GR_ROLE_DOMAIN)) {
 		fprintf(stderr, "Error on line %lu of %s.  $HOME "
 				"is supported only on user roles.\n",
 				lineno, current_acl_file);
