@@ -27,8 +27,7 @@ LIBS=-lfl
 #	-fcall-used-g5 -fcall-used-g5 -fcall-used-g7 -Wno-sign-compare
 OPT_FLAGS=-O2
 CFLAGS=$(OPT_FLAGS) -DGRSEC_DIR=\"$(GRSEC_DIR)\"
-LDFLAGS=-static		    # must be left as static,otherwise requires 
-		            # modification in gradm_adm.c
+LDFLAGS=
 INSTALL = /usr/bin/install -c
 
 # FHS
