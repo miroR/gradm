@@ -1,7 +1,7 @@
 #include "gradm.h"
 
-static struct gr_learn_file_node **cachednode = NULL;
-static unsigned int cachedlen = 0;
+struct gr_learn_file_node **cachednode = NULL;
+unsigned int cachedlen = 0;
 
 int is_protected_path(char *filename, u_int32_t mode)
 {

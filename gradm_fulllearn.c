@@ -1,5 +1,8 @@
 #include "gradm.h"
 
+extern struct gr_learn_file_node **cachednode;
+extern unsigned int cachedlen;
+
 struct gr_learn_group_node **role_list = NULL;
 extern FILE *fulllearn_pass1in;
 extern FILE *fulllearn_pass2in;
@@ -284,6 +287,9 @@ void free_subject_full(struct gr_learn_file_node *subject)
 {
 	struct gr_learn_file_tmp_node **tmptable;
 	unsigned long table_size, i;
+
+	cachednode = NULL;
+	cachedlen = 0;
 
 	if (subject->hash) {
 		tmptable = (struct gr_learn_file_tmp_node **)subject->hash->table;
