@@ -17,22 +17,26 @@ learn_logs:	learn_log
 	;
 
 filename:	/*empty*/	{ $$ = strdup(""); }
-	|	FILENAME
+	|	FILENAME	{
+				  if (!strcmp($1, "//"))
+					$1[1] = '\0';
+				  $$ = $1;
+				}
 	;
 
 learn_log:
 		error
 	|	DATE NUM ':' NUM ':' NUM ':' NUM ':' filename ':' NUM
 		{
-			__u16 s, s2;
-			__u32 l, l2, l3;
+			__u16 s;
+			__u32 l, l2, l3, l4;
 
 			s = atoi($2);
-			s2 = atoi($6);
 			l = atol($4);
-			l2 = atol($8);
-			l3 = atol($12);
-			add_learn_file_info(s, l, s2, l2, &($10), l3);
+			l2 = atoi($6);
+			l3 = atol($8);
+			l4 = atol($12);
+			add_learn_file_info(s, l, l2, l3, &($10), l4);
 		}		
 	|	DATE NUM ':' NUM ':' IPADDR ':' NUM ':' NUM ':' NUM ':' NUM
 		{
