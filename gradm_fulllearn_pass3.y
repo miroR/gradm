@@ -151,9 +151,7 @@ learn_log:
 			struct gr_learn_file_node *subject = NULL;
 			uid_t uid;
 			gid_t gid;
-			u_int32_t addr;
-			u_int16_t port;
-			u_int8_t mode, proto, socktype;
+			unsigned int real, eff, fs;
 			char *filename = $9;
 
 			/* check if we have an inherited learning subject */
@@ -165,14 +163,10 @@ learn_log:
 
 			uid = $5;
 			gid = $7;
-			mode = $19;
+			real = $15;
+			eff = $17;
+			fs = $19;
 
-			addr = $13;
-
-			port = $15;
-			socktype = $17;
-			proto = $19;
-			mode = $21;
 
 			match_role(role_list, uid, gid, &group, &user);
 			/* only add objects for the role currently in memory */
@@ -189,11 +183,10 @@ learn_log:
 				subject = match_file_node(subjlist, filename);
 			/* only learn objects for current subject in memory */
 			if (subject && !strcmp(subject->filename, current_learn_subject)) {
-			if (subject && mode == GR_IP_CONNECT)
-				insert_ip(&(subject->connect_list), addr, port, proto, socktype);
-			else if (subject && mode == GR_IP_BIND)
-				insert_ip(&(subject->bind_list), addr, port, proto, socktype);
-
+			if (subject && $13 == USER)
+				insert_learn_id_transition(&(subject->user_trans_list), real, eff, fs);
+			else if (subject && $13 == GROUP)
+				insert_learn_id_transition(&(subject->group_trans_list), real, eff, fs);
 			}
 			}
 			free(filename);

@@ -1719,3 +1719,7 @@ find_learn_role(struct gr_learn_role_entry **role_list, char *rolename)
 	return NULL;
 }
 
+void insert_learn_id_transition(unsigned int **list, int real, int eff, int fs)
+{
+
+}
