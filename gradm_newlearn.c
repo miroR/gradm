@@ -1086,6 +1086,7 @@ int display_leaf(struct gr_learn_file_node *node,
 			while (*p) {
 				pwd = getpwuid(**p);
 				if (pwd == NULL) {
+					fprintf(stream, " %d", **p);
 					p++;
 					continue;
 				}
@@ -1094,6 +1095,8 @@ int display_leaf(struct gr_learn_file_node *node,
 			}
 			if (node->group_trans_list == NULL)
 				fprintf(stream, "\n\n");
+			else
+				fprintf(stream, "\n");
 		}
 
 		if (node->group_trans_list) {
@@ -1104,6 +1107,7 @@ int display_leaf(struct gr_learn_file_node *node,
 			while (*p) {
 				grp = getgrgid(**p);
 				if (grp == NULL) {
+					fprintf(stream, " %d", **p);
 					p++;
 					continue;
 				}
