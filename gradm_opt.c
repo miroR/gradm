@@ -10,11 +10,10 @@ expand_acl(struct proc_acl *proc, struct role_acl *role)
 	strcpy(tmpproc, proc->filename);
 
 	while (parent_dir(proc->filename, &tmpproc)) {
-		for_each_subject(tmpp, role) {
-			if (!strcmp(tmpproc, tmpp->filename)) {
-				proc->parent_subject = tmpp;
-				return;
-			}
+		tmpp = lookup_acl_subject_by_name(role, tmpproc);
+	        if (tmpp) {
+			proc->parent_subject = tmpp;
+			return;
 		}
 	}
 
