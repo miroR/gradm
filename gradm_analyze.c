@@ -258,7 +258,7 @@ handle_notrojan_mode(void)
 				strcpy(objname, obj->filename);
 				do {
 					for_each_role(role2, current_role) {
-						if (!strcmp(role->rolename, ":::kernel:::"))
+						if (!strcmp(role2->rolename, ":::kernel:::"))
 							continue;
 						for_each_subject(subj2, role2) {
 							if (subj2 == subj
