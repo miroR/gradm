@@ -29,6 +29,7 @@ char *high_reduce_dirs[] = {
 char *dont_reduce_dirs[] = {
 				"/",
 				"/dev",
+				"/usr",
 				NULL
 			   };
 
