@@ -140,7 +140,7 @@ void insert_into_cache(char *str, unsigned int len)
 	return;
 }
 		
-__inline__ char * rewrite_learn_entry(char *p)
+char * rewrite_learn_entry(char *p)
 {
 	int i;
 	char *tmp = p;
@@ -148,6 +148,7 @@ __inline__ char * rewrite_learn_entry(char *p)
 	//char *slash;
 	char *next;
 	unsigned int len;
+	unsigned int ourlen = 0;
 
 	for (i = 0; i < 8; i++) {
 		tmp = strchr(tmp, '\t');
@@ -162,21 +163,27 @@ __inline__ char * rewrite_learn_entry(char *p)
 	*endobj = '\0';
 	/* now we have separated the string */
 
-	if (strncmp(tmp, "/proc/", 6)) {
+	if (!strncmp(tmp, "/proc/", 6)) {
+		ourlen = 6;
+	} else if (!strncmp(tmp, "/tmp/", 5)) {
+		ourlen = 5;
+	} else {
 		*endobj = '\t';
 		return p;
 	}
 
-	if (*(tmp + 6) < '1' || *(tmp + 6) > '9') {
-		*endobj = '\t';
-		return p;
+	if (ourlen == 6) {
+		if (*(tmp + 6) < '1' || *(tmp + 6) > '9') {
+			*endobj = '\t';
+			return p;
+		}
 	}
 
 	*endobj = '\t';
 	next = endobj;
 	while (*next++);
 	len = next - endobj;
-	memmove(tmp + 5, endobj, len);
+	memmove(tmp + ourlen - 1, endobj, len);
 	return next;
 
 /*	slash = strchr(tmp + 6, '/');
