@@ -205,12 +205,12 @@ int display_role(struct gr_learn_group_node *group, struct gr_learn_user_node *u
 void display_roles(struct gr_learn_group_node **grouplist, FILE *stream)
 {
 	fprintf(stream, "role default\n");
-	fprintf(stream, "   subject / {\n");
-	fprintf(stream, "      /                                                  h\n");
-	fprintf(stream, "      -CAP_ALL\n");
-	fprintf(stream, "      connect\tdisabled\n");
-	fprintf(stream, "      bind\tdisabled\n");
-	fprintf(stream, "   }\n\n");
+	fprintf(stream, "subject / {\n");
+	fprintf(stream, "\t/\t\t\th\n");
+	fprintf(stream, "\t-CAP_ALL\n");
+	fprintf(stream, "\tconnect\tdisabled\n");
+	fprintf(stream, "\tbind\tdisabled\n");
+	fprintf(stream, "}\n\n");
 	traverse_roles(grouplist, &display_role, stream);
 	return;
 }
@@ -992,11 +992,11 @@ int display_leaf(struct gr_learn_file_node *node,
 		connect = node->connect_list;
 		bind = node->bind_list;
 		conv_subj_mode_to_str(node->mode, modes, sizeof(modes));
-		fprintf(stream, "   subject %s %s {\n", node->filename, modes);
+		fprintf(stream, "subject %s %s {\n", node->filename, modes);
 		if (object)
 			display_tree(object, stream);
 		if (!node->subject) {
-			fprintf(stream, "      -CAP_ALL\n");
+			fprintf(stream, "\t-CAP_ALL\n");
 			goto show_ips;
 		}
 
@@ -1005,20 +1005,20 @@ int display_leaf(struct gr_learn_file_node *node,
 				raise_num++;
 
 		if (raise_num < ((sizeof(capability_list)/sizeof(struct capability_set)) - 1) / 2) {
-			fprintf(stream, "      -CAP_ALL\n");
+			fprintf(stream, "\t-CAP_ALL\n");
 			for(i = 0; i < ((sizeof(capability_list)/sizeof(struct capability_set)) - 1); i++)
 				if (node->subject->cap_raise & (1 << capability_list[i].cap_val))
-					fprintf(stream, "      +%s\n", capability_list[i].cap_name);
+					fprintf(stream, "\t+%s\n", capability_list[i].cap_name);
 		} else {
-			fprintf(stream, "      +CAP_ALL\n");
+			fprintf(stream, "\t+CAP_ALL\n");
 			for(i = 0; i < ((sizeof(capability_list)/sizeof(struct capability_set)) - 1); i++)
 				if (!(node->subject->cap_raise & (1 << capability_list[i].cap_val)))
-					fprintf(stream, "      -%s\n", capability_list[i].cap_name);
+					fprintf(stream, "\t-%s\n", capability_list[i].cap_name);
 		}
 
 		for(i = 0; i < (sizeof(rlim_table)/sizeof(struct rlimconv)); i++)
 			if (node->subject->resmask & (1 << rlim_table[i].val))
-				fprintf(stream, "      %s %lu %lu\n",
+				fprintf(stream, "\t%s %lu %lu\n",
 					rlim_table[i].name,
 					node->subject->res[i].rlim_cur,
 					node->subject->res[i].rlim_max);
@@ -1027,23 +1027,23 @@ show_ips:
 		if (bind)
 			display_ip_tree(bind, GR_IP_BIND, stream);
 		else
-			fprintf(stream, "      bind\tdisabled\n");
+			fprintf(stream, "\tbind\tdisabled\n");
 		if (connect)
 			display_ip_tree(connect, GR_IP_CONNECT, stream);
 		else
-			fprintf(stream, "      connect\tdisabled\n");
+			fprintf(stream, "\tconnect\tdisabled\n");
 
-		fprintf(stream, "   }\n\n");
+		fprintf(stream, "}\n\n");
 	} else {
 		conv_mode_to_str(node->mode, modes, sizeof(modes));
 		i = strlen(node->filename);
 		if (strchr(node->filename, ' ')) {
-				fprintf(stream, "      \"%s\"\t%s\n", node->filename, modes);
+				fprintf(stream, "\t\"%s\"\t\t\t%s\n", node->filename, modes);
 		} else {
 			if (i < 50)
-				fprintf(stream, "      %-50s %s\n", node->filename, modes);
+				fprintf(stream, "\t%s\t\t\t%s\n", node->filename, modes);
 			else
-				fprintf(stream, "      %s\t%s\n", node->filename, modes);
+				fprintf(stream, "\t%s\t\t\t%s\n", node->filename, modes);
 		}
 	}
 	return 0;
@@ -1134,9 +1134,9 @@ int display_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node **unu
 print_ip:
 	node = saved;
 	if (contype == GR_IP_CONNECT)
-		sprintf(ipandtype, "      connect %u.%u.%u.%u/%u", ip[0], ip[1], ip[2], ip[3], netmask);
+		sprintf(ipandtype, "\tconnect %u.%u.%u.%u/%u", ip[0], ip[1], ip[2], ip[3], netmask);
 	else if (contype == GR_IP_BIND)
-		sprintf(ipandtype, "      bind %u.%u.%u.%u/%u", ip[0], ip[1], ip[2], ip[3], netmask);
+		sprintf(ipandtype, "\tbind %u.%u.%u.%u/%u", ip[0], ip[1], ip[2], ip[3], netmask);
 
 	for (i = 1; i < 5; i++) {
 		if (node->ip_type & (1 << i)) {
