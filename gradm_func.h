@@ -52,3 +52,5 @@ void conv_name_to_type(struct ip_acl *ip, char *name);
 void add_role_allowed_ip(struct role_acl *role, __u32 addr, __u32 netmask);
 void add_role_transition(struct role_acl *role, char *rolename);
 void add_proc_nested_acl(struct role_acl *role, char *mainsubjname, char **nestednames, int nestlen, __u32 nestmode);
+void start_grlearn(char *logfile);
+void stop_grlearn(void);
