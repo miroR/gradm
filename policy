@@ -83,6 +83,14 @@
 # subject /bin/su
 # group_transition_deny evilhacker1 evilhacker2
 #
+# Domains:
+# With domains you can combine users that don't share a common
+# GID as well as groups so that they share a single policy
+# Domains work just like roles, with the only exception being that
+# the line starting with "role" is replaced with one of the following:
+# domain somedomainname u user1 user2 user3 user4 ... usern
+# domain somedomainname g group1 group2 group3 group4 ... groupn
+#
 # New learning system:
 # To learn on a given subject: add l (the letter l, not the number 1)
 # to the subject mode
