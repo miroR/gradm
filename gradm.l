@@ -495,6 +495,7 @@ int main(int argc, char *argv[])
 	no_coredump();
 
 	current_stack = &include_stack;
+	current_stack->name = NULL;
 
 	init_variables();
 
