@@ -146,8 +146,8 @@ struct role_allowed_ip {
 	__u32 addr;
 	__u32 netmask;
 
-	struct role_allow_ip *prev;
-	struct role_allow_ip *next;
+	struct role_allowed_ip *prev;
+	struct role_allowed_ip *next;
 };
 
 struct ip_acl {

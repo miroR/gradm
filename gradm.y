@@ -99,7 +99,7 @@ obj_mode: /* empty */
 
 role_allow_ip:			ROLE_ALLOW_IP IPADDR ip_netmask
 				{
-					add_role_allow_ip(current_role, get_ip($2), $3);
+					add_role_allowed_ip(current_role, get_ip($2), $3);
 				}
 	;
 
