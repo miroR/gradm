@@ -53,9 +53,9 @@
 #
 #regular expressions are not supported for pathnames in this config file
 
+always-reduce-path /dev/pts
 
 high-reduce-path /tmp
-high-reduce-path /dev/pts
 high-reduce-path /var/tmp
 high-reduce-path /proc
 high-reduce-path /lib
