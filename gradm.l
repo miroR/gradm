@@ -338,7 +338,7 @@ void add_include(char *includename)
 					if (tmp == NULL)
 						failure("calloc");
 					
-					path = calloc(1, strlen(includename) + strlen(namelist[n]->d_name + 2));
+					path = calloc(1, strlen(includename) + strlen(namelist[n]->d_name) + 2);
 					if (path == NULL)
 						failure("calloc");
 
