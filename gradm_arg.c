@@ -185,7 +185,7 @@ parse_args(int argc, char *argv[])
 			if (optarg) {
 				char pathbuf[PATH_MAX];
 
-				if (realpath(optarg, pathbuf)) {
+				if (!realpath(optarg, pathbuf)) {
 					fprintf(stderr, "Unable to open %s for learning logs.\n", optarg);
 					exit(EXIT_FAILURE);
 				}
