@@ -110,10 +110,14 @@ install: $(GRADM_BIN) gradm.8 acl grlearn
 	@if [ ! -f $(DESTDIR)$(GRSEC_DIR)/acl ] ; then \
 		$(INSTALL) -m 0600 acl $(DESTDIR)$(GRSEC_DIR) ; \
 	fi
-	rm -f $(DESTDIR)/dev/grsec
-	@if [ ! -e $(DESTDIR)/dev/grsec ] ; then \
-		mkdir -p $(DESTDIR)/dev ; \
-		$(MKNOD) -m 0622 $(DESTDIR)/dev/grsec c 1 10 ; \
+	@if [ `grep devfs /proc/mounts` ]; then \
+		; \
+	else \
+		rm -f $(DESTDIR)/dev/grsec \
+		if [ ! -e $(DESTDIR)/dev/grsec ] ; then \
+			mkdir -p $(DESTDIR)/dev ; \
+			$(MKNOD) -m 0622 $(DESTDIR)/dev/grsec c 1 10 ; \
+		fi \
 	fi
 	mkdir -p $(DESTDIR)$(MANDIR)/man8
 	$(INSTALL) -m 0644 gradm.8 $(DESTDIR)$(MANDIR)/man8/$(GRADM_BIN).8
