@@ -841,9 +841,6 @@ proc_subject_mode_conv(const char *mode)
 		case 'G':
 			retmode |= GR_PAXGCC;
 			break;
-		case 'X':
-			retmode |= GR_PAXRANDEXEC;
-			break;
 		case 'O':
 			retmode |= GR_IGNORE;
 			break;

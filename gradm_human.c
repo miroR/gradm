@@ -61,7 +61,6 @@ static struct subj_mode_name_table {
 	GR_PAXRANDMMAP, 'R'}, {
 	GR_PAXGCC, 'G'}, {
 	GR_PAXMPROTECT, 'M'}, {
-	GR_PAXRANDEXEC, 'X'}, {
 	GR_KILLPROC, 'K'}, {
 	GR_KILLIPPROC, 'C'}, {
 	GR_NOTROJAN, 'T'}, {
