@@ -9,7 +9,7 @@ extern int grlearn_configlex(void);
 }
 
 %token <string> FILENAME NOLEARN INHERITLEARN INHERITNOLEARN DONTREDUCE 
-%token <string> PROTECTED HIGHPROTECTED HIGHREDUCE
+%token <string> PROTECTED HIGHPROTECTED HIGHREDUCE ALWAYSREDUCE
 %token <num> NUM
 
 %%
