@@ -159,6 +159,8 @@ int full_reduce_id_node(struct gr_learn_file_node *subject,
 
 	size = 0;
 	p = uid_list;
+	if (p == NULL)
+		goto do_group;
 	while (*p) {
 		p++;
 		size++;
@@ -170,9 +172,11 @@ int full_reduce_id_node(struct gr_learn_file_node *subject,
 		free(uid_list);
 		subject->user_trans_list = NULL;
 	}
-
+do_group:
 	size = 0;
 	p = gid_list;
+	if (p == NULL)
+		return 0;
 	while (*p) {
 		p++;
 		size++;
