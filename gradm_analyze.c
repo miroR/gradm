@@ -319,8 +319,21 @@ analyze_acls(void)
 	struct chk_perm chk;
 	unsigned int errs_found = 0;
 	struct role_acl *role;
+	int def_role_found = 0;
 
 	check_role_transitions();
+
+	for_each_role(role, current_role)
+		if (role->roletype & GR_ROLE_DEFAULT)
+			def_role_found = 1;
+
+	if (!def_role_found) {
+		fprintf(stderr, "There is no default role present in your "
+			"configuration.\nPlease read the RBAC "
+			"documentation and create a default role before "
+			"attempting to enable the RBAC system.\n\n");
+		exit(EXIT_FAILURE);
+	}
 
 	for_each_role(role, current_role) {
 		if (role->roletype & GR_ROLE_SPECIAL)
