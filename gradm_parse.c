@@ -365,6 +365,42 @@ display_all_dupes(struct proc_acl *subject, struct file_acl *filp2)
 	return;
 }
 
+static char *
+parse_homedir(char *filename)
+{
+	struct passwd *pwd;
+	unsigned int newlen;
+	char *newfilename;
+
+	if (!(current_role->roletype & GR_ROLE_USER)) {
+		fprintf(stderr, "Error on line %lu of %s.  $HOME "
+				"is supported only on user roles.\n",
+				lineno, current_acl_file);
+		exit(EXIT_FAILURE);
+	}
+
+	pwd = getpwuid(current_role->uidgid);
+
+	if (pwd == NULL) {
+		fprintf(stderr, "Error: /etc/passwd was modified during parsing.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	newlen = strlen(pwd->pw_dir) + strlen(filename) - 5 + 1;
+		
+	newfilename = calloc(1, newlen);
+
+	if (!newfilename) {
+		fprintf(stderr, "Out of memory.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	strcpy(newfilename, pwd->pw_dir);
+	strcat(newfilename, (filename + 5));
+
+	return newfilename;
+}
+
 int
 add_proc_object_acl(struct proc_acl *subject, char *filename,
 		    __u32 mode, int type)
@@ -459,42 +495,6 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	insert_acl_object(subject, p);
 
 	return 1;
-}
-
-static char *
-parse_homedir(char *filename)
-{
-	struct passwd *pwd;
-	unsigned int newlen;
-	char *newfilename;
-
-	if (!(current_role->roletyle & GR_ROLE_USER)) {
-		fprintf(stderr, "Error on line %lu of %s.  $HOME "
-				"is supported only on user roles.\n",
-				lineno, current_acl_file);
-		exit(EXIT_FAILURE);
-	}
-
-	pwd = getpwuid(current_role->uidgid);
-
-	if (pwd == NULL) {
-		fprintf(stderr, "Error: /etc/passwd was modified during parsing.\n");
-		exit(EXIT_FAILURE);
-	}
-
-	newlen = strlen(pwd->pw_dir) + strlen(filename) - 5 + 1;
-		
-	newfilename = calloc(1, newlen);
-
-	if (!newfilename) {
-		fprintf(stderr, "Out of memory.\n");
-		exit(EXIT_FAILURE);
-	}
-
-	strcpy(newfilename, pwd->pw_dir);
-	strcat(newfilename, (filename + 5));
-
-	return newfilename;
 }
 
 int
