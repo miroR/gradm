@@ -1,0 +1,90 @@
+#sample default process acl for grsecurity
+
+/ {
+	/		r
+	/opt		rx
+	/home		rwx
+	/mnt		rw
+	/dev
+	/dev/urandom	r
+	/dev/random	r
+	/dev/zero	rw
+	/dev/input	rw
+	/dev/psaux	rw
+	/dev/null	rw
+	/dev/tty0	rw
+	/dev/tty1	rw
+	/dev/tty2	rw
+	/dev/tty3	rw
+	/dev/tty4	rw
+	/dev/tty5	rw
+	/dev/tty6	rw
+	/dev/tty7	rw
+	/dev/tty8	rw
+	/dev/console	rw
+	/dev/tty	rw
+	/dev/pts	rw
+	/dev/ptmx	rw
+	/dev/dsp	rw
+	/dev/mixer	rw
+	/dev/ippp0	rw
+	/dev/ippp1	rw
+	/dev/ippp2	rw
+	/dev/ippp3	rw
+	/dev/ippp4	rw
+	/dev/ippp5	rw
+	/dev/ippp6	rw
+	/dev/ippp7	rw
+	/dev/initctl	rw
+	/dev/fd0	r
+	/dev/cdrom	r
+	/dev/mem	h
+	/dev/kmem	h
+	/dev/port	h
+	/bin		rx
+	/sbin		rx
+	/lib		rx
+	/usr		rx
+	/etc		rx
+	/proc		rwx
+	/proc/kcore	h
+	/proc/sys	r
+	/root		r
+	/tmp		rw
+	/var		rwx
+	/var/tmp	rw
+	/var/log	r
+	/boot		r
+	/etc/grsec	h
+	
+	-CAP_LINUX_IMMUTABLE
+	-CAP_NET_RAW
+	-CAP_MKNOD
+	-CAP_SYS_RAWIO
+	-CAP_SYS_MODULE
+}
+
+/sbin/syslogd {
+	/dev/log rw
+	/var/log wo
+}
+
+/sbin/klogd {
+	/dev/log rw
+}
+
+/usr/sbin/cron {
+	/dev/log rw
+}
+
+/bin/login {
+	/dev/log rw
+}
+
+/usr/sbin/sshd {
+	/dev/log rw
+}
+
+/usr/sbin/tcpd {
+	/dev/log rw
+}
