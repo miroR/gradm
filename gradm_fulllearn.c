@@ -12,7 +12,9 @@ void fulllearn_pass1(FILE *stream)
 {
 	fulllearn_pass1in = stream;
 	fulllearn_pass1parse();
+	printf("Beginning full learning role reduction...");
 	reduce_roles(&role_list);
+	printf("done.\n");
 
 	return;
 }
@@ -25,6 +27,7 @@ int full_reduce_subjects(struct gr_learn_group_node *group,
 	__u32 table_size;
 
 	if (user) {
+		printf("Beginning full learning subject reduction for user %s...", user->rolename);
 		if (!user->hash)
 			insert_file(&(user->subject_list), "/", GR_FIND, 1);
 		else {
@@ -37,7 +40,9 @@ int full_reduce_subjects(struct gr_learn_group_node *group,
 				insert_file(&(user->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
 			}
 		}
+		printf("done.\n");
 	} else {
+		printf("Beginning full learning subject reduction for group %s...", group->rolename);
 		if (!group->hash)
 			insert_file(&(group->subject_list), "/", GR_FIND, 1);
 		else {
@@ -50,6 +55,7 @@ int full_reduce_subjects(struct gr_learn_group_node *group,
 				insert_file(&(group->subject_list), tmptable[i]->filename, tmptable[i]->mode, 1);
 			}
 		}
+		printf("done.\n");
 	}
 
 	return 0;
@@ -117,7 +123,11 @@ int full_reduce_objects(struct gr_learn_group_node *group,
 	else
 		subjects = group->subject_list;
 
+	printf("Beginning full learning object reduction for %s %s...", 
+		, user ? "user" : "group", user ? user->rolename : 
+		group->rolename);
 	traverse_file_tree(subjects, &full_reduce_object_node, NULL, NULL);
+	printf("done.\n");
 
 	return 0;
 }
