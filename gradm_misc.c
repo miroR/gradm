@@ -74,6 +74,7 @@ transmit_to_kernel(struct gr_arg_wrapper *buf)
 	}
 
 	close(fd);
+	ioctl(0, TIOCNXCL);
 	if (buf->arg->mode != GRADM_DISABLE) {
 		memset(buf->arg, 0, sizeof(struct gr_arg));
 		if (err)
@@ -96,6 +97,8 @@ void check_acl_status(u_int16_t reqmode)
 	struct gr_arg arg;
 	struct gr_arg_wrapper wrapper;
 
+	ioctl(0, TIOCEXCL);
+
 	wrapper.version = GRADM_VERSION;
 	wrapper.size = sizeof(struct gr_arg);
 	wrapper.arg = &arg;
@@ -110,16 +113,28 @@ void check_acl_status(u_int16_t reqmode)
 	close(fd);
 
 	switch (reqmode) {
+	case GRADM_PASSSET:
+		if (retval == 3) {
+			printf("Your terminal is being sniffed.\n");
+			ioctl(0, TIOCNXCL);
+			exit(EXIT_FAILURE);
+		}
+		break;
 	case GRADM_STATUS:
+		ioctl(0, TIOCNXCL);
 		if (retval == 1) {
 			printf("The RBAC system is currently enabled.\n");
 			exit(0);
 		} else if (retval == 2) {
 			printf("The RBAC system is currently disabled.\n");
 			exit(1);
+		} else if (retval == 3) {
+			printf("Your terminal is being sniffed.\n");
+			exit(2);
 		}
 		break;
 	case GRADM_ENABLE:
+		ioctl(0, TIOCNXCL);
 		if (retval == 1) {
 			printf("The operation you requested cannot be performed "
 				"because the RBAC system is currently enabled.\n");
@@ -134,6 +149,11 @@ void check_acl_status(u_int16_t reqmode)
 		if (retval == 2) {
 			printf("The operation you requested cannot be performed "
 				"because the RBAC system is currently disabled.\n");
+			ioctl(0, TIOCNXCL);
+			exit(EXIT_FAILURE);
+		} else if (retval == 3) {
+			printf("Your terminal is being sniffed.  Please logout and take whatever measures necessary.\n");
+			ioctl(0, TIOCNXCL);
 			exit(EXIT_FAILURE);
 		}
 		break;

@@ -284,6 +284,8 @@ parse_args(int argc, char *argv[])
 		case 'P':
 			if (argc > 3)
 				show_help();
+			entry.mode = GRADM_PASSSET;
+			check_acl_status(entry.mode);
 			if (argc == 3) {
 				strncpy(entry.rolename, argv[2], GR_SPROLE_LEN);
 				entry.rolename[GR_SPROLE_LEN - 1] = '\0';

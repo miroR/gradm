@@ -46,7 +46,8 @@ enum {
 	GRADM_RELOAD 	= 3,
 	GRADM_MODSEGV 	= 4,
 	GRADM_STATUS 	= 5,
-	GRADM_UNSPROLE 	= 6
+	GRADM_UNSPROLE 	= 6,
+	GRADM_PASSSET	= 7
 };
 
 enum {
