@@ -38,8 +38,12 @@ void get_user_passwd(struct gr_pw_entry * entry, int mode)
 	struct termios term;
 	struct gr_pw_entry * old = NULL;
 	struct gr_pw_entry new;
-	int i;
+	int i, err;
 
+	err = mlock(&new, sizeof(new));
+	if (err)
+		fprintf(stderr, "Warning: Unable to lock password "
+			"into physical memory.\n");
 start_pw:
 	memset(&new, 0, sizeof(struct gr_pw_entry));
 

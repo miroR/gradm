@@ -745,6 +745,7 @@ struct gr_arg * conv_user_to_kernel(struct gr_pw_entry * entry)
 	unsigned long iacls = 0;
 	unsigned long tiacls = 0;
 	unsigned long i = 0;
+	int err;
 
 	for_each_role(rtmp, current_role) {
 		racls++;
@@ -759,6 +760,11 @@ struct gr_arg * conv_user_to_kernel(struct gr_pw_entry * entry)
 
 	if((retarg = (struct gr_arg *) calloc(1, sizeof(struct gr_arg))) == NULL)
 		failure("calloc");
+
+	err = mlock(retarg, sizeof(struct gr_arg));
+	if (err)
+		fprintf(stderr, "Warning, unable to lock authentication "
+			"structure in physical memory.\n");
 
 	if(!racls && !tpacls && !facls)  // we are disabling, don't want to calloc 0
 		goto set_pw;

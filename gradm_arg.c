@@ -58,6 +58,7 @@ static void conv_name_to_num(const char * filename, unsigned short * dev, ino_t 
 void parse_args(int argc, char *argv[])
 {
 	int next_option = 0;
+	int err;
 	char * output_log = NULL;
 	char * learn_log = NULL;
 	int gr_learn = 0;
@@ -78,6 +79,11 @@ void parse_args(int argc, char *argv[])
 		{ "output",	1,	NULL,	'O'	},
 		{ NULL,		0,	NULL,	 0 	}
 	};
+
+	err = mlock(&entry, sizeof(entry));
+	if (err)
+		fprintf(stderr, "Warning: Unable to lock password "
+			"in physical memory.\n");
 
 	memset(&entry, 0, sizeof(struct gr_pw_entry));
 
