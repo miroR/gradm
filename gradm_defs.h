@@ -306,6 +306,7 @@ struct user_acl_role_db {
 	__u32 s_entries; /* total number of subject acls */
 	__u32 i_entries; /* total number of ip acls */
 	__u32 o_entries; /* Total number of object acls */
+	__u32 a_entries; /* total number of allowed role ips */
 };
 
 struct gr_arg {
