@@ -778,6 +778,7 @@ int third_reduce_node(struct gr_learn_file_node *node,
 		if ((*tmp)->mode == node->mode ||
 		    (((node->mode & (GR_WRITE | GR_CREATE)) == (GR_WRITE | GR_CREATE)) &&
 		    ((*tmp)->mode & GR_WRITE))) {
+			node->mode |= (*tmp)->mode;
 			tmp2 = tmp;
 			free(*tmp);
 			*tmp = NULL;
