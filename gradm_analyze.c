@@ -242,8 +242,6 @@ void analyze_acls(void)
 	unsigned int errs_found = 0;
 	struct role_acl *role;
 
-	return;
-
 	for_each_role(role, current_role) {
 
 	def_acl = role->root_label;
