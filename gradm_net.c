@@ -51,7 +51,10 @@ add_ip_acl(struct proc_acl *subject, u_int8_t mode, struct ip_acl *acl_tmp)
 	num_pointers++;
 
 	subject->ip_num++;
-	subject->ips = gr_dyn_realloc(subject->ips, subject->ip_num * sizeof(struct ip_acl *));
+	if (subject->ips == NULL)
+		subject->ips = gr_dyn_alloc(subject->ip_num * sizeof(struct ip_acl *));
+	else
+		subject->ips = gr_dyn_realloc(subject->ips, subject->ip_num * sizeof(struct ip_acl *));
 
 	p = (struct ip_acl *) calloc(1, sizeof (struct ip_acl));
 	if (!p)
