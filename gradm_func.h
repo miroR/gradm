@@ -126,3 +126,4 @@ void gr_dyn_free(void *addr);
 void insert_acl_object(struct proc_acl *subject, struct file_acl *object);
 void insert_acl_subject(struct role_acl *role, struct proc_acl *subject);
 
+void insert_nested_acl_subject(struct proc_acl *subject);

@@ -554,3 +554,8 @@ void insert_acl_subject(struct role_acl *role, struct proc_acl *subject)
 	return;
 }
 
+void insert_nested_acl_subject(struct proc_acl *subject)
+{
+	subject->hash = create_hash_table(GR_HASH_OBJECT);
+	return;
+}

@@ -568,6 +568,8 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 	/* don't insert nested subjects into main hash */
 	if (!(flag & GR_FFAKE))
 		insert_acl_subject(role, p);
+	else
+		insert_nested_acl_subject(p);
 
 	current_subject = p;
 
