@@ -65,10 +65,10 @@ subject_label:			SUBJECT SUBJ_NAME subj_mode
 
 				 if (!stat($2, &fstat) && S_ISREG(fstat.st_mode)) {
 					if (is_valid_elf_binary($2)) {
-						if (!add_proc_object_acl(current_subject, $2, proc_object_mode_conv("xo"), GR_LEARN))
+						if (!add_proc_object_acl(current_subject, $2, proc_object_mode_conv("x"), GR_LEARN))
 							exit(EXIT_FAILURE);
 					} else {
-						if (!add_proc_object_acl(current_subject, $2, proc_object_mode_conv("rxo"), GR_LEARN))
+						if (!add_proc_object_acl(current_subject, $2, proc_object_mode_conv("rx"), GR_LEARN))
 							exit(EXIT_FAILURE);
 					}
 				 }
