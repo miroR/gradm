@@ -122,10 +122,10 @@ add_domain_child(struct role_acl *role, char *idname)
 	struct group *grp;
 
 	if (is_role_dupe(current_role, idname, role->roletype)) {
-		fprintf(stderr, "Duplicate role on line %lu of %s.\n"
+		fprintf(stderr, "Duplicate role %s on line %lu of %s.\n"
 			"The RBAC system will not be allowed to be "
 			"enabled until this error is fixed.\n",
-			lineno, current_acl_file);
+			idname, lineno, current_acl_file);
 		exit(EXIT_FAILURE);
 	}
 
@@ -318,10 +318,10 @@ add_role_acl(struct role_acl **role, char *rolename, u_int16_t type, int ignore)
 	}
 
 	if (is_role_dupe(*role, rtmp->rolename, rtmp->roletype)) {
-		fprintf(stderr, "Duplicate role on line %lu of %s.\n"
+		fprintf(stderr, "Duplicate role %s on line %lu of %s.\n"
 			"The RBAC system will not be allowed to be "
 			"enabled until this error is fixed.\n",
-			lineno, current_acl_file);
+			rtmp->rolename, lineno, current_acl_file);
 		exit(EXIT_FAILURE);
 	}
 
