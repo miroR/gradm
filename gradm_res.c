@@ -132,7 +132,7 @@ add_res_acl(struct proc_acl *subject, const char *name,
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "
 			"add a resource without a subject declaration.\n"
-			"The ACL system will not load until this "
+			"The RBAC system will not load until this "
 			"error is fixed.\n", lineno, current_acl_file);
 		exit(EXIT_FAILURE);
 	}

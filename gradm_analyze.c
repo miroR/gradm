@@ -82,7 +82,7 @@ check_default_objects(struct role_acl *role)
 			def_notfound = 0;
 		if (def_notfound) {
 			fprintf(stderr, "Default ACL object not found for "
-				"role %s subject %s\nThe ACL system will "
+				"role %s subject %s\nThe RBAC system will "
 				"not load until you correct this "
 				"error.\n", role->rolename, tmp->filename);
 			exit(EXIT_FAILURE);
@@ -491,9 +491,9 @@ analyze_acls(void)
 		errs_found += handle_notrojan_mode();
 
 		if (errs_found) {
-			printf("There were %d holes found in your ACL "
+			printf("There were %d holes found in your RBAC "
 			       "configuration.  These must be fixed before the "
-			       "ACL system will be allowed to be enabled.\n",
+			       "RBAC system will be allowed to be enabled.\n",
 			       errs_found);
 			exit(EXIT_FAILURE);
 		}

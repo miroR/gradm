@@ -135,7 +135,7 @@ add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 
 	if (strcmp(rolename, "default") && (type & GR_ROLE_DEFAULT)) {
 		fprintf(stderr, "No role type specified for %s on line %lu "
-			"of %s.\nThe ACL system will not be allowed to be "
+			"of %s.\nThe RBAC system will not be allowed to be "
 			"enabled until this error is fixed.\n", rolename,
 			lineno, current_acl_file);
 		return 0;
@@ -143,7 +143,7 @@ add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 
 	if (is_role_dupe(*role, rtmp->rolename, rtmp->roletype)) {
 		fprintf(stderr, "Duplicate role on line %lu of %s.\n"
-			"The ACL system will not be allowed to be "
+			"The RBAC system will not be allowed to be "
 			"enabled until this error is fixed.\n",
 			lineno, current_acl_file);
 		return 0;
@@ -157,7 +157,7 @@ add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 
 			if (!pwd) {
 				fprintf(stderr, "User %s on line %lu of %s "
-					"does not exist.\nThe ACL system will "
+					"does not exist.\nThe RBAC system will "
 					"not be allowed to be enabled until "
 					"this error is fixed.\n", rolename,
 					lineno, current_acl_file);
@@ -170,7 +170,7 @@ add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 
 			if (!grp) {
 				fprintf(stderr, "Group %s on line %lu of %s "
-					"does not exist.\nThe ACL system will "
+					"does not exist.\nThe RBAC system will "
 					"not be allowed to be enabled until "
 					"this error is fixed.\n", rolename,
 					lineno, current_acl_file);
@@ -245,7 +245,7 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 		if (err) {
 			fprintf(stderr, "glob() error \"%s\" encountered"
 				" on line %lu of %s.\n"
-				"The ACL system will not load until this"
+				"The RBAC system will not load until this"
 				" error is fixed.\n", strerror(errno), lineno,
 				current_acl_file);
 			exit(EXIT_FAILURE);
@@ -313,7 +313,7 @@ add_link1:
 		if (err) {
 			fprintf(stderr, "glob() error \"%s\" encountered"
 				" on line %lu of %s.\n"
-				"The ACL system will not load until this"
+				"The RBAC system will not load until this"
 				" error is fixed.\n", strerror(errno), lineno,
 				current_acl_file);
 			exit(EXIT_FAILURE);
@@ -409,7 +409,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "
 			"add an object without a subject declaration.\n"
-			"The ACL system will not load until this "
+			"The RBAC system will not load until this "
 			"error is fixed.\n", lineno, current_acl_file);
 		return 0;
 	}
@@ -474,13 +474,15 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	} else if ((p2 = is_proc_object_dupe(*filp, p))) {
 		if (type & GR_SYMLINK)
 			return 1;
-		fprintf(stderr, "Duplicate ACL entry found for \"%s\""
-			" on line %lu of %s.\n"
+		fprintf(stderr, "Duplicate object found for \"%s\""
+			" in role %s, subject %s, on line %lu of %s.\n"
 			"\"%s\" references the same object as the following object(s):\n",
-			p->filename, lineno, current_acl_file, p->filename);
+			p->filename, current_role->rolename, 
+			subject->filename, lineno, 
+			current_acl_file, p->filename);
 		display_all_dupes(subject, p);
 		fprintf(stderr, "specified on an earlier line."
-			"The ACL system will not load until this"
+			"The RBAC system will not load until this"
 			" error is fixed.\n");
 		return 0;
 	}
@@ -505,7 +507,7 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 	if (!role) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "
 			"add a subject without a role declaration.\n"
-			"The ACL system will not load until this "
+			"The RBAC system will not load until this "
 			"error is fixed.\n", lineno, current_acl_file);
 		return 0;
 	}
@@ -554,12 +556,13 @@ add_proc_subject_acl(struct role_acl *role, char *filename, __u32 mode, int flag
 	p->inode = fstat.st_ino;
 
 	if (!(flag & GR_FFAKE) && (p2 = is_proc_subject_dupe(role, p))) {
-		fprintf(stderr, "Duplicate ACL entry found for \"%s\""
-			" on line %lu of %s.\n"
+		fprintf(stderr, "Duplicate subject found for \"%s\""
+			" in role %s, on line %lu of %s.\n"
 			"\"%s\" references the same object as \"%s\""
 			" specified on an earlier line.\n"
-			"The ACL system will not load until this"
-			" error is fixed.\n", p->filename, lineno,
+			"The RBAC system will not load until this"
+			" error is fixed.\n", p->filename, 
+			role->rolename, lineno,
 			current_acl_file, p->filename, p2->filename);
 		return 0;
 	}

@@ -37,7 +37,7 @@ add_ip_acl(struct proc_acl *subject, __u8 mode, struct ip_acl *acl_tmp)
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.\n  Definition "
 			"of an IP ACL without a subject definition.\n"
-			"The ACL system will not be allowed to be "
+			"The RBAC system will not be allowed to be "
 			"enabled until this problem is fixed.\n",
 			lineno, current_acl_file);
 		exit(EXIT_FAILURE);

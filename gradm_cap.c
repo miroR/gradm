@@ -49,7 +49,7 @@ cap_conv(const char *cap)
 		}
 
 	fprintf(stderr, "Invalid capability name \"%s\" on line %lu of %s.\n"
-		"The ACL system will not load until this"
+		"The RBAC system will not load until this"
 		" error is fixed.\n", cap, lineno, current_acl_file);
 
 	exit(EXIT_FAILURE);
@@ -66,7 +66,7 @@ add_cap_acl(struct proc_acl *subject, const char *cap)
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "
 			"add a capability without a subject declaration.\n"
-			"The ACL system will not load until this "
+			"The RBAC system will not load until this "
 			"error is fixed.\n", lineno, current_acl_file);
 		exit(EXIT_FAILURE);
 	}

@@ -1,6 +1,6 @@
 .TH GRADM 8 
 .SH NAME
-gradm \- Administration program for grsecurity ACLs
+gradm \- Administration program for the grsecurity RBAC system
 .SH SYNOPSIS
 .B gradm
 [
@@ -50,8 +50,8 @@ is the userspace ACL parsing and authentication program for the
 Access Control List System.
 
 grsecurity aims to be a complete security system for Linux 2.4.  gradm 
-performs several tasks for the ACL system including authenticated via a 
-password to the kernel and parsing ACLs to be passed to the kernel.
+performs several tasks for the RBAC system including authenticated via a 
+password to the kernel and parsing rules to be passed to the kernel.
 
 .SH OPTIONS
 .TP
@@ -59,16 +59,16 @@ password to the kernel and parsing ACLs to be passed to the kernel.
 All options to gradm are mutually exclusive, except for -L and -O.
 .TP
 .B \-E
-Enable the ACL system
+Enable the RBAC system
 .TP
 
 .B \-R
-Reload the ACL system (only valid while in admin mode)
+Reload the RBAC system (only valid while in admin mode)
 .TP
 
 .B \-M <filename|uid>
 Remove an execution ban on a given uid or filename that has been
-put in place by the RES_CRASH resource restriction of the ACL system.
+put in place by the RES_CRASH resource restriction of the RBAC system.
 .TP
 
 .B \-L <logfile>
@@ -83,7 +83,7 @@ Specifies output mode.  Requires a single argument that can be
 .TP
 
 .B \-D
-Disable the ACL system
+Disable the RBAC system
 .TP
 
 .B \-T <subject> <object>
@@ -92,7 +92,7 @@ Displays the permissions for object allowed by subject
 
 .B \-P [rolename]
 Without an argument, it sets the password for administering
-the ACL system.  With a role name as an argument, it sets
+the RBAC system.  With a role name as an argument, it sets
 the password for that given special role.
 .TP
 
@@ -116,7 +116,7 @@ Print version information and exit
 
 .SH REPORTING BUGS
 Please include as much information as possible(using any available debugging 
-options) and send bug reports for gradm or the grsecurity ACL system 
+options) and send bug reports for gradm or the grsecurity RBAC system 
 to 
 .B dev@grsecurity.net.
 
