@@ -34,7 +34,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 <*>"#"					{ BEGIN(COMMENT_STATE); }
 <*>[ \t]+				;
-<COMMENT_STATE>[.]*			;
+<COMMENT_STATE>.*			;
 
 <ROLETYPE_STATE>[ugs]			{
 					  gradmlval.string = strdup(yytext);
