@@ -140,7 +140,6 @@ parse_args(int argc, char *argv[])
 				show_help();
 			entry.mode = GRADM_UNSPROLE;
 			check_acl_status(entry.mode);
-			get_user_passwd(&entry, GR_PWONLY);
 			grarg = conv_user_to_kernel(&entry);
 			transmit_to_kernel(grarg, sizeof (struct gr_arg));
 			memset(grarg, 0, sizeof (struct gr_arg));
