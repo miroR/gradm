@@ -12,8 +12,6 @@ static int fd2 = -1;
 /* handle flushing of buffer when grlearn is stopped */
 void term_handler(int sig)
 {
-	char c;
-
 	signal(sig, SIG_IGN);
 	if (fd2 >= 0)
 		write(fd2, writebuf, writep - writebuf);
