@@ -23,7 +23,7 @@
 #operation without restriction as will any binaries executed by
 #these processes.
 
-inherit-learn /etc/cron-hourly
-inherit-learn /etc/cron-daily
-inherit-learn /etc/cron-weekly
-inherit-learn /etc/cron-monthly
+inherit-learn /etc/cron.hourly
+inherit-learn /etc/cron.daily
+inherit-learn /etc/cron.weekly
+inherit-learn /etc/cron.monthly
