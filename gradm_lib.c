@@ -235,6 +235,8 @@ void resize_hash_table(struct gr_hash_struct *hash)
 
 void *lookup_name_entry(struct gr_hash_struct *hash, char *name)
 {
+	if (hash == NULL)
+		return NULL;
 	if (hash->type == GR_HASH_OBJECT) {
 		unsigned long index = nhash(name, hash->table_size);
 		struct file_acl *match;
@@ -285,6 +287,9 @@ struct proc_acl *lookup_acl_subject_by_name(struct role_acl *role, char *name)
 
 void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 {
+	if (hash == NULL)
+		return NULL;
+
 	if (hash->type == GR_HASH_OBJECT) {
 		struct file_acl *object = (struct file_acl *)entry;
 		unsigned long index = fhash(object->inode, object->dev, hash->table_size);
