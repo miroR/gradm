@@ -15,6 +15,8 @@
 #define GR_SALT_SIZE		16
 #define GR_SHA_SUM_SIZE		32
 
+#define GR_SPROLE_LEN		64
+
 #define GR_FEXIST		0x1
 #define GR_FFAKE		0x2
 #define GR_FLEARN		0x4
@@ -34,7 +36,7 @@
 enum {
 	GRADM_DISABLE	= 0,
 	GRADM_ENABLE	= 1,
-	GRADM_ADMIN	= 2,
+	GRADM_SPROLE	= 2,
 	GRADM_RELOAD	= 3,
 	GRADM_MODSEGV	= 4
 };
@@ -66,7 +68,9 @@ enum {
 	GR_ROLE_GROUP	= 0x02,
 	GR_ROLE_DEFAULT = 0x04,
 	GR_ROLE_SPECIAL = 0x08,
-	GR_ROLE_AUTH	= 0x10
+	GR_ROLE_AUTH	= 0x10,
+	GR_ROLE_NOPW	= 0x20,
+	GR_ROLE_GOD	= 0x40
 };
 
 enum {
@@ -183,6 +187,9 @@ struct role_acl {
 	char * rolename;
 	uid_t uidgid;
 	__u8 roletype;
+
+	__u16 auth_attempts;
+	unsigned long expires;
 
 	struct proc_acl *root_label;
 	struct proc_acl *proc_subject;
@@ -309,11 +316,20 @@ struct user_acl_role_db {
 	__u32 a_entries; /* total number of allowed role ips */
 };
 
+struct sprole_pw {
+	unsigned char *rolename;
+	unsigned char salt[GR_SALT_LEN];
+	unsigned char sum[GR_SHA_LEN];
+}
+
 struct gr_arg {
         struct user_acl_role_db role_db;
         unsigned char pw[GR_PW_LEN];
 	unsigned char salt[GR_SALT_SIZE];
 	unsigned char sum[GR_SHA_SUM_SIZE];
+	unsigned char sp_role[GR_SPROLE_LEN];
+	struct sprole_pw *sprole_pws;
+	__u16 num_sprole_pws;
 	unsigned short segv_dev;
 	ino_t segv_inode;	
 	uid_t segv_uid;
