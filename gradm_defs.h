@@ -1,8 +1,7 @@
 #define GRSEC_DIR		"/etc/grsec"
+#define GRLEARN_PATH		"/sbin/grlearn"
 #define GR_ACL_PATH 		GRSEC_DIR "/acl"
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
-
-#define SYSLOG_CONF		"/etc/syslog.conf"
 
 #define GR_VERSION		"2.0"
 

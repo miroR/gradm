@@ -10,7 +10,7 @@ gradm \- Administration program for grsecurity ACLs
 .B \-R
 ]
 [
-.B \-L [logfile]
+.B \-L <logfile>
 ]
 [
 .B \-O <filename|stream>
@@ -71,12 +71,9 @@ Remove an execution ban on a given uid or filename that has been
 put in place by the RES_CRASH resource restriction of the ACL system.
 .TP
 
-.B \-L [logfile]
-Parses the learning logs.  Accepts an optional argument which
-specifies the kernel logfile to scan for the learning logs.
-Learning logs are logged through syslog with a level of INFO.
-If the argument is not specified, gradm will scan your
-/etc/syslog.conf file to find a suitable log to scan.
+.B \-L <logfile>
+Parses the learning logs.  Accepts an argument which
+specifies the logfile to scan for the learning logs.
 This option has to be used with -O.
 .TP
 

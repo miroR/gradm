@@ -25,7 +25,7 @@ show_help(void)
 	       "			Create password for ACL administration\n"
 	       "			or a special role\n"
 	       "	-R, --reload	Reload the ACL system while in admin mode\n"
-	       "	-L [filename], --learn\n"
+	       "	-L <filename>, --learn\n"
 	       "			Compute new ACLs from learning log\n"
 	       "	-O <filename>, --output\n"
 	       "			Specify where to place ACLs generated from learning mode\n"
@@ -71,7 +71,7 @@ parse_args(int argc, char *argv[])
 	int gr_output = 0;
 	struct gr_pw_entry entry;
 	struct gr_arg *grarg;
-	const char *const short_opts = "EDP::RL::O:M:a:n:hv";
+	const char *const short_opts = "EDP::RL:O:M:a:n:hv";
 	const struct option long_opts[] = {
 		{"help", 0, NULL, 'h'},
 		{"version", 0, NULL, 'v'},
@@ -82,7 +82,7 @@ parse_args(int argc, char *argv[])
 		{"noauth", 1, NULL, 'n'},
 		{"reload", 0, NULL, 'R'},
 		{"modsegv", 1, NULL, 'M'},
-		{"learn", 2, NULL, 'L'},
+		{"learn", 1, NULL, 'L'},
 		{"output", 1, NULL, 'O'},
 		{NULL, 0, NULL, 0}
 	};
@@ -108,6 +108,7 @@ parse_args(int argc, char *argv[])
 			parse_acls();
 			expand_acls();
 			analyze_acls();
+			start_grlearn(learn_log);
 			grarg = conv_user_to_kernel(&entry);
 			read_saltandpass(entry.rolename, grarg->salt,
 					 grarg->sum);
@@ -151,14 +152,15 @@ parse_args(int argc, char *argv[])
 			grarg = conv_user_to_kernel(&entry);
 			transmit_to_kernel(grarg, sizeof (struct gr_arg));
 			memset(grarg, 0, sizeof (struct gr_arg));
+			stop_grlearn();
 			exit(EXIT_SUCCESS);
 			break;
 		case 'L':
 			if (argc > 5 || argc < 3)
 				show_help();
 			gr_learn = 1;
-			if (optind <= (argc - 1) && argv[optind][0] != '-')
-				learn_log = strdup(argv[optind]);
+			if (optarg)
+				learn_log = strdup(optarg);
 			break;
 		case 'O':
 			if (argc > 5 || argc < 3)
@@ -243,9 +245,6 @@ parse_args(int argc, char *argv[])
 				exit(EXIT_FAILURE);
 			}
 		}
-
-		if (!learn_log)
-			syslog_lookup_log(&learn_log);
 
 		handle_learn_logs(learn_log, stream);
 

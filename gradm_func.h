@@ -18,6 +18,7 @@ int add_proc_object_acl(struct proc_acl *subject, char *filename,
 			__u32 mode, int type);
 void add_cap_acl(struct proc_acl *subject, const char *cap);
 void add_gradm_acl(struct role_acl *role);
+void add_grlearn_acl(struct role_acl *role);
 void change_current_acl_file(const char *filename);
 struct gr_arg *conv_user_to_kernel(struct gr_pw_entry *entry);
 int parent_dir(const char *filename, char *parent_dirent[]);

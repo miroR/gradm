@@ -192,6 +192,8 @@ add_role_acl(struct role_acl **role, char *rolename, __u16 type, int ignore)
 
 	if (type & GR_ROLE_AUTH)
 		add_gradm_acl(*role);
+	if (!(type & GR_ROLE_SPECIAL))
+		add_grlearn_acl(*role);
 
 	return 1;
 }
