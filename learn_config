@@ -51,9 +51,11 @@ high-reduce-path /dev/pts
 high-reduce-path /var/tmp
 high-reduce-path /proc
 high-reduce-path /lib
+high-reduce-path /lib/tls
 high-reduce-path /lib/security
 high-reduce-path /lib/modules
 high-reduce-path /usr/lib
+high-reduce-path /usr/lib/tls
 high-reduce-path /var/lib
 high-reduce-path /usr/bin
 high-reduce-path /usr/sbin
