@@ -106,7 +106,7 @@ void verbose_stats(void)
 	}				
 
 	printf("Policy statistics:\n");
-	printf("----------------------------------------------------------------\n");
+	printf("-------------------------------------------------------\n");
 	printf("Role summary:\n");
 	printf("\t%d user roles\n", uroles);
 	printf("\t%d group roles\n", groles);
