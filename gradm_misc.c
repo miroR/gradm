@@ -141,6 +141,14 @@ init_variables(void)
 	num_objects = 0;
 	num_pointers = 0;
 
+	dont_reduce_dirs = NULL;
+	protected_paths = NULL;
+	high_reduce_dirs = NULL;
+	high_protected_paths = NULL;
+
+	add_to_string_array(&high_protected_paths, GRSEC_DIR);
+	add_to_string_array(&high_protected_paths, GRDEV_PATH);
+
 	memset(&ip, 0, sizeof (ip));
 
 	return;

@@ -1,71 +1,7 @@
 #include "gradm.h"
 
-char *high_reduce_dirs[] = {
-				"/tmp",
-				"/dev/pts",
-				"/var/tmp",
-				"/proc",
-				"/lib",
-				"/lib/security",
-				"/lib/modules",
-				"/usr/lib",
-				"/var/lib",
-				"/usr/bin",
-				"/usr/sbin",
-				"/sbin",
-				"/bin",
-				"/usr/local/share",
-				"/usr/local/bin",
-				"/usr/local/sbin",
-				"/usr/local/etc",
-				"/usr/local/lib",
-				"/usr/share",
-				"/usr/share/locale",
-				"/usr/share/zoneinfo",
-				"/usr/X11R6/lib",
-				NULL
-			   };
-
-char *dont_reduce_dirs[] = {
-				"/",
-				"/dev",
-				"/usr",
-				"/var",
-				"/opt",
-				NULL
-			   };
-
-char *protected_paths[] = {
-				"/etc",
-				"/lib",
-				"/boot",
-				"/usr",
-				"/opt",
-				"/var",
-				"/dev/log",
-				"/root",
-				NULL
-			};
-
-char *high_protected_paths[] = {
-				"/etc/ssh",
-				GRSEC_DIR,
-				GRDEV_PATH,
-				"/proc/kcore",
-				"/proc/sys",
-				"/proc/bus",
-				"/etc/shadow",
-				"/etc/passwd",
-				"/var/log",
-				"/dev/mem",
-				"/dev/kmem",
-				"/dev/port",
-				"/dev/log",
-				NULL
-			};
-
-struct gr_learn_file_node **cachednode = NULL;
-unsigned int cachedlen = 0;
+static struct gr_learn_file_node **cachednode = NULL;
+static unsigned int cachedlen = 0;
 
 int is_protected_path(char *filename, u_int32_t mode)
 {

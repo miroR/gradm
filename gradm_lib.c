@@ -1,5 +1,20 @@
 #include "gradm.h"
 
+void add_to_string_array(char ***array, char *str)
+{
+	unsigned int size = 0;
+	if (*array == NULL)
+		*array = gr_dyn_alloc(2 * sizeof(char *));
+	while (*(*array + size))
+		size++;
+
+	*array = gr_dyn_realloc(*array, (size + 2) * sizeof(char *));
+	memset(*array + size, 0, 2 * sizeof(char *));
+	*(*array + size) = str;
+
+	return;
+}
+
 char * gr_strdup(char *p)
 {
 	char *ret;

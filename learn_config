@@ -2,7 +2,8 @@
 #the learning algorithm for specific paths.
 #
 #It accepts lines in the form of <command> <pathname>
-#Where <command> can be inherit-learn, no-learn, or inherit-no-learn.
+#Where <command> can be inherit-learn, no-learn, inherit-no-learn,
+#high-reduce-path, dont-reduce-path, protected-path, and high-protected-path.
 #
 #inherit-learn changes the learning process for the specified path
 #by throwing all learned accesses for every binary executed by the
@@ -22,6 +23,71 @@
 #within the specified path will be able to perform any normal system
 #operation without restriction as will any binaries executed by
 #these processes.
+#
+#high-reduce-path modifies the heuristics of the learning process
+#to weight in favor of reducing accesses for this path
+#
+#dont-reduce-path modifies the heuristics of the learning process
+#so that it will never reduce accesses for this path
+#
+#protected-path specifies a path on your system that is considered an
+#important resource.  Any process that modifies one of these paths
+#is given its own subject in the learning process, facilitating
+#a secure policy.
+#
+#high-protected-path specifies a path that should be hidden from
+#all processes but those that access it directly.  It is recommended
+#to use highly sensitive files for this command.
+
+high-reduce-path /tmp
+high-reduce-path /dev/pts
+high-reduce-path /var/tmp
+high-reduce-path /proc
+high-reduce-path /lib
+high-reduce-path /lib/security
+high-reduce-path /lib/modules
+high-reduce-path /usr/lib
+high-reduce-path /var/lib
+high-reduce-path /usr/bin
+high-reduce-path /usr/sbin
+high-reduce-path /sbin
+high-reduce-path /bin
+high-reduce-path /usr/local/share
+high-reduce-path /usr/local/bin
+high-reduce-path /usr/local/sbin
+high-reduce-path /usr/local/etc
+high-reduce-path /usr/local/lib
+high-reduce-path /usr/share
+high-reduce-path /usr/share/locale
+high-reduce-path /usr/share/zoneinfo
+high-reduce-path /usr/X11R6/lib
+
+dont-reduce-path /
+dont-reduce-path /dev
+dont-reduce-path /usr
+dont-reduce-path /var
+dont-reduce-path /opt
+
+protected-path /etc
+protected-path /lib
+protected-path /boot
+protected-path /usr
+protected-path /opt
+protected-path /var
+protected-path /dev/log
+protected-path /root
+
+high-protected-path /etc/ssh
+high-protected-path /proc/kcore
+high-protected-path /proc/sys
+high-protected-path /proc/bus
+high-protected-path /etc/shadow
+high-protected-path /etc/passwd
+high-protected-path /var/log
+high-protected-path /dev/mem
+high-protected-path /dev/kmem
+high-protected-path /dev/port
+high-protected-path /dev/log
 
 inherit-learn /etc/cron.hourly
 inherit-learn /etc/cron.daily

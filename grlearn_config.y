@@ -8,7 +8,8 @@ extern int grlearn_configlex(void);
 	unsigned long num;
 }
 
-%token <string> FILENAME NOLEARN INHERITLEARN INHERITNOLEARN CACHESIZE
+%token <string> FILENAME NOLEARN INHERITLEARN INHERITNOLEARN DONTREDUCE 
+%token <string> PROTECTED HIGHPROTECTED HIGHREDUCE
 %token <num> NUM
 
 %%
@@ -22,6 +23,22 @@ learn_config:
 		{
 			add_proc_subject_acl(current_role, $2, proc_subject_mode_conv("o"), 0);
 			add_proc_object_acl(current_subject, "/", proc_object_mode_conv("rwxcdm"), GR_FEXIST);
+		}
+	|	DONTREDUCE FILENAME
+		{
+			add_to_string_array(&dont_reduce_dirs, $2);
+		}
+	|	PROTECTED FILENAME
+		{
+			add_to_string_array(&protected_paths, $2);
+		}
+	|	HIGHREDUCE FILENAME
+		{
+			add_to_string_array(&high_reduce_dirs, $2);
+		}
+	|	HIGHPROTECTED FILENAME
+		{
+			add_to_string_array(&high_protected_paths, $2);
 		}
 	|	INHERITLEARN FILENAME
 		{

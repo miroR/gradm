@@ -140,3 +140,4 @@ void output_learn_header(FILE *stream);
 int display_leaf(struct gr_learn_file_node *node, struct gr_learn_file_node *unused1, FILE *stream);
 
 void insert_learn_id_transition(unsigned int ***list, int real, int eff, int fs);
+void add_to_string_array(char ***array, char *str);

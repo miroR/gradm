@@ -30,10 +30,18 @@ FILENAME [/][^\t\n]*
 "no-learn"				{
 					  return NOLEARN;
 					}
-"cache-size"				{
-					  return CACHESIZE;
+"dont-reduce"				{
+					  return DONTREDUCE;
 					}
-
+"high-reduce"				{
+					  return HIGHREDUCE;
+					}
+"protected"				{
+					  return PROTECTED;
+					}
+"high-protected"			{
+					  return HIGHPROTECTED;
+					}
 {NUM}					{
 					  grlearn_configlval.num = atol(yytext);
 					  return NUM;

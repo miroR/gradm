@@ -414,3 +414,8 @@ u_int32_t num_domain_children;
 char *current_learn_rolename;
 char *current_learn_subject;
 u_int16_t current_learn_rolemode;
+
+char **dont_reduce_dirs;
+char **protected_paths;
+char **high_reduce_dirs;
+char **high_protected_paths;
