@@ -107,16 +107,18 @@ struct rlimconv {
 };
 
 struct learn_info {
-	unsigned short subj_dev;
-	ino_t subj_ino;
+	char * rolename;
+	__u8 roletype;
+	char *subjname;
 	char * obj_name;
 	__u32 res_cur, res_max;
 	__u32 mode;
 };
 
 struct ip_learn_info {
-	unsigned short subj_dev;
-	ino_t subj_ino;
+	char *rolename;
+	__u8 roletype;
+	char *subjname;
 	__u32 addr;
 	__u16 port;
 	__u16 sock;

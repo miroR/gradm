@@ -109,7 +109,7 @@ static void clear_remove_queue(void)
 	return;
 }
 
-static int learn_is_dupe(unsigned short subj_dev, ino_t subj_ino,
+static int learn_is_dupe(char *rolename, __u8 roletype, char *subjname,
 			 unsigned long res_cur, unsigned long res_max,
 			 char * obj_name, __u32 mode)
 {
@@ -121,9 +121,10 @@ static int learn_is_dupe(unsigned short subj_dev, ino_t subj_ino,
 	for(i = 0; i < learn_num; i++, tmp_db++) {
 		if(!(*tmp_db)) continue;
 
-		if(((*tmp_db)->subj_dev == subj_dev) &&
-		   ((*tmp_db)->subj_ino == subj_ino) &&
-		   !strcmp((*tmp_db)->obj_name, obj_name)) {
+		if(!strcmp((*tmp_db)->obj_name, obj_name) &&
+		   !strcmp((*tmp_db)->rolename, rolename) &&
+		   !strcmp((*tmp_db)->subjname, subjname) &&
+		   (*tmp_db)->roletype == roletype) {
 			// capabilities and resources get special handling
 			if(!strlen(obj_name)) {
 				if(!res_cur && !res_max && 
@@ -156,7 +157,7 @@ static int learn_is_dupe(unsigned short subj_dev, ino_t subj_ino,
 
 static void insert_reduced_acl(unsigned long offset, char * common_dir,
 				unsigned long res_cur, unsigned long res_max,
-			       unsigned short subj_dev, ino_t subj_ino, __u32 mode)
+			       char *rolename, __u8 roletype, char *subjname, __u32 mode)
 {
 	char * reduced_dir;
 
@@ -166,15 +167,16 @@ static void insert_reduced_acl(unsigned long offset, char * common_dir,
 
 	strncpy(reduced_dir, common_dir, strlen(common_dir));
 
-	if(learn_is_dupe(subj_dev, subj_ino, res_cur, res_max, reduced_dir, mode)) {
+	if(learn_is_dupe(rolename, roletype, subjname, res_cur, res_max, reduced_dir, mode)) {
 		free(reduced_dir);
 		free((*(learn_db + offset))->obj_name);
 		(*(learn_db + offset)) = NULL;
 		return;
 	}
 
-	(*(learn_db + offset))->subj_dev = subj_dev;
-	(*(learn_db + offset))->subj_ino = subj_ino;
+	(*(learn_db + offset))->rolename = rolename;
+	(*(learn_db + offset))->roletype = roletype;
+	(*(learn_db + offset))->subjname = subjname;
 	(*(learn_db + offset))->res_cur = res_cur;
 	(*(learn_db + offset))->res_max = res_max;
 	(*(learn_db + offset))->mode = mode;
@@ -223,10 +225,12 @@ static void reduce_acls(void)
 		
 			if(have_common_dir((*(tmp_db + x + i))->obj_name,
 			   common_dir, common_len) &&
-			   ((*(tmp_db + i))->subj_dev ==
-			   (*(tmp_db + x + i))->subj_dev) &&
-			   ((*(tmp_db + i))->subj_ino ==
-			   (*(tmp_db + x + i))->subj_ino) &&
+			   !strcmp((*(tmp_db + i))->rolename,
+				   (*(tmp_db + x + i))->rolename) &&
+			   !strcmp((*(tmp_db + i))->subjname,
+				   (*(tmp_db + x + i))->subjname) &&
+			   ((*(tmp_db + i))->roletype ==
+			   (*(tmp_db + x + i))->roletype) &&
 			   ((*(tmp_db + i))->mode ==
 			   (*(tmp_db + x + i))->mode)) {
 				occur++;
@@ -240,8 +244,9 @@ static void reduce_acls(void)
 			insert_reduced_acl(i, common_dir,
 			(*(tmp_db + i))->res_cur,
 			(*(tmp_db + i))->res_max,
-			(*(tmp_db + i))->subj_dev,
-			(*(tmp_db + i))->subj_ino,
+			(*(tmp_db + i))->rolename,
+			(*(tmp_db + i))->roletype,
+			(*(tmp_db + i))->subjname,
 			(*(tmp_db + i))->mode);
 		}
 		clear_remove_queue();						
@@ -251,7 +256,7 @@ static void reduce_acls(void)
 	return;
 }
 
-int learn_ip_is_dupe(unsigned short subj_dev, ino_t subj_ino,
+int learn_ip_is_dupe(char *rolename, __u8 roletype, char *subjname,
 			unsigned long ip, __u16 port, __u16 sock, __u16 proto,
 			__u16 mode)
 {
@@ -261,8 +266,9 @@ int learn_ip_is_dupe(unsigned short subj_dev, ino_t subj_ino,
 	tmp_db = ip_learn_db;
 
 	for(i = 0; i < ip_learn_num; i++, tmp_db++) {
-		if(((*tmp_db)->subj_dev == subj_dev) &&
-		   ((*tmp_db)->subj_ino == subj_ino) &&
+		if(!strcmp((*tmp_db)->subjname, subjname) &&
+		   !strcmp((*tmp_db)->rolename, rolename) &&
+		   ((*tmp_db)->roletype == roletype) &&
 		   ((*tmp_db)->addr == ip) &&
 		   ((*tmp_db)->port == port) &&
 		   ((*tmp_db)->sock == sock) &&
@@ -274,13 +280,13 @@ int learn_ip_is_dupe(unsigned short subj_dev, ino_t subj_ino,
 	return 0;
 }
 
-void add_learn_ip_info(unsigned short subj_dev, ino_t subj_ino,
+void add_learn_ip_info(char *rolename, __u8 roletype, char *subjname,
 			__u32 ip, __u16 port, __u16 sock, __u16 proto,
 			__u16 mode)
 {
 	struct ip_learn_info ** tmp_db;
 
-	if(learn_ip_is_dupe(subj_dev, subj_ino, ip, port, sock, proto, mode))
+	if(learn_ip_is_dupe(rolename, roletype, subjname, ip, port, sock, proto, mode))
 		return;
 
 	if((ip_learn_db = (struct ip_learn_info **) realloc(ip_learn_db, (ip_learn_num + 1) * sizeof(struct ip_learn_info *))) == NULL)
@@ -293,8 +299,7 @@ void add_learn_ip_info(unsigned short subj_dev, ino_t subj_ino,
 	if(!(*tmp_db))
 		failure("calloc");
 	
-	(*tmp_db)->subj_dev = subj_dev;	
-	(*tmp_db)->subj_ino = subj_ino;	
+	(*tmp_db)->subjname = subjname;
 	(*tmp_db)->addr = ip;
 	(*tmp_db)->port = port;
 	(*tmp_db)->sock = sock;
@@ -305,9 +310,9 @@ void add_learn_ip_info(unsigned short subj_dev, ino_t subj_ino,
 
 	return;
 }
-void add_learn_file_info(unsigned short subj_dev, ino_t subj_ino,
+void add_learn_file_info(char *rolename, __u8 roletype, char *subjname,
 			unsigned long res_cur, unsigned long res_max,
-			char ** obj_name, __u32 mode)
+			char * obj_name, __u32 mode)
 {
 	struct learn_info ** tmp_db;
 	char * p;
@@ -318,11 +323,11 @@ void add_learn_file_info(unsigned short subj_dev, ino_t subj_ino,
 	}
 
 
-	if((p = strstr(*obj_name, " (deleted)")))
+	if((p = strstr(obj_name, " (deleted)")))
 		*p = '\0';
 
-	if(learn_is_dupe(subj_dev, subj_ino, res_cur, res_max, *obj_name, mode)) {
-		free(*obj_name);
+	if(learn_is_dupe(rolename, roletype, subjname, res_cur, res_max, obj_name, mode)) {
+		free(obj_name);
 		return;
 	}
 
@@ -336,15 +341,16 @@ void add_learn_file_info(unsigned short subj_dev, ino_t subj_ino,
 	if(!(*tmp_db))
 		failure("calloc");
 	
-	(*tmp_db)->subj_dev = subj_dev;	
-	(*tmp_db)->subj_ino = subj_ino;	
+	(*tmp_db)->rolename = rolename;
+	(*tmp_db)->roletype = roletype;
+	(*tmp_db)->subjname = subjname;
 	(*tmp_db)->res_cur = res_cur;
 	(*tmp_db)->res_max = res_max;
-	(*tmp_db)->obj_name = *obj_name;	
+	(*tmp_db)->obj_name = obj_name;	
 	(*tmp_db)->mode = mode;	
 	/* to be able to perform an operation on the file, we have to be
 	   able to view it */
-	if(strlen(*obj_name)) // check if it's a file
+	if(strlen(obj_name)) // check if it's a file
 		(*tmp_db)->mode |= GR_FIND;
 
 	learn_num++;
@@ -365,8 +371,9 @@ void merge_acl_rules(void)
 		for(i = 0; i < learn_num; i++) {
 			if(!(*(learn_db + i))) continue;
 
-			if(((*(learn_db + i))->subj_dev == proc->dev) && 
-			((*(learn_db + i))->subj_ino == proc->inode)) { 
+			if(!strcmp((*(learn_db + i))->subjname, proc->filename) && 
+			   !strcmp((*(learn_db + i))->rolename, role->rolename) && 
+			   ((*(learn_db + i))->roletype == role->roletype)) { 
 				/* ok, we found matching processes,
 				   let's add the rule. */
 				if(!strlen((*(learn_db + i))->obj_name) && !((*(learn_db + i))->res_cur) && !((*(learn_db + i))->res_max))
@@ -381,8 +388,9 @@ void merge_acl_rules(void)
 		}
 
 		for(i = 0; i < ip_learn_num; i++) {
-			if(((*(ip_learn_db + i))->subj_dev == proc->dev) && 
-			((*(ip_learn_db + i))->subj_ino == proc->inode)) { 
+			if(!strcmp((*(ip_learn_db + i))->subjname, proc->filename) && 
+			   !strcmp((*(ip_learn_db + i))->rolename, role->rolename) && 
+			   ((*(learn_db + i))->roletype == role->roletype)) { 
 				struct ip_acl tmp_ip;
 				memset(&tmp_ip, 0, sizeof(tmp_ip));
 
