@@ -15,8 +15,9 @@ extern struct gr_learn_role_entry **special_role_list;
 }
 
 %token <string> FILENAME ROLENAME
-%token <num> NUM IPADDR
+%token <num> NUM IPADDR USER GROUP
 %type <string> filename
+%type <num> id_type
 
 %%
 
@@ -30,6 +31,10 @@ filename:	/*empty*/	{ $$ = strdup(""); }
 					$1[1] = '\0';
 				  $$ = $1;
 				}
+	;
+
+id_type:	USER
+	|	GROUP
 	;
 
 learn_log:
@@ -63,12 +68,18 @@ learn_log:
 				role = default_role_entry;
 			}
 
+			free($1);
+
 			if (rolemode & GR_ROLE_LEARN) {
 				insert_ip(&(role->allowed_ips), addr, 0, 0, 0);
 				if ((!strcmp($17, "") && strlen($9) > 1 && !res1 && !res2) || is_protected_path($17, $19))
 					insert_learn_role_subject(role, conv_filename_to_struct($9, GR_FIND | GR_OVERRIDE));
 			} else if (strlen($9) > 1)
 				insert_learn_role_subject(role, conv_filename_to_struct($11, GR_FIND | GR_OVERRIDE));
+
+			free($9);
+			free($11);
+			free($17);
 		}		
 	|	ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' IPADDR ':' NUM ':' NUM ':' NUM ':' NUM ':' IPADDR
 		{
@@ -96,11 +107,22 @@ learn_log:
 				role = default_role_entry;
 			}
 
+			free($1);
+
 			if (rolemode & GR_ROLE_LEARN) {
 				insert_ip(&(role->allowed_ips), addr, 0, 0, 0);
 				insert_learn_role_subject(role, conv_filename_to_struct($9, GR_FIND | GR_OVERRIDE));
 			} else if (strlen($9) > 1)
 				insert_learn_role_subject(role, conv_filename_to_struct($11, GR_FIND | GR_OVERRIDE));
+
+			free($9);
+			free($11);
+		}
+	|       ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' id_type ':' NUM ':' NUM ':' NUM ':' IPADDR
+		{
+			free($1);
+			free($9);
+			free($11);
 		}
 	;
 %%

@@ -15,8 +15,9 @@ extern struct gr_learn_role_entry **special_role_list;
 }
 
 %token <string> FILENAME ROLENAME
-%token <num> NUM IPADDR
+%token <num> NUM IPADDR USER GROUP
 %type <string> filename
+%type <num> id_type
 
 %%
 
@@ -30,6 +31,10 @@ filename:	/*empty*/	{ $$ = strdup(""); }
 					$1[1] = '\0';
 				  $$ = $1;
 				}
+	;
+
+id_type:	USER
+	|	GROUP
 	;
 
 learn_log:
@@ -58,6 +63,8 @@ learn_log:
 			else
 				role = default_role_entry;
 
+			free($1);
+
 			subjlist = role->subject_list;
 
 			if (rolemode & GR_ROLE_LEARN)
@@ -75,6 +82,9 @@ learn_log:
 				}
 				subject->subject->cap_raise |= (1 << mode);
 			}
+			free($9);
+			free($11);
+			free($17);
 		}		
 	|	ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' IPADDR ':' NUM ':' NUM ':' NUM ':' NUM ':' IPADDR
 		{
@@ -103,6 +113,8 @@ learn_log:
 			else
 				role = default_role_entry;
 
+			free($1);
+
 			subjlist = role->subject_list;
 
 			if (rolemode & GR_ROLE_LEARN)
@@ -114,6 +126,48 @@ learn_log:
 				insert_ip(&(subject->connect_list), addr, port, proto, socktype);
 			else if (mode == GR_IP_BIND)
 				insert_ip(&(subject->bind_list), addr, port, proto, socktype);
+
+			free($9);
+			free($11);
 		}
+	| ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' id_type ':' NUM ':' NUM ':' NUM ':' IPADDR
+		{
+			struct gr_learn_role_entry *role;
+			struct gr_learn_file_node *subjlist;
+			struct gr_learn_file_node *subject;
+			u_int16_t rolemode;
+			unsigned int real, eff, fs;
+
+			rolemode = $3;
+			real = $15;
+			eff = $17;
+			fs = $19;
+
+			if (rolemode & GR_ROLE_USER)
+				role = insert_learn_role(&user_role_list, $1, rolemode);
+			else if (rolemode & GR_ROLE_GROUP)
+				role = insert_learn_role(&group_role_list, $1, rolemode);
+			else if (rolemode & GR_ROLE_SPECIAL)
+				role = insert_learn_role(&special_role_list, $1, rolemode);
+			else
+				role = default_role_entry;
+
+			free($1);
+
+			subjlist = role->subject_list;
+
+			if (rolemode & GR_ROLE_LEARN)
+				subject = match_file_node(subjlist, $9);
+			else
+				subject = match_file_node(subjlist, $11);
+				
+			if ($13 == USER)
+				insert_learn_id_transition(&(subject->user_trans_list), real, eff, fs);
+			else if ($13 == GROUP)
+				insert_learn_id_transition(&(subject->group_trans_list), real, eff, fs);
+
+			free($9);
+			free($11);
+		}		
 	;
 %%

@@ -8,7 +8,8 @@ static struct in_addr ip;
 %}
 
 ROLENAME [_a-zA-Z0-9-]{1,30}
-NUM [0-9]+
+NOTAFILE [a-z]+"["[0-9]+"]"
+NUM [-]?[0-9]+
 FILENAME [/][^\t\n]*
 IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
@@ -18,9 +19,21 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
 %%
 
+"u"					{
+					  learn_pass2lval.num = USER;
+					  return USER;
+					}
+"g"					{
+					  learn_pass2lval.num = GROUP;
+					  return GROUP;
+					}
 {NUM}					{
 					  learn_pass2lval.num = atol(yytext);
 					  return NUM;
+					}
+{NOTAFILE}				{
+					  learn_pass2lval.string = strdup("/proc");
+					  return FILENAME;
 					}
 {ROLENAME}				{
 					  learn_pass2lval.string = strdup(yytext);

@@ -129,6 +129,14 @@ void merge_acl_rules()
 				}
 				matchsubj->subject->cap_raise |= ~subject->cap_drop;
 				matchsubj->subject->resmask |= subject->resmask;
+				for (i = 0; i < subject->user_trans_num; i++) {
+					x = *(subject->user_transitions + i);
+					insert_learn_id_transition(&(matchsubj->user_trans_list), x, x, x);
+				}
+				for (i = 0; i < subject->group_trans_num; i++) {
+					x = *(subject->group_transitions + i);
+					insert_learn_id_transition(&(matchsubj->group_trans_list), x, x, x);
+				}
 				for (i = 0; i < GR_NLIMITS; i++) {
 					if (subject->res[i].rlim_cur > matchsubj->subject->res[i].rlim_cur)
 						matchsubj->subject->res[i].rlim_cur = subject->res[i].rlim_cur;

@@ -109,6 +109,8 @@ learn_log:
 		}
 	| ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' id_type ':' NUM ':' NUM ':' NUM ':' IPADDR
 	{
+		free($9);
+		free($11);
 	}
 	;
 %%

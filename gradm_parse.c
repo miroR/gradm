@@ -8,6 +8,7 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 {
 	struct passwd *pwd;
 	struct group *grp;
+	int i;
 
 	if (usergroup == GR_ID_USER) {
 		if (allowdeny == GR_ID_ALLOW) {
@@ -29,6 +30,11 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 			}
 			subject->user_trans_type |= GR_ID_DENY;
 		}
+
+		/* dupecheck */
+		for (i = 0; i < subject->user_trans_num; i++)
+			if (*(subject->user_transitions + i) == usergroup)
+				return;
 
 		pwd = getpwnam(idname);
 
@@ -68,6 +74,11 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 			}
 			subject->group_trans_type |= GR_ID_DENY;
 		}
+
+		/* dupecheck */
+		for (i = 0; i < subject->group_trans_num; i++)
+			if (*(subject->group_transitions + i) == usergroup)
+				return;
 
 		grp = getgrnam(idname);
 
@@ -411,6 +422,8 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 			lineno, current_acl_file, basepoint, filename);
 		exit(EXIT_FAILURE);
 	}
+
+	free(basepoint);
 
 	if (anchor->globbed) {
 		glob = anchor->globbed;

@@ -8,6 +8,7 @@ static struct in_addr ip;
 %}
 
 ROLENAME [_a-zA-Z0-9-]{1,30}
+NOTAFILE [a-z]+"["[0-9]+"]"
 NUM [-]?[0-9]+
 FILENAME [/][^\t\n]*
 IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
@@ -29,6 +30,10 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 {NUM}					{
 					  fulllearn_pass2lval.num = atol(yytext);
 					  return NUM;
+					}
+{NOTAFILE}				{
+					  fulllearn_pass2lval.string = strdup("/proc");
+					  return FILENAME;
 					}
 {ROLENAME}				{
 					  /* not used in grammar */
