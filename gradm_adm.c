@@ -93,18 +93,10 @@ add_kernel_acl(void)
 	    (current_role, "/", proc_subject_mode_conv("o"), 0))
 		exit(EXIT_FAILURE);
 	if (!add_proc_object_acl
-	    (current_subject, "/", proc_object_mode_conv(""), GR_FEXIST))
+	    (current_subject, "/", proc_object_mode_conv("rx"), GR_FEXIST))
 		exit(EXIT_FAILURE);
 	if (!add_proc_object_acl
-	    (current_subject, "/bin/true", proc_object_mode_conv("x"),
-	     GR_FEXIST))
-		exit(EXIT_FAILURE);
-	if (!add_proc_object_acl
-	    (current_subject, "/sbin/hotplug", proc_object_mode_conv("rx"),
-	     GR_FEXIST))
-		exit(EXIT_FAILURE);
-	if (!add_proc_object_acl
-	    (current_subject, "/sbin/modprobe", proc_object_mode_conv("x"),
+	    (current_subject, "/etc/grsec", proc_object_mode_conv("h"),
 	     GR_FEXIST))
 		exit(EXIT_FAILURE);
 
