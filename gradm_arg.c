@@ -33,7 +33,8 @@ static void show_help(void)
 		"			Specify where to place ACLs generated from learning mode\n"
 		"	-M <filename|uid>, --modsegv\n"
 		"			Remove a ban on a specific file or UID\n"
-		"	-a, --admin	Provides full overriding access for the current user\n"
+		"	-a <rolename> , --admin\n"
+		"			Authenticates to a special role\n"
 		"	-h, --help	Display this help\n"
 		"	-v, --version	Display version information\n"
 		, GR_VERSION);
@@ -67,14 +68,14 @@ void parse_args(int argc, char *argv[])
 	int gr_output = 0;
 	struct gr_pw_entry entry;
 	struct gr_arg * grarg;
-	const char * const short_opts = "EDPRL::O:M:ahv";
+	const char * const short_opts = "EDP:RL::O:M:a:hv";
 	const struct option long_opts[] = {
 		{ "help",	0,	NULL,	'h'	},
 		{ "version",	0,	NULL,	'v'	},
 		{ "enable",	0,	NULL,	'E'	},
 		{ "disable",	0,	NULL,	'D'	},
 		{ "passwd",	2,	NULL,	'P'	},
-		{ "admin",	0,	NULL,	'a'	},
+		{ "admin",	1,	NULL,	'a'	},
 		{ "reload",	0,	NULL,	'R'	},
 		{ "modsegv",	1,	NULL,	'M'	},
 		{ "learn",	2,	NULL,	'L'	},
@@ -173,8 +174,10 @@ void parse_args(int argc, char *argv[])
 				exit(EXIT_SUCCESS);
 				break;
 			case 'a':
-				if(argc > 2)
+				if(argc != 3)
 					show_help();
+				strncpy(entry.rolename, argv[2], GR_SPROLE_LEN);
+				entry.rolename[GR_SPROLE_LEN - 1] = '\0';
 				get_user_passwd(&entry, GR_PWONLY);
 				entry.mode = GRADM_ADMIN;
 				grarg = conv_user_to_kernel(&entry);
