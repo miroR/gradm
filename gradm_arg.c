@@ -182,8 +182,15 @@ parse_args(int argc, char *argv[])
 			if (argc > 6 || argc < 3)
 				show_help();
 			gr_learn = 1;
-			if (optarg)
-				learn_log = strdup(optarg);
+			if (optarg) {
+				char pathbuf[PATH_MAX];
+
+				if (realpath(optarg, pathbuf)) {
+					fprintf(stderr, "Unable to open %s for learning logs.\n", optarg);
+					exit(EXIT_FAILURE);
+				}
+				learn_log = strdup(pathbuf);
+			}
 			break;
 		case 'O':
 			if (argc > 6 || argc < 3)
