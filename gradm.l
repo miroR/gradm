@@ -169,7 +169,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 [$][a-zA-Z0-9_]+			{
 					  gr_line = yytext;
-					  if (!strcmp(gr_line, "HOME")) {
+					  if (!strcmp(gr_line, "$HOME")) {
 						gradmlval.string = gr_strdup(gr_line);
 						return OBJ_NAME;
 					  } else {
