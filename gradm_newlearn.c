@@ -733,9 +733,6 @@ int second_reduce_node(struct gr_learn_file_node *node,
 {
 	int (* retval)(struct gr_learn_file_node *node);
 
-	if (!strcmp(node->filename, "*"))
-		return 0;
-
 	retval = (int (*)(struct gr_learn_file_node *))analyze_node_reduction(node);
 
 	if (retval)
@@ -753,9 +750,6 @@ int third_reduce_node(struct gr_learn_file_node *node,
 		       struct gr_learn_file_node *unused1, FILE *unused)
 {
 	struct gr_learn_file_node **tmp, **tmp2;
-
-	if (!strcmp(node->filename, "*"))
-		return 0;
 
 	tmp = node->leaves;
 
@@ -897,7 +891,7 @@ int first_reduce_node(struct gr_learn_file_node *node,
 	char *p, *p2;
 	unsigned int node_len = strlen(node->filename);
 
-	if (num < thresh || !strcmp(node->filename, "*"))
+	if (num < thresh)
 		return 0;
 
 	tmp = node->leaves;
