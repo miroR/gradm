@@ -22,7 +22,7 @@ struct resize_entry {
 };
 
 #define MAX_MEM_SIZE	512
-#define MAX_RESIZE_SIZE	64
+#define MAX_RESIZE_SIZE	16
 
 static struct mem_entry **stat_alloc = NULL;
 static unsigned long stat_alloc_num = 0;
