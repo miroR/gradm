@@ -165,10 +165,10 @@ void add_ip_acl(struct proc_acl *subject, __u8 mode, struct ip_acl * tmp);
 
 void parse_learn_log(const char * filename);
 
-void add_learn_ip_info(unsigned short subj_dev, ino_t subj_ino,
+void add_learn_ip_info(char *rolename, __u8 roletype, char *subjname,
                         __u32 ip, __u16 port, __u16 sock, __u16 proto,
                         __u16 mode);
-void add_learn_file_info(unsigned short subj_dev, ino_t subj_ino,
+void add_learn_file_info(char *rolename, __u8 roletype, char *subjname,
                         unsigned long res_cur, unsigned long res_max,
                         char ** obj_name, __u32 mode);
 void read_saltandpass(char *salt, char *pass);
