@@ -65,8 +65,8 @@ USE_LEX = $(shell if [ -x $(FLEX) ]; then echo $(FLEX); \
 $(GRADM_BIN): $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $(OBJECTS) $(LIBS) $(LDFLAGS)
 
-grlearn: grlearn.c
-	$(CC) $(CFLAGS) -o $@ grlearn.c $(LIBS) $(LDFLAGS)
+grlearn: grlearn.c gradm_lib.c
+	$(CC) $(CFLAGS) -o $@ grlearn.c gradm_lib.c $(LIBS) $(LDFLAGS)
 
 
 gradm.tab.c: gradm.y

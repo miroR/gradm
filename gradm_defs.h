@@ -324,6 +324,7 @@ char *current_acl_file;
 enum {
 	GR_HASH_SUBJECT,
 	GR_HASH_OBJECT,
+	GR_HASH_FILENAME
 };
 
 struct gr_hash_struct {
