@@ -1036,7 +1036,7 @@ show_ips:
 	} else {
 		conv_mode_to_str(node->mode, modes, sizeof(modes));
 		i = strlen(node->filename);
-		if (strchr(node->filename, ' ') {
+		if (strchr(node->filename, ' ')) {
 				fprintf(stream, "      \"%s\"\t%s\n", node->filename, modes);
 		} else {
 			if (i < 50)
