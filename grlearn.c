@@ -78,19 +78,19 @@ struct cache_entry {
 	char *entryname;
 	unsigned long used;
 	unsigned long checked;
-	unsigned char taken:1;
+	unsigned int len;
+	unsigned char taken;
 } *cache[640];
 static unsigned long check_count = 0;
 
 /* maintain a cache of most recently used items */
-int check_cache(char *str)
+int check_cache(char *str, unsigned int len)
 {
 	int i;
 	check_count++;
 	for (i = 0; i < 640; i++) {
-		if (!cache[i]->taken)
-			continue;
-		if (!strcmp(cache[i]->entryname, str)) {
+		if (cache[i]->taken && cache[i]->len == len &&
+		    !strcmp(cache[i]->entryname, str)) {
 			cache[i]->used++;
 			return 1;
 		}
@@ -99,7 +99,7 @@ int check_cache(char *str)
 	return 0;
 }
 
-void insert_into_cache(char *str)
+void insert_into_cache(char *str, unsigned int len)
 {
 	int i;
 	struct cache_entry *least;
@@ -119,6 +119,7 @@ void insert_into_cache(char *str)
 
 	strcpy(least->entryname, str);
 	least->used = 0;
+	least->len = len;
 	least->checked = check_count;
 
 	return;
@@ -184,6 +185,8 @@ __inline__ char * rewrite_learn_entry(char *p)
 int main(int argc, char *argv[])
 {
 	char *buf;
+	char *writebuf;
+	char *writep;
 	char *next;
 	char *p;
 	ssize_t retval;
@@ -191,6 +194,7 @@ int main(int argc, char *argv[])
 	int fd, fd2;
 	pid_t pid;
 	struct sched_param schedulerparam;
+	unsigned int len;
 	int i;
 
 	if (argc != 2)
@@ -208,6 +212,10 @@ int main(int argc, char *argv[])
 	buf = calloc(1, LEARN_BUFFER_SIZE);
 	if (!buf)
 		return 1;
+	writebuf = calloc(1, 4 * MAX_ENTRY_SIZE);
+	if (!writebuf)
+		return 1;
+	writep = writebuf;
 	for(i = 0; i < 640; i++) {
 		cache[i] = calloc(1, sizeof(struct cache_entry));
 		if (!cache[i])
@@ -264,12 +272,20 @@ int main(int argc, char *argv[])
 			p = buf;
 			while (p < (buf + retval)) {
 				next = rewrite_learn_entry(p);
-				if (!check_cache(p)) {
-					insert_into_cache(p);
-					write(fd2, p, strlen(p));
+				len = strlen(p);
+				if (!check_cache(p, len)) {
+					insert_into_cache(p, len);
+					if (((4 * MAX_ENTRY_SIZE) - (writep - writebuf)) > len) {
+						memcpy(writep, p, len);
+						writep += len;
+					} else {
+						write(fd2, writebuf, writep - writebuf);
+						memset(writebuf, 0, sizeof(4 * MAX_ENTRY_SIZE));
+						writep = writebuf;
+					}
 				}
 				if (next == p)
-					while (*p++);
+					p += len + 1;
 				else
 					p = next;
 			}
