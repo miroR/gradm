@@ -149,6 +149,9 @@ add_kernel_acl(void)
 	    (current_subject, "/proc/bus/usb", proc_object_mode_conv("rw"), GR_FEXIST))
 		exit(EXIT_FAILURE);
 	if (!add_proc_object_acl
+	    (current_subject, "/var/run/openct", proc_object_mode_conv("rwcd"), GR_FEXIST))
+		exit(EXIT_FAILURE);
+	if (!add_proc_object_acl
 	    (current_subject, GRSEC_DIR, proc_object_mode_conv("h"),
 	     GR_FEXIST))
 		exit(EXIT_FAILURE);
