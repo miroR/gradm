@@ -1446,13 +1446,13 @@ __u8 extract_ip_field(__u32 ip, unsigned long depth)
 
 	switch(depth) {
 	case 3:
-		return ip_node[0];
-	case 2:
-		return ip_node[1];
-	case 1:
-		return ip_node[2];
-	case 0:
 		return ip_node[3];
+	case 2:
+		return ip_node[2];
+	case 1:
+		return ip_node[1];
+	case 0:
+		return ip_node[0];
 	default:
 		return 0;
 	}
