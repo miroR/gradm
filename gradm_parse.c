@@ -558,7 +558,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 
 	if (!strncmp(filename, "$HOME", 5))
 		filename = parse_homedir(filename);
-	else if (!strncmp(filename, "/dev/pts/", 8)) {
+	else if (!strncmp(filename, "/dev/pts/", 9)) {
 		fprintf(stderr, "Error on line %lu of %s.  Grsecurity does "
 				"not support fine-grained policy on devpts mounts.\n"
 				"Please change your more fine-grained object to a /dev/pts "
