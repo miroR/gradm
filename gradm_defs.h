@@ -1,5 +1,3 @@
-#include "gradm.h"
-
 #ifndef GRSEC_DIR
 #define GRSEC_DIR		"/etc/grsec"
 #endif

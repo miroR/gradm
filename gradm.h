@@ -31,9 +31,6 @@
 #include <linux/threads.h>
 #include <linux/version.h>
 
-#include "gradm_defs.h"
-#include "gradm_func.h"
-
 #define failure(x) do { \
 	fprintf(stderr, x ": %s\n\n", strerror(errno)); \
 	exit(EXIT_FAILURE);\
@@ -77,5 +74,8 @@ typedef gr_dev_t unsigned short
 #define MINOR(dev)	((dev) & 0xff)
 #define MKDEV(ma,mi)	((ma)<<8 | (mi))
 #endif
+
+#include "gradm_defs.h"
+#include "gradm_func.h"
 
 #endif
