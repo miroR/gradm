@@ -35,7 +35,6 @@ various_acls:			role_label
 
 role_label: 			ROLE ROLE_NAME role_type
 				{
-				printf("adding role %s\n", $2);
 				 if (!add_role_acl(&current_role, $2, $3, 0))
 					exit(EXIT_FAILURE);
 				}
@@ -49,7 +48,6 @@ role_type: /* empty */
 
 subject_label:			SUBJECT SUBJ_NAME subj_mode
 				{
-				printf("adding subj %s\n", $2);
 				 struct stat fstat;
 
 				 if (!add_proc_subject_acl(current_role, $2, $3))
@@ -69,7 +67,6 @@ subject_label:			SUBJECT SUBJ_NAME subj_mode
 
 object_file_label:		OBJ_NAME obj_mode
 				{
-				printf("adding obj %s\n", $1);
 				 if (!add_proc_object_acl(current_subject, $1, $2, GR_FEXIST))
 					exit(EXIT_FAILURE);
 				}
