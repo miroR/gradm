@@ -69,7 +69,9 @@ transmit_to_kernel(struct gr_arg_wrapper *buf)
 			fprintf(stderr, "You are using incompatible "
 				"versions of gradm and grsecurity.\n"
 				"Please update both versions to the "
-				"ones available on the website.\n");
+				"ones available on the website.\n"
+				"Make sure your gradm has been compiled "
+				"for the kernel you are currently running.\n");
 		}
 	}
 
