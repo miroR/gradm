@@ -544,6 +544,7 @@ void greatest_occurring_modes(struct gr_learn_file_node *node, u_int32_t *modear
 			max2 = i;
 	}
 
+	
 	*modeary = modes[max];
 	*(modeary + 1) = modes[max2];
 }
@@ -703,6 +704,10 @@ int *analyze_node_reduction(struct gr_learn_file_node *node)
 	if (node_num > 3)
 		reduction_level++;
 	if (node_num > 6)
+		reduction_level++;
+	if (node_num > 10)
+		reduction_level++;
+	if (node_num > 15)
 		reduction_level++;
 	if (node_num > 20)
 		reduction_level++;
