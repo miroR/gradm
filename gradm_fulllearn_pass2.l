@@ -40,10 +40,6 @@ IPADDR [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return ROLENAME;
 					}
 {FILENAME}				{
-					  unsigned int len = strlen(yytext);
-					  char *p = yytext;
-					  if (len > 10 && !strcmp(p + len - 10, " (deleted)"))
-						*(p + len - 10) = '\0';
 					  fulllearn_pass2lval.string = gr_strdup(yytext);
 					  return FILENAME;
 					}
