@@ -5,20 +5,19 @@
 #define NR_OPEN 1024
 #endif
 
-struct rlimconv rlim_table[] = {
-	{"RES_CPU", RLIMIT_CPU},
-	{"RES_FSIZE", RLIMIT_FSIZE},
-	{"RES_DATA", RLIMIT_DATA},
-	{"RES_STACK", RLIMIT_STACK},
-	{"RES_CORE", RLIMIT_CORE},
-	{"RES_RSS", RLIMIT_RSS},
-	{"RES_NPROC", RLIMIT_NPROC},
-	{"RES_NOFILE", RLIMIT_NOFILE},
-	{"RES_MEMLOCK", RLIMIT_MEMLOCK},
-	{"RES_AS", RLIMIT_AS},
-	{"RES_LOCKS", RLIMIT_LOCKS},
-	{"RES_CRASH", RLIMIT_LOCKS + 1}
-
+char *rlim_table[] = {
+	[RLIMIT_CPU] = "RES_CPU",
+	[RLIMIT_FSIZE] = "RES_FSIZE",
+	[RLIMIT_DATA] = "RES_DATA",
+	[RLIMIT_STACK] = "RES_STACK",
+	[RLIMIT_CORE] = "RES_CORE",
+	[RLIMIT_RSS] = "RES_RSS",
+	[RLIMIT_NPROC] = "RES_NPROC",
+	[RLIMIT_NOFILE] = "RES_NOFILE",
+	[RLIMIT_MEMLOCK] = "RES_MEMLOCK",
+	[RLIMIT_AS] = "RES_AS",
+	[RLIMIT_LOCKS] = "RES_LOCKS",
+	[RLIMIT_LOCKS + 1] = "RES_CRASH"
 };
 
 static unsigned short
@@ -26,9 +25,9 @@ name_to_res(const char *name)
 {
 	int i;
 
-	for (i = 0; i < (sizeof (rlim_table) / sizeof (struct rlimconv)); i++) {
-		if (!strcmp(rlim_table[i].name, name))
-			return rlim_table[i].val;
+	for (i = 0; i < SIZE(rlim_table); i++) {
+		if (!strcmp(rlim_table[i], name))
+			return i;
 	}
 
 	fprintf(stderr, "Invalid resource name: %s "
@@ -113,17 +112,10 @@ modify_res(struct proc_acl *proc, int res, unsigned long cur, unsigned long max)
 {
 	int i;
 
-	if ((res < 0)
-	    || (res > (sizeof (rlim_table) / sizeof (struct rlimconv))))
+	if ((res < 0) || (res > SIZE(rlim_table)))
 		return;
 
-	/* some archs can define resource limit order */
-	for (i = 0; i < (sizeof(rlim_table) / sizeof (struct rlimconv)); i++) {
-		if (rlim_table[i].val == res)
-			break;
-	}
-
-	if (proc->resmask & res_to_mask(rlim_table[i].val)) {
+	if (proc->resmask & res_to_mask(res)) {
 		proc->res[res].rlim_cur = cur;
 		proc->res[res].rlim_max = max;
 	}

@@ -28,6 +28,8 @@
 #include <asm/param.h>
 #include <asm/ioctls.h>
 
+#define SIZE(x) (sizeof(x) / sizeof(x[0]))
+
 #define failure(x) do { \
 	fprintf(stderr, x ": %s\n\n", strerror(errno)); \
 	exit(EXIT_FAILURE);\
