@@ -402,8 +402,8 @@ struct gr_arg_wrapper {
 	u_int32_t size;
 };
 
+char *rlim_table[GR_NLIMITS];
 struct capability_set capability_list[30];
-struct rlimconv rlim_table[12];
 
 uid_t special_role_uid;
 

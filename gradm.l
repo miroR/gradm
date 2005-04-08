@@ -471,7 +471,6 @@ void show_policy(void) {
 	struct proc_acl *proc;
 	struct role_acl *rolp;
 	struct role_transition *rolet;
-	extern struct rlimconv rlim_table[];
 	int i;
 
 	for (rolp = current_role;rolp;rolp=rolp->prev) {
@@ -539,7 +538,7 @@ void show_policy(void) {
                         printf("\t\tOBJECT: %s dev:%d inode:%lu mode:%d\n", filp->filename, filp->dev, filp->inode, filp->mode);
 		for (i=0;i<GR_NLIMITS;i++)
 			if (proc->resmask & (1 << i))
-				printf("\t\t%s: soft: %lu hard: %lu\n", rlim_table[i].name, proc->res[i].rlim_cur, proc->res[i].rlim_max);
+				printf("\t\t%s: soft: %lu hard: %lu\n", rlim_table[i], proc->res[i].rlim_cur, proc->res[i].rlim_max);
 	}
 	}
 }

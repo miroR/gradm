@@ -1110,10 +1110,9 @@ int display_leaf(struct gr_learn_file_node *node,
 					fprintf(stream, "\t-%s\n", capability_list[i].cap_name);
 		}
 
-		for(i = 0; i < (sizeof(rlim_table)/sizeof(struct rlimconv)); i++)
-			if (node->subject->resmask & (1 << rlim_table[i].val))
-				fprintf(stream, "\t%s %lu %lu\n",
-					rlim_table[i].name,
+		for(i = 0; i < SIZE(rlim_table); i++)
+			if (node->subject->resmask & (1 << i))
+				fprintf(stream, "\t%s %lu %lu\n", rlim_table[i],
 					node->subject->res[i].rlim_cur,
 					node->subject->res[i].rlim_max);
 
