@@ -226,17 +226,8 @@ void learn_pass2(FILE *stream)
 }
 
 void
-perform_parse_and_reduce(const char *file)
+perform_parse_and_reduce(FILE *learnlog)
 {
-	FILE *learnlog;
-
-	learnlog = fopen(file, "r");
-	if (learnlog == NULL) {
-		fprintf(stderr, "Unable to open learning log: %s.\n"
-				"Error: %s\n", file, strerror(errno));
-		exit(EXIT_FAILURE);
-	}
-
 	learn_pass1(learnlog);
 	fseek(learnlog, 0, SEEK_SET);
 	learn_pass2(learnlog);
@@ -330,11 +321,11 @@ void display_learn_logs(FILE *stream)
 
 
 void
-handle_learn_logs(const char *file, FILE * stream)
+handle_learn_logs(FILE *learnlog, FILE * stream)
 {
 	parse_acls();
 	expand_acls();
-	perform_parse_and_reduce(file);
+	perform_parse_and_reduce(learnlog);
 	display_learn_logs(stream);
 
 	return;

@@ -129,6 +129,24 @@ void verbose_stats(void)
 	return;
 }
 
+static FILE *open_learn_log(char *learn_log)
+{
+	FILE *learnfile = NULL;
+
+	if (!strcmp(learn_log, "-"))
+		learnfile = stdin;
+	else {
+		learnfile = fopen(learn_log, "r");
+		if (!learnfile) {
+			fprintf(stderr, "Unable to open learning log: %s.\n"
+				"Error: %s\n", learn_log, strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	return learnfile;
+}
+
 void
 parse_args(int argc, char *argv[])
 {
@@ -260,7 +278,7 @@ parse_args(int argc, char *argv[])
 			gr_learn = 1;
 			if (optarg) {
 				char pathbuf[PATH_MAX];
-				if (*optarg == '/')
+				if ((*optarg == '/') || !strcmp(optarg, "-"))
 					learn_log = gr_strdup(optarg);
 				else {
 					strcpy(pathbuf, cwd);
@@ -366,6 +384,9 @@ parse_args(int argc, char *argv[])
 		transmit_to_kernel(grarg);
 	} else if (gr_learn && gr_output) {
 		FILE *stream;
+		FILE *learnfile;
+
+		learnfile = open_learn_log(learn_log);
 
 		if (!strcmp(output_log, "stdout"))
 			stream = stdout;
@@ -388,9 +409,9 @@ parse_args(int argc, char *argv[])
 		parse_learn_config();
 
 		if (gr_fulllearn)
-			generate_full_learned_acls(learn_log, stream);
+			generate_full_learned_acls(learnfile, stream);
 		else
-			handle_learn_logs(learn_log, stream);
+			handle_learn_logs(learnfile, stream);
 
 		free(learn_log);
 		free(output_log);

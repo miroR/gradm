@@ -30,7 +30,7 @@ void add_res_acl(struct proc_acl *subject, const char *name,
 		 const char *soft, const char *hard);
 void pass_struct_to_human(FILE * stream);
 int is_valid_elf_binary(const char *filename);
-void handle_learn_logs(const char *logfile, FILE * stream);
+void handle_learn_logs(FILE *logfile, FILE * stream);
 void modify_caps(struct proc_acl *proc, int cap);
 void modify_res(struct proc_acl *proc, int res, unsigned long cur,
 		unsigned long max);
@@ -64,7 +64,7 @@ void match_role(struct gr_learn_group_node **grouplist, uid_t uid, gid_t gid, st
 struct gr_learn_ip_node ** find_insert_ip(struct gr_learn_ip_node **base, u_int32_t ip, struct gr_learn_ip_node **parent);
 void conv_mode_to_str(u_int32_t mode, char *modestr, unsigned short len);
 void conv_subj_mode_to_str(u_int32_t mode, char *modestr, unsigned short len);
-void generate_full_learned_acls(char *learn_log, FILE *stream);
+void generate_full_learned_acls(FILE *learn_log, FILE *stream);
 void reduce_roles(struct gr_learn_group_node ***grouplist);
 void insert_file(struct gr_learn_file_node **base, char *filename, u_int32_t mode, u_int8_t subj);
 void first_stage_reduce_tree(struct gr_learn_file_node *base);

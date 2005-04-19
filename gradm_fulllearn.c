@@ -463,18 +463,10 @@ void output_role_info(struct gr_learn_group_node *group, struct gr_learn_user_no
 	return;
 }
 
-void generate_full_learned_acls(char *learn_log, FILE *stream)
+void generate_full_learned_acls(FILE *learnlog, FILE *stream)
 {
 	struct gr_learn_group_node **group;
 	struct gr_learn_user_node **user;
-	FILE *learnlog;
-
-	learnlog = fopen(learn_log, "r");
-	if (learnlog == NULL) {
-		fprintf(stderr, "Unable to open learning log: %s.\n"
-				"Error: %s\n", learn_log, strerror(errno));
-		exit(EXIT_FAILURE);
-	}
 
 	output_learn_header(stream);
 
