@@ -54,6 +54,8 @@
 #regular expressions are not supported for pathnames in this config file
 
 always-reduce-path /dev/pts
+always-reduce-path /var/spool/qmailscan/tmp
+always-reduce-path /var/run/screen
 
 high-reduce-path /tmp
 high-reduce-path /var/tmp
