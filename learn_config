@@ -56,6 +56,9 @@
 always-reduce-path /dev/pts
 always-reduce-path /var/spool/qmailscan/tmp
 always-reduce-path /var/run/screen
+always-reduce-path /usr/share/locale
+always-reduce-path /usr/share/zoneinfo
+always-reduce-path /usr/share/terminfo
 
 high-reduce-path /tmp
 high-reduce-path /var/tmp
@@ -80,8 +83,6 @@ high-reduce-path /usr/local/sbin
 high-reduce-path /usr/local/etc
 high-reduce-path /usr/local/lib
 high-reduce-path /usr/share
-high-reduce-path /usr/share/locale
-high-reduce-path /usr/share/zoneinfo
 high-reduce-path /usr/X11R6/lib
 
 dont-reduce-path /
