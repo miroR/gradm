@@ -404,6 +404,7 @@ void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
 			gr_stat_free(node);
 		} else {
 			*curr = (struct gr_learn_file_tmp_node *)entry;
+			(*curr)->key = key;
 			hash->used_size++;
 		}
 	}
