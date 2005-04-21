@@ -17,16 +17,14 @@ struct include_entry {
 	YY_BUFFER_STATE buffer;
 	FILE *file;
 	char *name;
-	struct include_entry *prev;
+	struct include_entry *dirents;
 	struct include_entry *next;
-	struct include_entry *parent;
 	struct include_entry **stack;
 	int sp;
 };
 
-struct include_entry include_stack;
-struct include_entry *current_stack;
-
+static struct include_entry include_stack;
+static struct include_entry *main_stack;
 %}
 
 IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
@@ -312,77 +310,115 @@ $HOME[/]?[^ \t\n]*			{
 
 %%
 
+void push_include(unsigned long linenum, YY_BUFFER_STATE buffer,
+		  FILE *file, char *name)
+{
+	int sp = main_stack->sp;
+
+	main_stack->stack = realloc(main_stack->stack, (1 + main_stack->sp) * sizeof(struct include_entry *));
+	if (main_stack->stack == NULL)
+		failure("realloc");
+	main_stack->stack[sp] = calloc(1, sizeof(struct include_entry));
+	if (main_stack->stack[sp] == NULL)
+		failure("calloc");
+	main_stack->stack[sp]->sp = -1;
+	main_stack->stack[sp]->lineno = linenum;
+	main_stack->stack[sp]->file = gradmin;
+	main_stack->stack[sp]->name = current_acl_file;
+	main_stack->stack[sp]->buffer = YY_CURRENT_BUFFER;
+
+	return;
+}
+
 void add_include(char *includename)
 {
 	struct stat fstat;
 	FILE *tmpfile;
+	struct dirent **namelist;
+	struct include_entry *last = NULL;
+	struct include_entry *first = NULL;
+	struct include_entry *tmp = NULL;
+	char *path;
+	int n, i;
+	int sp;
 
-	if (current_stack->sp >= MAX_INCLUDE_DEPTH) {
+	sp = ++main_stack->sp;
+
+	if (sp >= MAX_INCLUDE_DEPTH) {
 		fprintf(stderr, "Includes too deep while trying to process "
 				"%s\n", includename);
 		exit(EXIT_FAILURE);
 	}
 
-	current_stack->stack = realloc(current_stack->stack, (1 + current_stack->sp) * sizeof(struct include_entry *));
-	if (current_stack->stack == NULL)
-		failure("realloc");
-	current_stack->stack[current_stack->sp] = calloc(1, sizeof(struct include_entry));
-	if (current_stack->stack[current_stack->sp] == NULL)
-		failure("calloc");
-	current_stack->stack[current_stack->sp]->lineno = lineno;
-	lineno = 1;
-	current_stack->stack[current_stack->sp]->file = yyin;
-	current_stack->stack[current_stack->sp]->name = current_acl_file;
-	current_stack->stack[current_stack->sp]->buffer = YY_CURRENT_BUFFER;
-	current_stack->stack[current_stack->sp]->parent = current_stack;
-
-	if (!stat(includename, &fstat)) {
-		if (S_ISDIR(fstat.st_mode)) {
-			struct dirent **namelist;
-			struct include_entry *last = current_stack->stack[current_stack->sp];
-			struct include_entry *tmp = NULL;
-			char *path;
-			int n;
-
-			n = scandir(includename, &namelist, 0, alphasort);
-			if (n >= 3) {
-				while (n--) {
-					if (!strcmp(namelist[n]->d_name, ".") || !strcmp(namelist[n]->d_name, ".."))
-						continue;
-					tmp = calloc(1, sizeof(struct include_entry));
-					if (tmp == NULL)
-						failure("calloc");
-					
-					path = calloc(1, strlen(includename) + strlen(namelist[n]->d_name) + 2);
-					if (path == NULL)
-						failure("calloc");
-
-					sprintf(path, "%s/%s", includename, namelist[n]->d_name);
-
-					tmp->name = path;
-					tmp->lineno = 1;
-					tmp->parent = current_stack;
-
-					last->next = tmp;
-					tmp->prev = last;
-					last = tmp;
-				}
-				change_current_acl_file(tmp->name);
-				tmpfile = fopen(tmp->name, "r");
-
-				if (!tmpfile) {
-					fprintf(stderr, "Unable to open included file: %s\n", tmp->name);
-					exit(EXIT_FAILURE);
-				}
-
-				yyin = tmpfile;
-				current_stack = tmp;
-				yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
-				return;
-			}
-			return;
-		}
+	if (stat(includename, &fstat)) {
+		fprintf(stderr, "Unable to access included path: %s.\n"
+				"Error: %s\n", includename, strerror(errno));
+		exit(EXIT_FAILURE);
 	}
+
+	printf("sp: %d, storing %s\n", main_stack->sp, current_acl_file);
+	push_include(lineno, YY_CURRENT_BUFFER, gradmin, current_acl_file);
+	lineno = 1;
+
+	if (!S_ISDIR(fstat.st_mode))
+		goto not_a_dir;
+
+	n = scandir(includename, &namelist, 0, alphasort);
+	if (n < 3)
+		return;
+
+	for (i = 0; i < n; i++) {
+		if (!strcmp(namelist[i]->d_name, ".") || !strcmp(namelist[i]->d_name, ".."))
+			continue;
+		tmp = calloc(1, sizeof(struct include_entry));
+		if (tmp == NULL)
+			failure("calloc");
+		
+		path = calloc(1, strlen(includename) + strlen(namelist[i]->d_name) + 2);
+		if (path == NULL)
+			failure("calloc");
+
+		sprintf(path, "%s/%s", includename, namelist[i]->d_name);
+
+		if (stat(path, &fstat)) {
+			fprintf(stderr, "Unable to access included path: %s.\n"
+					"Error: %s\n", includename, strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+		if (S_ISDIR(fstat.st_mode)) {
+			fprintf(stderr, "Including the nested directory %s is not currently supported.\n", path);
+			exit(EXIT_FAILURE);
+		}
+		tmp->sp = -1;
+		tmp->name = path;
+		printf("adding dirent %s\n", path);
+		tmp->lineno = 1;
+
+		if (last)
+			last->next = tmp;
+		last = tmp;
+		if (first == NULL)
+			first = tmp;
+	}
+
+	printf("sp: %d, setting dirents for %s to %s\n", main_stack->sp, main_stack->stack[main_stack->sp]->name, first->next ? first->next->name : "null");
+	main_stack->stack[main_stack->sp]->dirents = first->next;	
+	path = first->name;
+
+	change_current_acl_file(path);
+	tmpfile = fopen(path, "r");
+
+	if (!tmpfile) {
+		fprintf(stderr, "Unable to open included file: %s\n", path);
+		exit(EXIT_FAILURE);
+	}
+	printf("switching to %s\n", current_acl_file);
+
+	gradmin = tmpfile;
+	yy_switch_to_buffer(yy_create_buffer(gradmin, YY_BUF_SIZE));
+	return;
+
+not_a_dir:
 	tmpfile = fopen(includename, "r");
 
 	if (!tmpfile) {
@@ -392,49 +428,50 @@ void add_include(char *includename)
 	}
 
 	change_current_acl_file(includename);
-	current_stack->sp++;
-	yyin = tmpfile;
-	yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
+	gradmin = tmpfile;
+	yy_switch_to_buffer(yy_create_buffer(gradmin, YY_BUF_SIZE));
 
 	return;
 }
 
 int is_eof(void)
 {
-repeat:
-	if (current_stack->sp)
-		fclose(yyin);
-	current_stack->sp--;
-	if (current_stack->sp < 0) {
-		if (!current_stack->prev || !current_stack->prev->prev) {
-			if (current_stack->parent == NULL) {
-				current_stack->sp = 0;
-				lineno = 1;
-				return 1;
-			} else {
-				current_stack = current_stack->parent;
-				goto repeat;
-			}
-		} else {
-			current_stack = current_stack->prev;
-			lineno = 1;
-			change_current_acl_file(current_stack->name);
-			yy_delete_buffer(YY_CURRENT_BUFFER);
-			yyin = fopen(current_stack->name, "r");
-			if (yyin == NULL) {
-				fprintf(stderr, "Unable to open included file: %s\n", current_stack->name);
-				exit(EXIT_FAILURE);
-			}
-			yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
-			return 0;
-		}
-	}
+	struct include_entry *tmp = NULL;
 
-	change_current_acl_file(current_stack->stack[current_stack->sp]->name);
+	printf("eof with %s\n", current_acl_file);
+
+	fclose(gradmin);
+
+	if (main_stack->sp < 0)
+		return 1;
+
+	tmp = main_stack->stack[main_stack->sp];
+	if (tmp->dirents != NULL) {
+		tmp = tmp->dirents;
+		main_stack->stack[main_stack->sp]->dirents = tmp->next;
+		printf("eof, switching to %s\n", tmp->name);
+		change_current_acl_file(tmp->name);
+		yy_delete_buffer(YY_CURRENT_BUFFER);
+		gradmin = fopen(tmp->name, "r");
+		if (gradmin == NULL) {
+			fprintf(stderr, "Unable to open included file: %s\n", tmp->name);
+			exit(EXIT_FAILURE);
+		}
+		yy_switch_to_buffer(yy_create_buffer(gradmin, YY_BUF_SIZE));
+		return 0;
+	} else if (main_stack->sp > 0)
+		main_stack->sp--;
+	else if (!strcmp(main_stack->stack[main_stack->sp]->name, current_acl_file))
+		return 1;
+
+	tmp = main_stack->stack[main_stack->sp];
+	printf("sp: %d eof, going down stack to %s\n", main_stack->sp, tmp->name);
+
+	change_current_acl_file(tmp->name);
 	yy_delete_buffer(YY_CURRENT_BUFFER);
-	lineno = current_stack->stack[current_stack->sp]->lineno;
-	yyin = current_stack->stack[current_stack->sp]->file;
-	yy_switch_to_buffer(current_stack->stack[current_stack->sp]->buffer);
+	lineno = tmp->lineno;
+	gradmin = tmp->file;
+	yy_switch_to_buffer(tmp->buffer);
 
 	return 0;
 }
@@ -555,9 +592,10 @@ int main(int argc, char *argv[])
 	
 	no_coredump();
 
-	current_stack = &include_stack;
-	memset(current_stack, 0, sizeof(struct include_entry));
-
+	main_stack = &include_stack;
+	memset(main_stack, 0, sizeof(struct include_entry));
+	main_stack->sp = -1;
+	
 	init_variables();
 
 	parse_args(argc, argv);

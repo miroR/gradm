@@ -1002,7 +1002,6 @@ parse_acls(void)
 	gradmin = open_acl_file(GR_POLICY_PATH);
 	change_current_acl_file(GR_POLICY_PATH);
 	gradmparse();
-	fclose(gradmin);
 
 	add_kernel_acl();
 
