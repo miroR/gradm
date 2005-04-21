@@ -259,8 +259,8 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 		return match;
 	} else if (hash->type == GR_HASH_FILENAME) {
 		char *filename = (char *)entry;
-		u_int32_t key = nhash(filename, hash->table_size);
-		u_int32_t index = key;
+		u_int32_t key = full_name_hash(filename);
+		u_int32_t index = key % hash->table_size;
 		struct gr_learn_file_tmp_node *match;
 		unsigned char i = 0;
 
@@ -385,8 +385,8 @@ void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
 		hash->used_size++;
 	} else if (hash->type == GR_HASH_FILENAME) {
 		struct gr_learn_file_tmp_node *node = (struct gr_learn_file_tmp_node *)entry;
-		u_int32_t key = nhash(node->filename, hash->table_size);
-		u_int32_t index = key;
+		u_int32_t key = full_name_hash(node->filename);
+		u_int32_t index = key % hash->table_size;
 		struct gr_learn_file_tmp_node **curr;
 		unsigned char i = 0;
 
