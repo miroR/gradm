@@ -112,6 +112,7 @@ high-protected-path /dev/kmem
 high-protected-path /dev/port
 high-protected-path /dev/log
 
+inherit-learn /etc/cron.d
 inherit-learn /etc/cron.hourly
 inherit-learn /etc/cron.daily
 inherit-learn /etc/cron.weekly
