@@ -104,14 +104,20 @@ high-protected-path /etc/ssh
 high-protected-path /proc/kcore
 high-protected-path /proc/sys
 high-protected-path /proc/bus
-high-protected-path /etc/shadow
 high-protected-path /etc/passwd
+high-protected-path /etc/shadow
+high-protected-path /etc/shadow-
+high-protected-path /etc/gshadow
+high-protected-path /etc/gshadow-
 high-protected-path /var/log
 high-protected-path /dev/mem
 high-protected-path /dev/kmem
 high-protected-path /dev/port
 high-protected-path /dev/log
 high-protected-path /sys
+high-protected-path /etc/ppp/chap-secrets
+high-protected-path /etc/ppp/pap-secrets
+high-protected-path /etc/samba/smbpasswd
 
 inherit-learn /etc/cron.d
 inherit-learn /etc/cron.hourly
