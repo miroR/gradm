@@ -452,9 +452,7 @@ int is_eof(void)
 		}
 		yy_switch_to_buffer(yy_create_buffer(gradmin, YY_BUF_SIZE));
 		return 0;
-	} else if (main_stack->sp > 0)
-		main_stack->sp--;
-	else if (!strcmp(main_stack->stack[main_stack->sp]->name, current_acl_file))
+	} else if (!strcmp(main_stack->stack[main_stack->sp]->name, current_acl_file))
 		return 1;
 
 	tmp = main_stack->stack[main_stack->sp];
@@ -464,6 +462,9 @@ int is_eof(void)
 	lineno = tmp->lineno;
 	gradmin = tmp->file;
 	yy_switch_to_buffer(tmp->buffer);
+
+	if (main_stack->sp > 0)
+		main_stack->sp--;
 
 	return 0;
 }
