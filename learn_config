@@ -111,6 +111,7 @@ high-protected-path /dev/mem
 high-protected-path /dev/kmem
 high-protected-path /dev/port
 high-protected-path /dev/log
+high-protected-path /sys
 
 inherit-learn /etc/cron.d
 inherit-learn /etc/cron.hourly

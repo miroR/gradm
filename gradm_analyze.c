@@ -459,6 +459,14 @@ analyze_acls(void)
 			errs_found++;
 		}
 
+		if (!check_permission(role, def_acl, "/sys", &chk)) {
+			fprintf(stderr,
+				"Write access is allowed by role %s to /sys, the directory which "
+				"holds entries that allow modifying kernel variables.\n\n",
+				role->rolename);
+			errs_found++;
+		}
+
 		if (!check_permission(role, def_acl, "/etc", &chk)) {
 			fprintf(stderr,
 				"Write access is allowed by role %s to /etc, the directory which "
