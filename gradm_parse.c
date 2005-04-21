@@ -11,25 +11,14 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 	int i;
 
 	if (usergroup == GR_ID_USER) {
-		if (allowdeny == GR_ID_ALLOW) {
-			if (subject->user_trans_type & GR_ID_DENY) {
-				fprintf(stderr, "Error on line %lu of %s.  You cannot use "
-					"both user_transition_allow and user_transition_deny.\n"
-					"The RBAC system will not be allowed to be enabled until "
-					"this error is fixed.\n", lineno, current_acl_file);
-				exit(EXIT_FAILURE);
-			}
-			subject->user_trans_type |= GR_ID_ALLOW;
-		} else if (allowdeny == GR_ID_DENY) {
-			if (subject->user_trans_type & GR_ID_ALLOW) {
-				fprintf(stderr, "Error on line %lu of %s.  You cannot use "
-					"both user_transition_allow and user_transition_deny.\n"
-					"The RBAC system will not be allowed to be enabled until "
-					"this error is fixed.\n", lineno, current_acl_file);
-				exit(EXIT_FAILURE);
-			}
-			subject->user_trans_type |= GR_ID_DENY;
+		if ((subject->user_trans_type | allowdeny) == (GR_ID_ALLOW | GR_ID_DENY)) {
+			fprintf(stderr, "Error on line %lu of %s.  You cannot use "
+				"both user_transition_allow and user_transition_deny.\n"
+				"The RBAC system will not be allowed to be enabled until "
+				"this error is fixed.\n", lineno, current_acl_file);
+			exit(EXIT_FAILURE);
 		}
+		subject->user_trans_type |= allowdeny;
 
 		/* dupecheck */
 		for (i = 0; i < subject->user_trans_num; i++)
@@ -55,25 +44,14 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 		subject->user_transitions = gr_dyn_realloc(subject->user_transitions, subject->user_trans_num * sizeof(uid_t));
 		*(subject->user_transitions + subject->user_trans_num - 1) = pwd->pw_uid;
 	} else if (usergroup == GR_ID_GROUP) {
-		if (allowdeny == GR_ID_ALLOW) {
-			if (subject->group_trans_type & GR_ID_DENY) {
-				fprintf(stderr, "Error on line %lu of %s.  You cannot use "
-					"both group_transition_allow and group_transition_deny.\n"
-					"The RBAC system will not be allowed to be enabled until "
-					"this error is fixed.\n", lineno, current_acl_file);
-				exit(EXIT_FAILURE);
-			}
-			subject->group_trans_type |= GR_ID_ALLOW;
-		} else if (allowdeny == GR_ID_DENY) {
-			if (subject->group_trans_type & GR_ID_ALLOW) {
-				fprintf(stderr, "Error on line %lu of %s.  You cannot use "
-					"both group_transition_allow and group_transition_deny.\n"
-					"The RBAC system will not be allowed to be enabled until "
-					"this error is fixed.\n", lineno, current_acl_file);
-				exit(EXIT_FAILURE);
-			}
-			subject->group_trans_type |= GR_ID_DENY;
+		if ((subject->group_trans_type | allowdeny) == (GR_ID_ALLOW | GR_ID_DENY)) {
+			fprintf(stderr, "Error on line %lu of %s.  You cannot use "
+				"both group_transition_allow and group_transition_deny.\n"
+				"The RBAC system will not be allowed to be enabled until "
+				"this error is fixed.\n", lineno, current_acl_file);
+			exit(EXIT_FAILURE);
 		}
+		subject->group_trans_type |= allowdeny;
 
 		/* dupecheck */
 		for (i = 0; i < subject->group_trans_num; i++)
