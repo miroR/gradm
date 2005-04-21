@@ -356,7 +356,6 @@ void add_include(char *includename)
 		exit(EXIT_FAILURE);
 	}
 
-	printf("sp: %d, storing %s\n", main_stack->sp, current_acl_file);
 	push_include(lineno, YY_CURRENT_BUFFER, gradmin, current_acl_file);
 	lineno = 1;
 
@@ -391,7 +390,6 @@ void add_include(char *includename)
 		}
 		tmp->sp = -1;
 		tmp->name = path;
-		printf("adding dirent %s\n", path);
 		tmp->lineno = 1;
 
 		if (last)
@@ -401,7 +399,6 @@ void add_include(char *includename)
 			first = tmp;
 	}
 
-	printf("sp: %d, setting dirents for %s to %s\n", main_stack->sp, main_stack->stack[main_stack->sp]->name, first->next ? first->next->name : "null");
 	main_stack->stack[main_stack->sp]->dirents = first->next;	
 	path = first->name;
 
@@ -412,7 +409,6 @@ void add_include(char *includename)
 		fprintf(stderr, "Unable to open included file: %s\n", path);
 		exit(EXIT_FAILURE);
 	}
-	printf("switching to %s\n", current_acl_file);
 
 	gradmin = tmpfile;
 	yy_switch_to_buffer(yy_create_buffer(gradmin, YY_BUF_SIZE));
@@ -438,8 +434,6 @@ int is_eof(void)
 {
 	struct include_entry *tmp = NULL;
 
-	printf("eof with %s\n", current_acl_file);
-
 	fclose(gradmin);
 
 	if (main_stack->sp < 0)
@@ -449,7 +443,6 @@ int is_eof(void)
 	if (tmp->dirents != NULL) {
 		tmp = tmp->dirents;
 		main_stack->stack[main_stack->sp]->dirents = tmp->next;
-		printf("eof, switching to %s\n", tmp->name);
 		change_current_acl_file(tmp->name);
 		yy_delete_buffer(YY_CURRENT_BUFFER);
 		gradmin = fopen(tmp->name, "r");
@@ -465,7 +458,6 @@ int is_eof(void)
 		return 1;
 
 	tmp = main_stack->stack[main_stack->sp];
-	printf("sp: %d eof, going down stack to %s\n", main_stack->sp, tmp->name);
 
 	change_current_acl_file(tmp->name);
 	yy_delete_buffer(YY_CURRENT_BUFFER);
