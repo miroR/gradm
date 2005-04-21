@@ -126,3 +126,5 @@ inherit-learn /etc/cron.daily
 inherit-learn /etc/cron.weekly
 inherit-learn /etc/cron.monthly
 inherit-learn /etc/init.d
+inherit-learn /etc/rc.d/init.d
+
