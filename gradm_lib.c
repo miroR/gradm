@@ -259,13 +259,14 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 		return match;
 	} else if (hash->type == GR_HASH_FILENAME) {
 		char *filename = (char *)entry;
-		unsigned long index = nhash(filename, hash->table_size);
+		u_int32_t key = nhash(filename, hash->table_size);
+		u_int32_t index = key;
 		struct gr_learn_file_tmp_node *match;
 		unsigned char i = 0;
 
 		match = (struct gr_learn_file_tmp_node *)hash->table[index];
 
-		while (match && strcmp(match->filename, filename)) {
+		while (match && (match->key != key || strcmp(match->filename, filename))) {
 			index = (index + (1 << i)) % hash->table_size;
 			match = (struct gr_learn_file_tmp_node *)hash->table[index];
 			i = (i + 1) % 32;
@@ -384,13 +385,14 @@ void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
 		hash->used_size++;
 	} else if (hash->type == GR_HASH_FILENAME) {
 		struct gr_learn_file_tmp_node *node = (struct gr_learn_file_tmp_node *)entry;
-		unsigned long index = nhash(node->filename, hash->table_size);
+		u_int32_t key = nhash(node->filename, hash->table_size);
+		u_int32_t index = key;
 		struct gr_learn_file_tmp_node **curr;
 		unsigned char i = 0;
 
 		curr = (struct gr_learn_file_tmp_node **)&hash->table[index];
 
-		while (*curr && strcmp(node->filename, (*curr)->filename)) {
+		while (*curr && ((*curr)->key != key || strcmp(node->filename, (*curr)->filename))) {
 			index = (index + (1 << i)) % hash->table_size;
 			curr = (struct gr_learn_file_tmp_node **)&hash->table[index];
 			i = (i + 1) % 32;

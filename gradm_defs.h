@@ -291,6 +291,7 @@ struct gr_learn_group_node {
 
 struct gr_learn_file_tmp_node {
 	char *filename;
+	u_int32_t key;
 	u_int32_t mode;
 };
 
