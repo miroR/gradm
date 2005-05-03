@@ -53,6 +53,7 @@ enum {
 enum {
 	GR_IP_BIND 	= 0x01,
 	GR_IP_CONNECT 	= 0x02,
+	GR_IP_INVERT 	= 0x04,
 };
 
 enum {

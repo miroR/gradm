@@ -121,6 +121,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return RES_SOFTHARD;
 					}
 
+<IPIP_STATE>"!"				{
+					  return NOT;
+					}
+
 <IPIP_STATE>"disabled"			{
 					  return DISABLED;
 					}
@@ -528,10 +532,10 @@ void show_policy(void) {
 			for (c = 0; c < 32; c++)
 				if (ipp->addr & (1 << c))
 					netmask++;
-			if (ipp->mode == GR_IP_CONNECT)
-				printf("\tCONNECT %u.%u.%u.%u/%u:%d-%d", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], netmask, ipp->low, ipp->high);
+			if (ipp->mode &= GR_IP_CONNECT)
+				printf("\tCONNECT %s %u.%u.%u.%u/%u:%d-%d", ipp->mode & GR_IP_INVERT ? "!" : "", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], netmask, ipp->low, ipp->high);
 			else
-				printf("\tBIND %u.%u.%u.%u/%u:%d-%d", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], netmask, ipp->low, ipp->high);
+				printf("\tBIND %s %u.%u.%u.%u/%u:%d-%d", ipp->mode & GR_IP_INVERT ? "!" : "", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], netmask, ipp->low, ipp->high);
 
 			for (c = 1; c < 5; c++) {
 				if (ipp->type & (1 << c)) {
