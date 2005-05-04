@@ -58,12 +58,12 @@
 	for(x = (y)->globbed; x; x = (x)->next)
 
 
-#define MAJOR_24(dev)     ((unsigned int) ((dev)>>20))
-#define MINOR_24(dev)     ((unsigned int) ((dev) & ((1U << 20) - 1)))
-#define MKDEV_24(ma,mi)   ((mi & 0xff) | (ma << 8) | ((mi & ~0xff) << 12))
-#define MAJOR_26(dev)	((dev)>>8)
-#define MINOR_26(dev)	((dev) & 0xff)
-#define MKDEV_26(ma,mi)	((ma)<<8 | (mi))
+#define MAJOR_26(dev)     ((unsigned int) ((dev)>>20))
+#define MINOR_26(dev)     ((unsigned int) ((dev) & ((1U << 20) - 1)))
+#define MKDEV_26(ma,mi)   ((mi & 0xff) | (ma << 8) | ((mi & ~0xff) << 12))
+#define MAJOR_24(dev)	((dev)>>8)
+#define MINOR_24(dev)	((dev) & 0xff)
+#define MKDEV_24(ma,mi)	((ma)<<8 | (mi))
 
 #include "gradm_defs.h"
 #include "gradm_func.h"
