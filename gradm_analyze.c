@@ -440,6 +440,12 @@ analyze_acls(void)
 			errs_found++;
 		}
 
+		if (!check_permission(role, def_acl, "/dev/grsec", &chk)) {
+			fprintf(stderr,
+				"Writing access is allowed by role %s to /dev/grsec.  This could allow an attacker to bypass the PAM authentication feature of the RBAC system.\n\n", role->rolename);
+			errs_found++;
+		}
+
 		if (!check_permission(role, def_acl, "/root", &chk)) {
 			fprintf(stderr,
 				"Writing access is allowed by role %s to /root, the directory which "
