@@ -101,6 +101,13 @@
 # domain somedomainname u user1 user2 user3 user4 ... usern
 # domain somedomainname g group1 group2 group3 group4 ... groupn
 #
+# Inverted socket policies:
+# Rules such as
+# connect ! www.google.com:80 stream tcp
+# are now allowed, which allows you to specify that a process can connect to anything
+# except to port 80 of www.google.com with a stream tcp socket
+# the inverted socket matching also works on bind rules
+#
 # New learning system:
 # To learn on a given subject: add l (the letter l, not the number 1)
 # to the subject mode
