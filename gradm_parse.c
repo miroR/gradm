@@ -465,7 +465,10 @@ display_all_dupes(struct proc_acl *subject, struct file_acl *filp2)
 	for_each_object(tmp, subject)
 	    if (!stat(tmp->filename, &fstat)) {
 		ftmp.inode = fstat.st_ino;
-		ftmp.dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
+		if (is_24_kernel)
+			ftmp.dev = MKDEV_24(MAJOR_24(fstat.st_dev), MINOR_24(fstat.st_dev));
+		else
+			ftmp.dev = MKDEV_26(MAJOR_26(fstat.st_dev), MINOR_26(fstat.st_dev));
 		if (ftmp.inode == filp2->inode && ftmp.dev == filp2->dev)
 			fprintf(stderr, "%s\n", tmp->filename);
 	}
@@ -601,7 +604,10 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	p->filename = filename;
 	p->mode = mode;
 	p->inode = fstat.st_ino;
-	p->dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
+	if (is_24_kernel)
+		p->dev = MKDEV_24(MAJOR_24(fstat.st_dev), MINOR_24(fstat.st_dev));
+	else
+		p->dev = MKDEV_26(MAJOR_26(fstat.st_dev), MINOR_26(fstat.st_dev));
 
 	if (type & GR_FLEARN) {
 		struct file_acl *tmp;
@@ -702,7 +708,10 @@ add_proc_subject_acl(struct role_acl *role, char *filename, u_int32_t mode, int 
 	p->filename = filename;
 	p->mode = mode;
 
-	p->dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
+	if (is_24_kernel)
+		p->dev = MKDEV_24(MAJOR_24(fstat.st_dev), MINOR_24(fstat.st_dev));
+	else
+		p->dev = MKDEV_26(MAJOR_26(fstat.st_dev), MINOR_26(fstat.st_dev));
 	p->inode = fstat.st_ino;
 
 	if (!(flag & GR_FFAKE) && (p2 = is_proc_subject_dupe(role, p))) {
@@ -1056,7 +1065,7 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 	     (struct gr_arg_wrapper *) calloc(1, sizeof (struct gr_arg_wrapper))) == NULL)
 		failure("calloc");
 
-	wrapper->version = GRADM_VERSION | (KERNVER << 16);
+	wrapper->version = GRADM_VERSION;
 	wrapper->size = sizeof(struct gr_arg);
 	wrapper->arg = retarg;
 

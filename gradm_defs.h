@@ -177,7 +177,7 @@ struct ip_acl {
 struct file_acl {
 	char *filename;
 	ino_t inode;
-	gr_dev_t dev;
+	u_int32_t dev;
 	u_int32_t mode;
 
 	struct proc_acl *nested;
@@ -228,7 +228,7 @@ struct role_acl {
 struct proc_acl {
 	char *filename;
 	ino_t inode;
-	gr_dev_t dev;
+	u_int32_t dev;
 	u_int32_t mode;
 	u_int32_t cap_mask;
 	u_int32_t cap_drop;
@@ -331,7 +331,7 @@ struct gr_pw_entry {
 	unsigned char passwd[GR_PW_LEN];
 	unsigned char sum[GR_SHA_SUM_SIZE];
 	unsigned char salt[GR_SALT_SIZE];
-	gr_dev_t segv_dev;
+	u_int32_t segv_dev;
 	ino_t segv_inode;
 	uid_t segv_uid;
 	u_int16_t mode;
@@ -391,7 +391,7 @@ struct gr_arg {
 	unsigned char sum[GR_SHA_SUM_SIZE];
 	unsigned char sp_role[GR_SPROLE_LEN];
 	struct sprole_pw *sprole_pws;
-	gr_dev_t segv_dev;
+	u_int32_t segv_dev;
 	ino_t segv_inode;
 	uid_t segv_uid;
 	u_int16_t num_sprole_pws;
@@ -406,6 +406,8 @@ struct gr_arg_wrapper {
 
 char *rlim_table[GR_NLIMITS];
 struct capability_set capability_list[30];
+
+int is_24_kernel;
 
 uid_t special_role_uid;
 

@@ -20,10 +20,9 @@ MKNOD=/bin/mknod
 CC=/usr/bin/gcc
 FIND=/usr/bin/find
 STRIP=/usr/bin/strip
-KERNVER := $(shell uname -r | cut -d"." -f 2)
 LIBS := $(shell if [ "`uname -m`" != "sparc64" ]; then echo "-lfl" ; else echo "" ; fi)
 OPT_FLAGS := $(shell if [ "`uname -m`" != "sparc64" ] && [ "`uname -m`" != "x86_64" ]; then echo "-O2" ; else echo "-O2 -m64" ; fi)
-CFLAGS := $(OPT_FLAGS) -DGRSEC_DIR=\"$(GRSEC_DIR)\" -DKERNVER=$(KERNVER)
+CFLAGS := $(OPT_FLAGS) -DGRSEC_DIR=\"$(GRSEC_DIR)\"
 LDFLAGS=
 INSTALL = /usr/bin/install -c
 

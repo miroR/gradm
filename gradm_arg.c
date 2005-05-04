@@ -48,7 +48,7 @@ show_help(void)
 }
 
 static void
-conv_name_to_num(const char *filename, gr_dev_t *dev, ino_t * inode)
+conv_name_to_num(const char *filename, u_int32_t *dev, ino_t * inode)
 {
 	struct stat fstat;
 
@@ -58,7 +58,11 @@ conv_name_to_num(const char *filename, gr_dev_t *dev, ino_t * inode)
 		exit(EXIT_FAILURE);
 	}
 
-	*dev = MKDEV(MAJOR(fstat.st_dev), MINOR(fstat.st_dev));
+	if (is_24_kernel)
+		*dev = MKDEV_24(MAJOR_24(fstat.st_dev), MINOR_24(fstat.st_dev));
+	else
+		*dev = MKDEV_26(MAJOR_26(fstat.st_dev), MINOR_26(fstat.st_dev));
+
 	*inode = fstat.st_ino;
 
 	return;

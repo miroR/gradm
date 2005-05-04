@@ -486,7 +486,7 @@ int gradmerror(char *s)
 	exit(EXIT_FAILURE);
 }
 
-void no_coredump(void)
+static void no_coredump(void)
 {
 	struct rlimit rlim;
 
@@ -494,6 +494,20 @@ void no_coredump(void)
 	rlim.rlim_max = 0;
 
 	setrlimit(RLIMIT_CORE, &rlim);
+
+	return;
+}
+
+static void tailor_to_kernel(void)
+{
+	struct utsname buf;
+
+	uname(&buf);
+
+	if ((strlen(buf.release) < 3) || (buf.release[2] == '4'))
+		is_24_kernel = 1;
+	else
+		is_24_kernel = 0;
 
 	return;
 }
@@ -587,6 +601,7 @@ int main(int argc, char *argv[])
 
 	special_role_uid = 0;
 	
+	tailor_to_kernel();
 	no_coredump();
 
 	main_stack = &include_stack;

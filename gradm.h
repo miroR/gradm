@@ -25,6 +25,7 @@
 #include <sys/resource.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
+#include <sys/utsname.h>
 #include <asm/param.h>
 #include <asm/ioctls.h>
 
@@ -57,20 +58,12 @@
 	for(x = (y)->globbed; x; x = (x)->next)
 
 
-#if KERNVER == 6
-typedef u_int32_t gr_dev_t;
-#undef MAJOR
-#undef MINOR
-#undef MKDEV
-#define MAJOR(dev)     ((unsigned int) ((dev)>>20))
-#define MINOR(dev)     ((unsigned int) ((dev) & ((1U << 20) - 1)))
-#define MKDEV(ma,mi)   ((mi & 0xff) | (ma << 8) | ((mi & ~0xff) << 12))
-#else
-typedef unsigned short gr_dev_t;
-#define MAJOR(dev)	((dev)>>8)
-#define MINOR(dev)	((dev) & 0xff)
-#define MKDEV(ma,mi)	((ma)<<8 | (mi))
-#endif
+#define MAJOR_24(dev)     ((unsigned int) ((dev)>>20))
+#define MINOR_24(dev)     ((unsigned int) ((dev) & ((1U << 20) - 1)))
+#define MKDEV_24(ma,mi)   ((mi & 0xff) | (ma << 8) | ((mi & ~0xff) << 12))
+#define MAJOR_26(dev)	((dev)>>8)
+#define MINOR_26(dev)	((dev) & 0xff)
+#define MKDEV_26(ma,mi)	((ma)<<8 | (mi))
 
 #include "gradm_defs.h"
 #include "gradm_func.h"
