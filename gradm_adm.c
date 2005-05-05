@@ -148,7 +148,6 @@ add_gradm_pam_acl(struct role_acl *role)
 	add_proc_object_acl(current_subject, "/etc/nsswitch.conf", proc_object_mode_conv("r"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/dev/urandom", proc_object_mode_conv("r"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/proc", proc_object_mode_conv(""), GR_FEXIST);
-	add_proc_object_acl(current_subject, "/proc", proc_object_mode_conv(""), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/dev/tty", proc_object_mode_conv("rw"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/dev/tty?", proc_object_mode_conv("rw"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/dev/pts", proc_object_mode_conv("rw"), GR_FEXIST);
