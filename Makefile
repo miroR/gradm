@@ -97,7 +97,7 @@ install: $(GRADM_BIN) gradm.8 policy grlearn
 	$(INSTALL) -m 0755 $(GRADM_BIN) $(DESTDIR)/sbin
 	$(STRIP) $(DESTDIR)/sbin/$(GRADM_BIN)
 	@if [ -f $(GRADM_PAM) ] ; then \
-		$(INSTALL) -m 0755 $(GRADM_PAM) $(DESTDIR)/sbin ; \
+		$(INSTALL) -m 4755 $(GRADM_PAM) $(DESTDIR)/sbin ; \
 		$(STRIP) $(DESTDIR)/sbin/$(GRADM_PAM) ; \
 	fi
 	$(INSTALL) -m 0700 grlearn $(DESTDIR)/sbin
