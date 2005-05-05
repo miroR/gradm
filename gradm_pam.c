@@ -13,7 +13,8 @@ int gradm_pam_conv(int num_msg, const struct pam_message **msg, struct pam_respo
 	int i;
 	struct pam_response *response;
 
-	if (num_msg <= 0)
+	/* arbitrary OpenSSH-style limiting */
+	if (num_msg <= 0 || num_msg > 1000)
 		return PAM_CONV_ERR;
 
 	response = malloc(num_msg * sizeof(struct pam_response));
@@ -23,25 +24,42 @@ int gradm_pam_conv(int num_msg, const struct pam_message **msg, struct pam_respo
 		response[i].resp_retcode = 0;
 		response[i].resp = 0;
 		switch (msg[i]->msg_style) {
-			case PAM_PROMPT_ECHO_ON:
-				fputs(msg[i]->msg, stdout);
-				response[i].resp = calloc(1, PAM_MAX_RESP_SIZE);
-				fgets(response[i].resp, PAM_MAX_RESP_SIZE, stdin);
-				*(response[i].resp + strlen(response[i].resp) - 1) = '\0';
-				break;
-			case PAM_PROMPT_ECHO_OFF:
-				response[i].resp = strdup(getpass(msg[i]->msg));
-				break;
-			case PAM_ERROR_MSG:
-				fputs(msg[i]->msg, stderr);
-				break;
-			case PAM_TEXT_INFO:
-				fputs(msg[i]->msg, stdout);
-				break;
-			default:
-				if (response)
-					free(response);
-				return PAM_CONV_ERR;
+		case PAM_PROMPT_ECHO_ON:
+			char *p;
+
+			fputs(msg[i]->msg, stdout);
+			response[i].resp = calloc(1, PAM_MAX_RESP_SIZE);
+			if (response[i].resp == NULL)
+				failure("calloc");
+			fgets(response[i].resp, PAM_MAX_RESP_SIZE, stdin);
+			p = response[i].resp;
+			while (*p) {
+				if (*p == '\n') {
+					*p = '\0';
+					break;
+				}
+				p++;
+			}
+			break;
+		case PAM_PROMPT_ECHO_OFF:
+			char *p = getpass(msg[i]->msg);
+			if (p == NULL)
+				failure("getpass");
+			response[i].resp = strdup(p);
+			/* zero out static buffer */
+			memset(p, 0, strlen(p));
+			if (response[i].resp == NULL)
+				failure("strdup");
+			break;
+		case PAM_ERROR_MSG:
+			fputs(msg[i]->msg, stderr);
+			break;
+		case PAM_TEXT_INFO:
+			fputs(msg[i]->msg, stdout);
+			break;
+		default:
+			free(response);
+			return PAM_CONV_ERR;
 		}
 	}
 
