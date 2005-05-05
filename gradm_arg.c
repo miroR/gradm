@@ -342,7 +342,7 @@ parse_args(int argc, char *argv[])
 				show_help();
 			strncpy(entry.rolename, argv[2], GR_SPROLE_LEN);
 			entry.rolename[GR_SPROLE_LEN - 1] = '\0';
-			entry.mode = GRADM_SPROLE;
+			entry.mode = GRADM_SPROLEPAM;
 			check_pam_auth(entry.rolename);
 			check_acl_status(entry.mode);
 			grarg = conv_user_to_kernel(&entry);
