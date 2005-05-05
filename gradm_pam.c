@@ -22,7 +22,7 @@ int gradm_pam_conv(int num_msg, const struct pam_message **msg, struct pam_respo
 		return PAM_CONV_ERR;
 	for (i = 0; i < num_msg; i++) {
 		response[i].resp_retcode = 0;
-		response[i].resp = 0;
+		response[i].resp = NULL;
 		switch (msg[i]->msg_style) {
 		case PAM_PROMPT_ECHO_ON:
 			char *p;
@@ -58,6 +58,14 @@ int gradm_pam_conv(int num_msg, const struct pam_message **msg, struct pam_respo
 			fputs(msg[i]->msg, stdout);
 			break;
 		default:
+			int x;
+			for (x = i; x >= 0; x--) {
+				if (response[x].resp != NULL) {
+					memset(response[x].resp, 0, strlen(response[x].resp));
+					free(response[x].resp);
+					response[x].resp = NULL;
+				}
+			}
 			free(response);
 			return PAM_CONV_ERR;
 		}
