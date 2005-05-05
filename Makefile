@@ -93,16 +93,19 @@ lex.learn_pass2.c: gradm_learn_pass2.l
 	$(LEX) $(LEXFLAGS) -Plearn_pass2 ./gradm_learn_pass2.l
 
 install: $(GRADM_BIN) gradm.8 policy grlearn
-	mkdir -p $(DESTDIR)/sbin
-	$(INSTALL) -m 0755 $(GRADM_BIN) $(DESTDIR)/sbin
-	$(STRIP) $(DESTDIR)/sbin/$(GRADM_BIN)
+	@mkdir -p $(DESTDIR)/sbin
+	@echo "Installing gradm..."
+	@$(INSTALL) -m 0755 $(GRADM_BIN) $(DESTDIR)/sbin
+	@$(STRIP) $(DESTDIR)/sbin/$(GRADM_BIN)
 	@if [ -f $(GRADM_PAM) ] ; then \
+		echo "Installing gradm_pam..." ; \
 		$(INSTALL) -m 4755 $(GRADM_PAM) $(DESTDIR)/sbin ; \
 		$(STRIP) $(DESTDIR)/sbin/$(GRADM_PAM) ; \
 	fi
-	$(INSTALL) -m 0700 grlearn $(DESTDIR)/sbin
-	$(STRIP) $(DESTDIR)/sbin/grlearn
-	mkdir -p -m 700 $(DESTDIR)$(GRSEC_DIR)
+	@echo "Installing grlearn..."
+	@$(INSTALL) -m 0700 grlearn $(DESTDIR)/sbin
+	@$(STRIP) $(DESTDIR)/sbin/grlearn
+	@mkdir -p -m 700 $(DESTDIR)$(GRSEC_DIR)
 	@if [ ! -f $(DESTDIR)$(GRSEC_DIR)/policy ] ; then \
 		if [ -f $(DESTDIR)$(GRSEC_DIR)/acl ] ; then \
 			mv $(DESTDIR)$(GRSEC_DIR)/acl $(DESTDIR)$(GRSEC_DIR)/policy ; \
@@ -121,8 +124,9 @@ install: $(GRADM_BIN) gradm.8 policy grlearn
 			$(MKNOD) -m 0622 $(DESTDIR)/dev/grsec c 1 12 ; \
 		fi \
 	fi
-	mkdir -p $(DESTDIR)$(MANDIR)/man8
-	$(INSTALL) -m 0644 gradm.8 $(DESTDIR)$(MANDIR)/man8/$(GRADM_BIN).8
+	@echo "Installing gradm manpage..."
+	@mkdir -p $(DESTDIR)$(MANDIR)/man8
+	@$(INSTALL) -m 0644 gradm.8 $(DESTDIR)$(MANDIR)/man8/$(GRADM_BIN).8
 	@if [ -x /sbin/$(GRADM_BIN) ] ; then \
 		if [ -z $(DESTDIR) ] && [ ! -f $(GRSEC_DIR)/pw ] ; then \
 			/sbin/$(GRADM_BIN) -P ; \
