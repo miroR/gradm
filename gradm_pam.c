@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
 
 	wrapper.version = GRADM_VERSION;
 	wrapper.size = sizeof(struct gr_arg);
+	wrapper.arg = &arg;
 	arg.mode = GRADM_STATUS;
 
 	if ((fd = open(GRDEV_PATH, O_WRONLY)) < 0) {
