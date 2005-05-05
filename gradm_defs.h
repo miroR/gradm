@@ -2,6 +2,7 @@
 #define GRSEC_DIR		"/etc/grsec"
 #endif
 #define GRLEARN_PATH		"/sbin/grlearn"
+#define GRPAM_PATH		"/sbin/gradm_pam"
 #define GRDEV_PATH		"/dev/grsec"
 #define GR_POLICY_PATH 		GRSEC_DIR "/policy"
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
@@ -102,7 +103,8 @@ enum {
 	GR_ROLE_GOD 	= 0x0040,
 	GR_ROLE_LEARN 	= 0x0080,
 	GR_ROLE_TPE 	= 0x0100,
-	GR_ROLE_DOMAIN 	= 0x0200
+	GR_ROLE_DOMAIN 	= 0x0200,
+	GR_ROLE_PAM 	= 0x0400,
 };
 
 enum {
@@ -131,7 +133,8 @@ enum {
 	GR_NESTED	= 0x00040000,
 	GR_INHERITLEARN = 0x00080000,
 	GR_PROCFIND	= 0x00100000,
-	GR_POVERRIDE	= 0x00200000
+	GR_POVERRIDE	= 0x00200000,
+	GR_KERNELAUTH	= 0x00400000,
 };
 
 /* internal use only.  not to be modified */

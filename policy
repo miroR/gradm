@@ -15,6 +15,7 @@
 #      A polciy for gradm will automatically be added to the role
 # T -> Enable TPE for this role
 # l -> Enable learning for this role
+# P -> Use PAM authentication for this role.
 #
 # a role can only be one of user, group, or special
 #
@@ -80,6 +81,7 @@
 #      all accesses of this subject and anything it executes to be placed
 #      in this subject, and inheritance flags added to executable objects
 #      in this subject
+# a -> allow this process to talk to the /dev/grsec device
 #
 # user/group transitions:
 # You may now specify what users and groups a given subject can

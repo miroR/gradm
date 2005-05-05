@@ -38,6 +38,8 @@ show_help(void)
 	       "	-u, --unauth    Remove yourself from your current special role\n"
 	       "	-n <rolename> , --noauth\n"
 	       "			Authenticates to a special role that doesn't require auth\n"
+	       "	-p <rolename> , --pamauth\n"
+	       "			Authenticates to a special role through PAM\n"
 	       "	-V, --verbose   Display verbose policy statistics when enabling system\n"
 	       "	-h, --help	Display this help\n"
 	       "	-v, --version	Display version information\n",
@@ -166,7 +168,7 @@ parse_args(int argc, char *argv[])
 	struct gr_pw_entry entry;
 	struct gr_arg_wrapper *grarg;
 	char cwd[PATH_MAX];
-	const char *const short_opts = "SVEFuDP::RL:O:M:a:n:hv";
+	const char *const short_opts = "SVEFuDP::RL:O:M:a:p:n:hv";
 	const struct option long_opts[] = {
 		{"help", 0, NULL, 'h'},
 		{"version", 0, NULL, 'v'},
@@ -183,6 +185,7 @@ parse_args(int argc, char *argv[])
 		{"fulllearn", 0, NULL, 'F'},
 		{"output", 1, NULL, 'O'},
 		{"unauth", 0, NULL, 'u'},
+		{"pamauth", 1, NULL, 'p'},
 		{NULL, 0, NULL, 0}
 	};
 
@@ -330,6 +333,18 @@ parse_args(int argc, char *argv[])
 			entry.mode = GRADM_SPROLE;
 			check_acl_status(entry.mode);
 			get_user_passwd(&entry, GR_PWONLY);
+			grarg = conv_user_to_kernel(&entry);
+			transmit_to_kernel(grarg);
+			exit(EXIT_SUCCESS);
+			break;
+		case 'p':
+			if (argc != 3)
+				show_help();
+			strncpy(entry.rolename, argv[2], GR_SPROLE_LEN);
+			entry.rolename[GR_SPROLE_LEN - 1] = '\0';
+			entry.mode = GRADM_SPROLE;
+			check_pam_auth(entry.rolename);
+			check_acl_status(entry.mode);
 			grarg = conv_user_to_kernel(&entry);
 			transmit_to_kernel(grarg);
 			exit(EXIT_SUCCESS);

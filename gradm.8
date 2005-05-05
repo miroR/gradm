@@ -35,6 +35,9 @@ gradm \- Administration program for the grsecurity RBAC system
 .B \-n <rolename>
 ]
 [
+.B \-p <rolename>
+]
+[
 .B \-u
 ]
 [
@@ -114,14 +117,20 @@ Authenticate to a special role that requires a password.
 Authenticate to a special role that does not require a password.
 .TP
 
+.B \-p <rolename>
+Authenticate through PAM to a special role.
+.TP
+
 .B \-u
 Removes yourself from your current special role, reverting back
 to the normal role selection.  To be used, for instance, for logging
 out of an admin role without exiting your shell.
+.TP
 
 .B \-V
 Displays verbose policy statistics when enabling the RBAC system.
 Can only be used with -E, -R, or -F -L <filename>
+.TP
 
 .B \-h
 Display help information

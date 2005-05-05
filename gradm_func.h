@@ -18,6 +18,7 @@ int add_proc_object_acl(struct proc_acl *subject, char *filename,
 			u_int32_t mode, int type);
 void add_cap_acl(struct proc_acl *subject, const char *cap);
 void add_gradm_acl(struct role_acl *role);
+void add_gradm_pam_acl(struct role_acl *role);
 void add_grlearn_acl(struct role_acl *role);
 void add_domain_child(struct role_acl *role, char *idname);
 void change_current_acl_file(const char *filename);
@@ -144,3 +145,5 @@ int display_leaf(struct gr_learn_file_node *node, struct gr_learn_file_node *unu
 void insert_learn_id_transition(unsigned int ***list, int real, int eff, int fs);
 void add_to_string_array(char ***array, char *str);
 void parse_learn_config(void);
+
+void check_pam_auth(char *rolename);

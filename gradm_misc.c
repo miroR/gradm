@@ -3,6 +3,39 @@
 extern FILE *grlearn_configin;
 extern int grlearn_configparse(void);
 
+void check_pam_auth(char *rolename)
+{
+	struct stat fstat;
+	int pid;
+
+	if (stat(GRPAM_PATH, &fstat)) {
+		fprintf(stderr, "PAM authentication support has been disabled "
+			"in this install.  Please reinstall gradm with PAM "
+			"authentication support.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	pid = fork();
+
+	if (pid == 0) {
+		execl(GRPAM_PATH, GRPAM_PATH, rolename, NULL);
+		exit(EXIT_FAILURE);
+	} else if (pid > 0) {
+		int status = 0;
+		wait(&status);
+		if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+			return;
+	} else {
+		fprintf(stderr, "Error forking.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	fprintf(stderr, "PAM authentication failed.\n");
+	exit(EXIT_FAILURE);
+
+	return;
+}
+
 void parse_learn_config(void)
 {
 	grlearn_configin = fopen(GR_LEARN_CONFIG_PATH, "r");

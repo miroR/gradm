@@ -5,6 +5,7 @@
 ##############################################################################
 
 GRADM_BIN=gradm
+GRADM_PAM=gradm_pam
 GRSEC_DIR=/etc/grsec
 
 LLEX=/usr/bin/lex
@@ -42,10 +43,14 @@ OBJECTS=gradm.tab.o lex.gradm.o learn_pass1.tab.o learn_pass2.tab.o \
 	lex.fulllearn_pass3.o lex.learn_pass1.o lex.learn_pass2.o \
 	grlearn_config.tab.o lex.grlearn_config.o
 
-all: $(GRADM_BIN) grlearn
+all: $(GRADM_BIN) $(GRADM_PAM) grlearn
+nopam: $(GRADM_BIN) grlearn
 
-$(GRADM_BIN): $(OBJECTS)
+$(GRADM_BIN): $(OBJECTS) gradm.h gradm_defs.h gradm_func.h
 	$(CC) $(CFLAGS) -o $@ $(OBJECTS) $(LIBS) $(LDFLAGS)
+
+$(GRADM_PAM): gradm_pam.c gradm.h gradm_defs.h gradm_func.h
+	$(CC) $(CFLAGS) -o $@ gradm_pam.c -lpam -lpam_misc $(LDFLAGS)
 
 grlearn: grlearn.c gradm_lib.c
 	$(CC) $(CFLAGS) -o $@ grlearn.c gradm_lib.c $(LIBS) $(LDFLAGS)
@@ -91,6 +96,10 @@ install: $(GRADM_BIN) gradm.8 policy grlearn
 	mkdir -p $(DESTDIR)/sbin
 	$(INSTALL) -m 0755 $(GRADM_BIN) $(DESTDIR)/sbin
 	$(STRIP) $(DESTDIR)/sbin/$(GRADM_BIN)
+	@if [ -f $(GRADM_PAM) ] ; then \
+		$(INSTALL) -m 0755 $(GRADM_PAM) $(DESTDIR)/sbin ; \
+		$(STRIP) $(DESTDIR)/sbin/$(GRADM_PAM) ; \
+	fi
 	$(INSTALL) -m 0700 grlearn $(DESTDIR)/sbin
 	$(STRIP) $(DESTDIR)/sbin/grlearn
 	mkdir -p -m 700 $(DESTDIR)$(GRSEC_DIR)
@@ -122,4 +131,4 @@ install: $(GRADM_BIN) gradm.8 policy grlearn
 	@true
 
 clean:
-	rm -f core *.o $(GRADM_BIN) lex.*.c *.tab.c *.tab.h grlearn
+	rm -f core *.o $(GRADM_BIN) $(GRADM_PAM) lex.*.c *.tab.c *.tab.h grlearn

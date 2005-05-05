@@ -347,8 +347,10 @@ add_role_acl(struct role_acl **role, char *rolename, u_int16_t type, int ignore)
 	if (type & GR_ROLE_SPECIAL)
 		add_role_transition(*role,rolename);
 
-	if (type & GR_ROLE_AUTH)
+	if (type & GR_ROLE_AUTH) {
 		add_gradm_acl(*role);
+		add_gradm_pam_acl(*role);
+	}
 	if (!(type & GR_ROLE_SPECIAL))
 		add_grlearn_acl(*role);
 	if (type & GR_ROLE_LEARN)
@@ -772,7 +774,24 @@ role_mode_conv(const char *mode)
 		case 'T':
 			retmode |= GR_ROLE_TPE;
 			break;
+		
+		case 'P':
+			retmode |= GR_ROLE_PAM;
+			break;
 		}
+	}
+
+	if (
+	    ((retmode & (GR_ROLE_NOPW | GR_ROLE_AUTH | GR_ROLE_PAM)) ==
+	    (GR_ROLE_NOPW | GR_ROLE_AUTH | GR_ROLE_PAM)) ||
+	    ((retmode & (GR_ROLE_NOPW | GR_ROLE_AUTH | GR_ROLE_PAM)) ==
+	     (GR_ROLE_NOPW | GR_ROLE_AUTH)) ||
+	    ((retmode & (GR_ROLE_NOPW | GR_ROLE_AUTH | GR_ROLE_PAM)) ==
+	     (GR_ROLE_AUTH | GR_ROLE_PAM)) ||
+	    ((retmode & (GR_ROLE_NOPW | GR_ROLE_AUTH | GR_ROLE_PAM)) ==
+	     (GR_ROLE_NOPW | GR_ROLE_PAM))) {
+		fprintf(stderr, "Error on line %lu of %s.  The role mode must contain only one of the auth, noauth, and pamauth modes.\n");
+		exit(EXIT_FAILURE);
 	}
 
 	if (retmode & GR_ROLE_SPECIAL &&
@@ -875,6 +894,9 @@ proc_subject_mode_conv(const char *mode)
 			break;
 		case 'i':
 			retmode |= GR_INHERITLEARN;
+			break;
+		case 'a':
+			retmode |= GR_KERNELAUTH;
 			break;
 		default:
 			fprintf(stderr, "Invalid proc subject mode "

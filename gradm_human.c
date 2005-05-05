@@ -11,7 +11,8 @@ static struct role_name_table {
 	GR_ROLE_AUTH, 'G'}, {
 	GR_ROLE_NOPW, 'N'}, {
 	GR_ROLE_GOD, 'A'}, {
-	GR_ROLE_TPE, 'T'}
+	GR_ROLE_TPE, 'T'}, {
+	GR_ROLE_PAM, 'P'}
 };
 
 static struct mode_name_table {
@@ -68,7 +69,8 @@ static struct subj_mode_name_table {
 	GR_PROCACCT, 'b'}, {
 	GR_RELAXPTRACE, 'r'}, {
 	GR_INHERITLEARN, 'i'}, {
-	GR_POVERRIDE, 't'}
+	GR_POVERRIDE, 't'}, {
+	GR_KERNELAUTH, 'a'}
 };
 
 void
