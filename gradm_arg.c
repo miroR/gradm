@@ -84,7 +84,7 @@ void verbose_stats(void)
 			continue;
 		troles++;
 		if (rtmp->roletype & GR_ROLE_SPECIAL) {
-			if (rtmp->roletype & GR_ROLE_NOPW)
+			if (rtmp->roletype & (GR_ROLE_NOPW | GR_ROLE_PAM))
 				snroles++;
 			else
 				saroles++;

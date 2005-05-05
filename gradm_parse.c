@@ -1034,7 +1034,7 @@ setup_special_roles(struct gr_arg *grarg)
 
 	for_each_role(rtmp, current_role) {
 		if (rtmp->roletype & GR_ROLE_SPECIAL &&
-		    !(rtmp->roletype & GR_ROLE_NOPW)) {
+		    !(rtmp->roletype & (GR_ROLE_NOPW | GR_ROLE_PAM))) {
 			strncpy(entry.rolename, rtmp->rolename, GR_SPROLE_LEN);
 			entry.rolename[GR_SPROLE_LEN - 1] = '\0';
 			if (!read_saltandpass
@@ -1075,7 +1075,7 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 	for_each_role(rtmp, current_role) {
 		racls++;
 		if (rtmp->roletype & GR_ROLE_SPECIAL &&
-		    !(rtmp->roletype & GR_ROLE_NOPW))
+		    !(rtmp->roletype & (GR_ROLE_NOPW | GR_ROLE_PAM)))
 			sproles++;
 	}
 
