@@ -34,11 +34,10 @@ int gradm_pam_conv(int num_msg, const struct pam_message **msg, struct pam_respo
 			fgets(response[i].resp, PAM_MAX_RESP_SIZE, stdin);
 			p = response[i].resp;
 			while (*p) {
-				if (*p == '\n') {
+				if (*p == '\n')
 					*p = '\0';
-					break;
-				}
-				p++;
+				else
+					p++;
 			}
 			break;
 		case PAM_PROMPT_ECHO_OFF:
