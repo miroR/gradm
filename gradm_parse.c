@@ -87,7 +87,7 @@ is_role_dupe(struct role_acl *role, const char *rolename, const u_int16_t type)
 	struct role_acl *tmp;
 
 	for_each_role(tmp, role)
-	    if ((tmp->roletype & type) && !strcmp(tmp->rolename, rolename))
+	    if ((tmp->roletype & (GR_ROLE_USER | GR_ROLE_GROUP | GR_ROLE_SPECIAL) & type) && !strcmp(tmp->rolename, rolename))
 		return 1;
 
 	return 0;
