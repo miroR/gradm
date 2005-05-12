@@ -226,7 +226,7 @@ subject /usr/sbin/sshd dpo
 	/home
 	/lib		rx
 	/root
-	/proc
+	/proc		r
 	/proc/kcore	h
 	/proc/sys	h
 	/usr/lib	rx
