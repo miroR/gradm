@@ -1,6 +1,11 @@
 #include "gradm.h"
 #include <signal.h>
 
+static struct always_reduce_entry {
+	char *str;
+	unsigned int len;
+} *always_reduce_paths;
+
 #define GR_LEARN_PID_PATH GRSEC_DIR "/.grlearn.pid"
 #define LEARN_BUFFER_SIZE (512 * 1024)
 #define MAX_ENTRY_SIZE 16384
@@ -8,6 +13,39 @@
 static char *writebuf;
 static char *writep;
 static int fd2 = -1;
+
+extern FILE *grlearn_configin;
+
+static void parse_learn2_config(void)
+{
+        grlearn_configin = fopen(GR_LEARN_CONFIG_PATH, "r");
+        if (grlearn_configin == NULL) {
+                fprintf(stderr, "Unable to open %s: %s\n", GR_LEARN_CONFIG_PATH, strerror(errno));
+                exit(EXIT_FAILURE);
+        }
+        grlearn2_configparse();
+        return;
+}
+
+void add_always_reduce(char *str)
+{
+        unsigned int size = 0;
+        if (always_reduce_paths == NULL)
+                always_reduce_paths = calloc(2, sizeof(struct always_reduce_entry));
+        if (always_reduce_paths == NULL)
+		exit(EXIT_FAILURE);
+        while (always_reduce_paths[size].str)
+                size++;
+
+	always_reduce_paths = realloc(always_reduce_paths, (size + 2) * sizeof(struct always_reduce_entry));
+        if (always_reduce_paths == NULL)
+		exit(EXIT_FAILURE);
+	memset(always_reduce_paths + size, 0, 2 * sizeof(struct always_reduce_entry));
+	always_reduce_paths[size].str = str;
+	always_reduce_paths[size].len = strlen(str);
+
+	return;
+}
 
 /* handle flushing of buffer when grlearn is stopped */
 void term_handler(int sig)
@@ -145,10 +183,10 @@ char * rewrite_learn_entry(char *p)
 	int i;
 	char *tmp = p;
 	char *endobj;
-	//char *slash;
 	char *next;
 	unsigned int len;
 	unsigned int ourlen = 0;
+	struct always_reduce_entry *arep;
 
 	for (i = 0; i < 8; i++) {
 		tmp = strchr(tmp, '\t');
@@ -163,47 +201,34 @@ char * rewrite_learn_entry(char *p)
 	*endobj = '\0';
 	/* now we have separated the string */
 
-	if (!strncmp(tmp, "/proc/", 6)) {
-		ourlen = 6;
-	} else if (!strncmp(tmp, "/tmp/", 5)) {
-		ourlen = 5;
-	} else if (!strncmp(tmp, "/dev/pts/", 9)) {
-		ourlen = 9;
-	} else {
+	if (!strncmp(tmp, "/proc/", 6) && (*(tmp + 6) >= '1') &&
+	    (*(tmp + 6) <= '9')) {
 		*endobj = '\t';
-		return p;
+		next = endobj;
+		while (*next++);
+		len = next - endobj;
+		memmove(tmp + 5, endobj, len);
+		return next;
 	}
 
-	if (ourlen == 6) {
-		if (*(tmp + 6) < '1' || *(tmp + 6) > '9') {
-			*endobj = '\t';
-			return p;
+	if (always_reduce_paths) {
+		arep = always_reduce_paths;
+		while (arep && arep->str) {
+			if (!strncmp(tmp, arep->str, arep->len) &&
+			    (*(tmp + arep->len) == '/')) {
+				*endobj = '\t';
+				next = endobj;
+				while (*next++);
+				len = next - endobj;
+				memmove(tmp + arep->len, endobj, len);
+				return next;
+			}
+			arep++;
 		}
 	}
 
 	*endobj = '\t';
-	next = endobj;
-	while (*next++);
-	len = next - endobj;
-	memmove(tmp + ourlen - 1, endobj, len);
-	return next;
-
-/*	slash = strchr(tmp + 6, '/');
-	*endobj = '\t';
-	next = endobj;
-	while(*next++);
-	if (slash == NULL) {
-		len = next - endobj;
-		memmove(tmp + 5, endobj, len);
-		return p;
-	} else {
-		len = next - slash;
-		*(tmp + 6) = '*';
-		memmove(tmp + 7, slash, len);
-		return p;
-	}
 	return p;
-*/
 }
 
 int main(int argc, char *argv[])
@@ -226,6 +251,8 @@ int main(int argc, char *argv[])
 		return stop_daemon();
 		
 	signal(SIGTERM, term_handler);
+
+	parse_learn2_config();
 
 	/* perform various operations to make us act in near real-time */
 

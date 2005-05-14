@@ -1,9 +1,15 @@
 %{
 #include "gradm.h"
+#ifdef IS_GRLEARN
+#include "grlearn2_config.tab.h"
+#define grlearn_configlval grlearn2_configlval
+#else
 #include "grlearn_config.tab.h"
+#endif
 
 void grlearn_configerror(const char *s);
 int grlearn_configwrap(void);
+
 %}
 
 NUM [0-9]+

@@ -10,8 +10,9 @@
 
 int gradm_pam_conv(int num_msg, const struct pam_message **msg, struct pam_response **resp, void *appdata_ptr)
 {
-	int i;
+	int i, x;
 	struct pam_response *response;
+	char *p;
 
 	/* arbitrary OpenSSH-style limiting */
 	if (num_msg <= 0 || num_msg > 1000)
@@ -25,8 +26,6 @@ int gradm_pam_conv(int num_msg, const struct pam_message **msg, struct pam_respo
 		response[i].resp = NULL;
 		switch (msg[i]->msg_style) {
 		case PAM_PROMPT_ECHO_ON:
-			char *p;
-
 			fputs(msg[i]->msg, stdout);
 			response[i].resp = calloc(1, PAM_MAX_RESP_SIZE);
 			if (response[i].resp == NULL)
@@ -41,7 +40,7 @@ int gradm_pam_conv(int num_msg, const struct pam_message **msg, struct pam_respo
 			}
 			break;
 		case PAM_PROMPT_ECHO_OFF:
-			char *p = getpass(msg[i]->msg);
+			p = getpass(msg[i]->msg);
 			if (p == NULL)
 				failure("getpass");
 			response[i].resp = strdup(p);
@@ -57,7 +56,6 @@ int gradm_pam_conv(int num_msg, const struct pam_message **msg, struct pam_respo
 			fputs(msg[i]->msg, stdout);
 			break;
 		default:
-			int x;
 			for (x = i; x >= 0; x--) {
 				if (response[x].resp != NULL) {
 					memset(response[x].resp, 0, strlen(response[x].resp));

@@ -50,11 +50,17 @@ $(GRADM_BIN): $(OBJECTS) gradm.h gradm_defs.h gradm_func.h
 	$(CC) $(CFLAGS) -o $@ $(OBJECTS) $(LIBS) $(LDFLAGS)
 
 $(GRADM_PAM): gradm_pam.c gradm.h gradm_defs.h gradm_func.h
-	$(CC) $(CFLAGS) -o $@ gradm_pam.c -lpam -lpam_misc $(LDFLAGS)
+	@if [ ! -f /usr/include/security/pam_appl.h ] ; then \
+		echo "Unable to detect PAM headers, disabling PAM support." ; \
+	else \
+		$(CC) $(CFLAGS) -o $@ gradm_pam.c -lpam -lpam_misc $(LDFLAGS) ; \
+	fi
 
-grlearn: grlearn.c gradm_lib.c
-	$(CC) $(CFLAGS) -o $@ grlearn.c gradm_lib.c $(LIBS) $(LDFLAGS)
+grlearn: grlearn.c gradm_lib.c grlearn2_config.tab.c lex.grlearn_config.c
+	$(CC) $(CFLAGS) -DIS_GRLEARN -o $@ grlearn.c gradm_lib.c grlearn2_config.tab.c lex.grlearn_config.c $(LIBS) $(LDFLAGS)
 
+grlearn2_config.tab.c: grlearn2_config.y
+	$(YACC) -b grlearn2_config -p grlearn2_config -d ./grlearn2_config.y
 
 grlearn_config.tab.c: grlearn_config.y
 	$(YACC) -b grlearn_config -p grlearn_config -d ./grlearn_config.y
