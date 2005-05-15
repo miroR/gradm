@@ -303,13 +303,27 @@ int main(int argc, char *argv[])
 	pid = fork();
 
 	if (pid > 0) {
+		int ppid;
+		ppid = getppid();
+		kill(ppid, SIGALRM);
+
 		exit(EXIT_SUCCESS);
 	} else if (!pid) {
+		int ppid;
+
 		write_pid_log(getpid());
+
+		ppid = getppid();
+		kill(ppid, SIGALRM);
+
 		close(0);
 		close(1);
 		close(2);
 	} else {
+		int ppid;
+		ppid = getppid();
+		kill(ppid, SIGALRM);
+
 		fprintf(stdout, "Unable to fork.\n");
 		exit(EXIT_FAILURE);
 	}

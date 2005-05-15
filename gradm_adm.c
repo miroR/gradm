@@ -266,8 +266,10 @@ void start_grlearn(char *logfile)
 
 	if (!pid) {
 		execl(GRLEARN_PATH, GRLEARN_PATH, logfile, NULL);
+		exit(EXIT_FAILURE);
 	} else if (pid > 0) {
 		wait(NULL);
+		sleep(5); // wait for child to send us SIGALRM
 	}
 
 	return;
