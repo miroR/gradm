@@ -46,7 +46,8 @@ void enforce_high_protected_paths(struct gr_learn_file_node *subject)
 				continue;
 			if (!tmptable[i]->mode)
 				continue;
-			if (!strcmp(tmptable[i]->filename, *tmp))
+			if (!strncmp(tmptable[i]->filename, *tmp, len) &&
+			    (tmptable[i]->filename[len] == '\0' || tmptable[i]->filename[len] == '/'))
 				goto next;
 		}
 		cachednode = NULL;
