@@ -237,8 +237,6 @@ struct proc_acl {
 	u_int32_t cap_mask;
 	u_int32_t cap_drop;
 
-	u_int32_t deleted_objects;
-
 	struct rlimit res[GR_NLIMITS];
 	u_int16_t resmask;
 
