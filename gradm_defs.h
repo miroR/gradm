@@ -135,8 +135,7 @@ enum {
 	GR_INHERITLEARN = 0x00080000,
 	GR_PROCFIND	= 0x00100000,
 	GR_POVERRIDE	= 0x00200000,
-	GR_KERNELAUTH	= 0x00400000,
-	GR_HASDELETED   = 0x00800000
+	GR_KERNELAUTH	= 0x00400000
 };
 
 /* internal use only.  not to be modified */
@@ -237,6 +236,8 @@ struct proc_acl {
 	u_int32_t mode;
 	u_int32_t cap_mask;
 	u_int32_t cap_drop;
+
+	u_int32_t deleted_objects;
 
 	struct rlimit res[GR_NLIMITS];
 	u_int16_t resmask;
