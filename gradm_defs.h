@@ -136,6 +136,7 @@ enum {
 	GR_PROCFIND	= 0x00100000,
 	GR_POVERRIDE	= 0x00200000,
 	GR_KERNELAUTH	= 0x00400000,
+	GR_HASDELETED   = 0x00800000
 };
 
 /* internal use only.  not to be modified */
