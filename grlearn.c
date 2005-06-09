@@ -15,6 +15,7 @@ static char *writep;
 static int fd2 = -1;
 
 extern FILE *grlearn_configin;
+extern int grlearn2_configparse(void);
 
 static void parse_learn2_config(void)
 {
@@ -185,7 +186,6 @@ char * rewrite_learn_entry(char *p)
 	char *endobj;
 	char *next;
 	unsigned int len;
-	unsigned int ourlen = 0;
 	struct always_reduce_entry *arep;
 
 	for (i = 0; i < 8; i++) {

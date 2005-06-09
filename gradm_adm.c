@@ -114,7 +114,6 @@ add_gradm_acl(struct role_acl *role)
 void
 add_gradm_pam_acl(struct role_acl *role)
 {
-	struct stat fstat;
 	struct ip_acl ip;
 	struct protoent *proto;
 

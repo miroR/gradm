@@ -790,7 +790,7 @@ role_mode_conv(const char *mode)
 	     (GR_ROLE_AUTH | GR_ROLE_PAM)) ||
 	    ((retmode & (GR_ROLE_NOPW | GR_ROLE_AUTH | GR_ROLE_PAM)) ==
 	     (GR_ROLE_NOPW | GR_ROLE_PAM))) {
-		fprintf(stderr, "Error on line %lu of %s.  The role mode must contain only one of the auth, noauth, and pamauth modes.\n");
+		fprintf(stderr, "Error on line %lu of %s.  The role mode must contain only one of the auth, noauth, and pamauth modes.\n", lineno, current_acl_file);
 		exit(EXIT_FAILURE);
 	}
 
