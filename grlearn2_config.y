@@ -25,12 +25,24 @@ learn_config_file:	learn_config
 
 learn_config:
 		NOLEARN FILENAME
+		{
+		}
 	|	INHERITLEARN FILENAME
+		{
+		}
 	|	INHERITNOLEARN FILENAME
+		{
+		}
 	|	DONTREDUCE FILENAME
+		{
+		}
 	|	PROTECTED FILENAME
+		{
+		}
 	|	HIGHREDUCE FILENAME
-		ALWAYSREDUCE FILENAME
+		{
+		}
+	|	ALWAYSREDUCE FILENAME
 		{
 			add_always_reduce($2);
 		}
