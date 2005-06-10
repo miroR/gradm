@@ -47,5 +47,7 @@ learn_config:
 			add_always_reduce($2);
 		}
 	|	HIGHPROTECTED FILENAME
+		{
+		}
 	;
 %%
