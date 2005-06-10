@@ -304,7 +304,7 @@ object_connect_ip_label:	CONNECT invert_socket IPADDR ip_netmask ip_ports ip_typ
 				{
 				 ip.addr = $3;
 				 ip.netmask = $4;
-				 add_ip_acl(current_subject, GR_IP_CONNECT | $3, &ip);
+				 add_ip_acl(current_subject, GR_IP_CONNECT | $2, &ip);
 				 memset(&ip, 0, sizeof(ip));
 				}
 	|			CONNECT invert_socket HOSTNAME ip_netmask ip_ports ip_typeproto
