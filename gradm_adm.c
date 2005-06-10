@@ -257,9 +257,18 @@ void add_rolelearn_acl(void)
 	return;
 }
 
+static void ipc_sig(int sig)
+{
+        signal(sig, SIG_IGN);
+
+	return;
+}
+
 void start_grlearn(char *logfile)
 {
 	pid_t pid;
+
+	signal(SIGUSR1, ipc_sig);
 
 	pid = fork();
 
@@ -268,7 +277,7 @@ void start_grlearn(char *logfile)
 		exit(EXIT_FAILURE);
 	} else if (pid > 0) {
 		wait(NULL);
-		sleep(5); // wait for child to send us SIGALRM
+		pause(); // wait for child to send us SIGUSR1
 	}
 
 	return;

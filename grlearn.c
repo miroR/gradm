@@ -305,7 +305,7 @@ int main(int argc, char *argv[])
 	if (pid > 0) {
 		int ppid;
 		ppid = getppid();
-		kill(ppid, SIGALRM);
+		kill(ppid, SIGUSR1);
 
 		exit(EXIT_SUCCESS);
 	} else if (!pid) {
@@ -314,7 +314,7 @@ int main(int argc, char *argv[])
 		write_pid_log(getpid());
 
 		ppid = getppid();
-		kill(ppid, SIGALRM);
+		kill(ppid, SIGUSR1);
 
 		close(0);
 		close(1);
@@ -322,7 +322,7 @@ int main(int argc, char *argv[])
 	} else {
 		int ppid;
 		ppid = getppid();
-		kill(ppid, SIGALRM);
+		kill(ppid, SIGUSR1);
 
 		fprintf(stdout, "Unable to fork.\n");
 		exit(EXIT_FAILURE);
