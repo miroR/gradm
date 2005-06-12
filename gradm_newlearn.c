@@ -214,9 +214,8 @@ static unsigned long count_users_nomultgroups(struct gr_learn_group_node *group)
 
 void insert_user(struct gr_learn_group_node ***grouplist, char *username, char *groupname, uid_t uid, gid_t gid)
 {
-	struct gr_learn_group_node **group, **group2;
+	struct gr_learn_group_node **group;
 	struct gr_learn_user_node **tmpuser;
-	struct gr_learn_user_node **tmp;
 	unsigned long num;
 	int multgroups = 0;
 
