@@ -297,14 +297,14 @@ void reduce_roles(struct gr_learn_group_node ***grouplist)
 	group = *grouplist;
 	while (group && *group) {
 		tmpuser = (*group)->users;
-		while(*tmpuser) {
+		while(tmpuser && *tmpuser) {
 			if ((*tmpuser)->multgroups) {
 				/* check to see if the user is in another group,
 				   and remove them from this group if so */
 				group2 = group + 1;
 				while (*group2) {
 					tmpuser2 = (*group2)->users;
-					while (*tmpuser2) {
+					while (tmpuser2 && *tmpuser2) {
 						if ((*tmpuser2)->uid == (*tmpuser)->uid) {
 							free((*tmpuser2)->rolename);
 							gr_stat_free(*tmpuser2);
