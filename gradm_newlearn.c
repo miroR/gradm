@@ -331,6 +331,7 @@ void reduce_roles(struct gr_learn_group_node ***grouplist)
 done_user:
 					group2++;
 				}
+			}
 done_group:
 			tmpuser++;
 		}
