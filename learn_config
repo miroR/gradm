@@ -55,6 +55,7 @@
 
 always-reduce-path /dev/pts
 always-reduce-path /var/spool/qmailscan/tmp
+always-reduce-path /var/spool/exim4
 always-reduce-path /var/run/screen
 always-reduce-path /usr/share/locale
 always-reduce-path /usr/share/zoneinfo
