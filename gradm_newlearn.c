@@ -193,12 +193,32 @@ unsigned long count_users(struct gr_learn_group_node *group)
 	return ret;
 }
 
+static unsigned long count_users_nomultgroups(struct gr_learn_group_node *group)
+{
+	struct gr_learn_user_node **tmp;
+	unsigned long ret = 0;
+
+	tmp = group->users;
+
+	if (!tmp)
+		return 0;
+
+	while (*tmp) {
+		if (!(*tmp)->multgroups)
+			ret++;
+		tmp++;
+	}
+
+	return ret;
+}
+
 void insert_user(struct gr_learn_group_node ***grouplist, char *username, char *groupname, uid_t uid, gid_t gid)
 {
-	struct gr_learn_group_node **group;
+	struct gr_learn_group_node **group, **group2;
 	struct gr_learn_user_node **tmpuser;
 	struct gr_learn_user_node **tmp;
 	unsigned long num;
+	int multgroups = 0;
 
 	/* first check to see if the user exists in any group */
 
@@ -206,8 +226,15 @@ void insert_user(struct gr_learn_group_node ***grouplist, char *username, char *
 	while (group && *group) {
 		tmpuser = (*group)->users;
 		while (tmpuser && *tmpuser) {
-			if ((*tmpuser)->uid == uid)
-				return;
+			/* found them, check if we've noted the group membership observed */
+			if ((*tmpuser)->uid == uid) {
+				/* user belongs to multiple groups, don't use them for reduction */
+				if ((*tmpuser)->group->gid != gid) {
+					(*tmpuser)->multgroups = 1;
+					multgroups = 1;
+				} else /* this entry is a duplicate */
+					return;
+			}
 			tmpuser++;
 		}
 		group++;
@@ -216,12 +243,6 @@ void insert_user(struct gr_learn_group_node ***grouplist, char *username, char *
 	group = find_insert_group(grouplist, gid);
 
 	if (*group) {
-		tmp = (*group)->users;
-		while (tmp && *tmp) {
-			if ((*tmp)->uid == uid)
-				return;
-			tmp++;
-		}
 		num = count_users(*group);
 
 		(*group)->users = (struct gr_learn_user_node **)gr_dyn_realloc((*group)->users, (num + 2) * sizeof(struct gr_learn_user_node *));
@@ -232,6 +253,7 @@ void insert_user(struct gr_learn_group_node ***grouplist, char *username, char *
 		(*tmpuser)->rolename = gr_strdup(username);
 		(*tmpuser)->uid = uid;
 		(*tmpuser)->group = *group;
+		(*tmpuser)->multgroups = multgroups;
 	} else {
 		*group = (struct gr_learn_group_node *)gr_stat_alloc(sizeof(struct gr_learn_group_node));
 		(*group)->rolename = gr_strdup(groupname);
@@ -242,6 +264,7 @@ void insert_user(struct gr_learn_group_node ***grouplist, char *username, char *
 		(*tmpuser)->rolename = gr_strdup(username);
 		(*tmpuser)->uid = uid;
 		(*tmpuser)->group = *group;
+		(*tmpuser)->multgroups = multgroups;
 	}
 
 	return;
@@ -250,12 +273,12 @@ void insert_user(struct gr_learn_group_node ***grouplist, char *username, char *
 void reduce_roles(struct gr_learn_group_node ***grouplist)
 {
 	unsigned int thresh = 3;
-	struct gr_learn_group_node **group = *grouplist;
-	struct gr_learn_user_node **tmpuser;
+	struct gr_learn_group_node **group = *grouplist, **group2;
+	struct gr_learn_user_node **tmpuser, **tmpuser2;
 	unsigned long num;
 
 	while (group && *group) {
-		num = count_users(*group);
+		num = count_users_nomultgroups(*group);
 		if (num >= thresh) {
 			tmpuser = (*group)->users;
 			while(*tmpuser) {
@@ -270,6 +293,50 @@ void reduce_roles(struct gr_learn_group_node ***grouplist)
 		group++;
 	}
 	
+	/* make sure only one role is created for each user */
+	group = *grouplist;
+	while (group && *group) {
+		tmpuser = (*group)->users;
+		while(*tmpuser) {
+			if ((*tmpuser)->multgroups) {
+				/* check to see if the user is in another group,
+				   and remove them from this group if so */
+				group2 = group + 1;
+				while (*group2) {
+					tmpuser2 = (*group2)->users;
+					while (*tmpuser2) {
+						if ((*tmpuser2)->uid == (*tmpuser)->uid) {
+							free((*tmpuser2)->rolename);
+							gr_stat_free(*tmpuser2);
+							while (*tmpuser2) {
+								*tmpuser2 = *(tmpuser2 + 1);
+								tmpuser2++;
+							}
+							/* we removed the only user in this group, so remove
+							   the group as well
+							*/
+							if ((*group2)->users == NULL) {
+								free((*group2)->rolename);
+								gr_stat_free(*group2);
+								while (*group2) {
+									*group2 = *(group2 + 1);
+									group2++;
+								}
+								goto done_group;
+							}
+							goto done_user;
+						}
+						tmpuser2++;
+					}
+done_user:
+					group2++;
+				}
+done_group:
+			tmpuser++;
+		}
+		group++;
+	}
+
 	return;
 }
 
@@ -1683,24 +1750,22 @@ struct gr_learn_role_entry *
 insert_learn_role(struct gr_learn_role_entry ***role_list, char *rolename, u_int16_t rolemode)
 {
 	unsigned long num = 0;
+	struct gr_learn_role_entry **tmp;
 
-	if (!(*role_list)) {
+	if ((*role_list) == NULL)
 		*role_list = (struct gr_learn_role_entry **)gr_dyn_alloc(2 * sizeof(struct gr_learn_role_entry *));
-	} else {
-		struct gr_learn_role_entry **tmp;
 
-		tmp = *role_list;
-		while(*tmp) {
-			if (!strcmp((*tmp)->rolename, rolename)) {
-				(*tmp)->rolemode |= rolemode;
-				return *tmp;
-			}
-			num++;
-			tmp++;
+	tmp = *role_list;
+	while(*tmp) {
+		if (!strcmp((*tmp)->rolename, rolename)) {
+			(*tmp)->rolemode |= rolemode;
+			return *tmp;
 		}
-		*role_list = (struct gr_learn_role_entry **)gr_dyn_realloc(*role_list, (2 + num) * sizeof(struct gr_learn_role_entry *));
-		memset(*role_list + num, 0, 2 * sizeof(struct gr_learn_role_entry *));
+		num++;
+		tmp++;
 	}
+	*role_list = (struct gr_learn_role_entry **)gr_dyn_realloc(*role_list, (2 + num) * sizeof(struct gr_learn_role_entry *));
+	memset(*role_list + num, 0, 2 * sizeof(struct gr_learn_role_entry *));
 
 	(*((*role_list) + num)) = (struct gr_learn_role_entry *)gr_stat_alloc(sizeof(struct gr_learn_role_entry));
 	(*((*role_list) + num))->rolename = gr_strdup(rolename);

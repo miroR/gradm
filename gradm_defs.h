@@ -303,6 +303,7 @@ struct gr_learn_file_tmp_node {
 struct gr_learn_user_node {
 	char *rolename;
 	uid_t uid;
+	int multgroups;
 	struct gr_learn_group_node *group;
 	struct gr_hash_struct *hash;
 	struct gr_learn_file_node *subject_list;
