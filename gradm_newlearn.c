@@ -273,7 +273,7 @@ void insert_user(struct gr_learn_group_node ***grouplist, char *username, char *
 void reduce_roles(struct gr_learn_group_node ***grouplist)
 {
 	unsigned int thresh = 3;
-	struct gr_learn_group_node **group = *grouplist, **group2;
+	struct gr_learn_group_node **group = *grouplist, **group2, **group3;
 	struct gr_learn_user_node **tmpuser, **tmpuser2;
 	unsigned long num;
 
@@ -315,24 +315,27 @@ void reduce_roles(struct gr_learn_group_node ***grouplist)
 							/* we removed the only user in this group, so remove
 							   the group as well
 							*/
-							if ((*group2)->users == NULL) {
+							if (*((*group2)->users) == NULL) {
+								gr_dyn_free((*group2)->users);
 								free((*group2)->rolename);
 								gr_stat_free(*group2);
-								while (*group2) {
-									*group2 = *(group2 + 1);
-									group2++;
+								group3 = group2;
+								while (*group3) {
+									*group3 = *(group3 + 1);
+									group3++;
 								}
-								goto done_group;
+								/* since we removed a group, the next group to check is the 
+								   one currently pointed to by group2 */
+								group2--;
 							}
-							goto done_user;
+							goto done;
 						}
 						tmpuser2++;
 					}
-done_user:
+done:
 					group2++;
 				}
 			}
-done_group:
 			tmpuser++;
 		}
 		group++;
