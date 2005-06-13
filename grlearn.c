@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
 	ssize_t retval;
 	struct pollfd fds;
 	int fd;
-	pid_t pid;
+	pid_t pid, ppid;
 	struct sched_param schedulerparam;
 	unsigned int len;
 	int i;
@@ -300,30 +300,20 @@ int main(int argc, char *argv[])
 	fcntl(fd, F_SETFD, FD_CLOEXEC);
 	fcntl(fd2, F_SETFD, FD_CLOEXEC);
 
+	ppid = getppid();
 	pid = fork();
 
 	if (pid > 0) {
-		int ppid;
-		ppid = getppid();
-		kill(ppid, SIGUSR1);
-
 		exit(EXIT_SUCCESS);
 	} else if (!pid) {
-		int ppid;
-
 		write_pid_log(getpid());
-
-		ppid = getppid();
 		kill(ppid, SIGUSR1);
 
 		close(0);
 		close(1);
 		close(2);
 	} else {
-		int ppid;
-		ppid = getppid();
 		kill(ppid, SIGUSR1);
-
 		fprintf(stdout, "Unable to fork.\n");
 		exit(EXIT_FAILURE);
 	}
