@@ -356,10 +356,6 @@ void free_role_group_full(struct gr_learn_group_node *group)
 
 	free_subject_objects(group->subject_list);
 	free_ip_ports(group->allowed_ips);
-	if (group->users) {
-		gr_dyn_free(group->users);
-		group->users = NULL;
-	}
 	
 	return;
 }
