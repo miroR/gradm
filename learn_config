@@ -60,9 +60,9 @@ always-reduce-path /var/run/screen
 always-reduce-path /usr/share/locale
 always-reduce-path /usr/share/zoneinfo
 always-reduce-path /usr/share/terminfo
+always-reduce-path /tmp
+always-reduce-path /var/tmp
 
-high-reduce-path /tmp
-high-reduce-path /var/tmp
 high-reduce-path /proc
 high-reduce-path /lib
 high-reduce-path /lib64
