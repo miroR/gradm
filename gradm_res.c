@@ -110,7 +110,7 @@ conv_res(const char *lim)
 void
 modify_res(struct proc_acl *proc, int res, unsigned long cur, unsigned long max)
 {
-	if ((res < 0) || (res > SIZE(rlim_table)))
+	if ((res < 0) || (res >= SIZE(rlim_table)))
 		return;
 
 	if (proc->resmask & res_to_mask(res)) {
