@@ -7,7 +7,7 @@ int learn_pass1wrap(void);
 static struct in_addr ip;
 %}
 
-ROLENAME [_a-zA-Z0-9-]{1,30}
+ROLENAME [_a-zA-Z0-9.-]{1,30}
 NOTAFILE [a-z]+"["[0-9]+"]"
 NUM [-]?[0-9]+
 FILENAME [/][^\t\n]*
