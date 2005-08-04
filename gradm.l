@@ -63,21 +63,21 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return DOMAIN_TYPE;
 					}
 <DOMAINLIST_STATE>"\\\n"		;
-<ROLE_STATE>[_a-zA-Z0-9-]{1,30}		{
+<ROLE_STATE>[_a-zA-Z0-9-.]{1,30}		{
 					  BEGIN(ROLETYPE_STATE);
 					  gradmlval.string = gr_strdup(yytext);
 					  return ROLE_NAME;
 					}
-<DOMAIN_STATE>[_a-zA-Z0-9-]{1,30}	{
+<DOMAIN_STATE>[_a-zA-Z0-9-.]{1,30}	{
 					  BEGIN(DOMAINTYPE_STATE);
 					  gradmlval.string = gr_strdup(yytext);
 					  return ROLE_NAME;
 					}
-<DOMAINLIST_STATE>[_a-zA-Z0-9-]{1,30}	{
+<DOMAINLIST_STATE>[_a-zA-Z0-9-.]{1,30}	{
 					  gradmlval.string = gr_strdup(yytext);
 					  return ROLE_NAME;
 					}
-<ROLETRANS_STATE>[_a-zA-Z0-9-]{1,30}	{
+<ROLETRANS_STATE>[_a-zA-Z0-9-.]{1,30}	{
 					  gradmlval.string = gr_strdup(yytext);
 					  return ROLE_NAME;
 					}
@@ -213,7 +213,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.num = proc_object_mode_conv(yytext);
 					  return OBJ_MODE;
 					}
-<IDTRANS_STATE>[_a-zA-Z0-9-]{1,30}	{
+<IDTRANS_STATE>[_a-zA-Z0-9-.]{1,30}	{
 					  gradmlval.string = gr_strdup(yytext);
 					  return ID_NAME;
 					}
