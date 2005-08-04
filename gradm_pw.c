@@ -99,16 +99,16 @@ get_user_passwd(struct gr_pw_entry *entry, int mode)
 		term.c_lflag |= ECHO;
 		tcsetattr(STDIN_FILENO, TCSANOW, &term);
 
-		entry->passwd[strlen(entry->passwd) - 1] = '\0';
+		entry->passwd[strlen((char *)entry->passwd) - 1] = '\0';
 
-		if ((strlen(entry->passwd) < 6) && mode == 1) {
+		if ((strlen((char *)entry->passwd) < 6) && mode == 1) {
 			fprintf(stderr,
 				"Your password must be at least 6 characters in length.\n");
 			goto start_pw;
 		}
 
 		if (i == GR_PWANDSUM) {
-			if (strcmp(old->passwd, entry->passwd)) {
+			if (strcmp((char *)old->passwd, (char *)entry->passwd)) {
 				fprintf(stderr, "Passwords do not match.\n");
 				exit(EXIT_FAILURE);
 			}
@@ -151,7 +151,7 @@ generate_salt(struct gr_pw_entry *entry)
 }
 
 int
-read_saltandpass(char *rolename, unsigned char *salt, unsigned char *pass)
+read_saltandpass(unsigned char *rolename, unsigned char *salt, unsigned char *pass)
 {
 	int fd;
 	int len;

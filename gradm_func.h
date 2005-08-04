@@ -37,7 +37,7 @@ void modify_res(struct proc_acl *proc, int res, unsigned long cur,
 		unsigned long max);
 void add_ip_acl(struct proc_acl *subject, u_int8_t mode, struct ip_acl *tmp);
 void add_host_acl(struct proc_acl *subject, u_int8_t mode, char *host, struct ip_acl *tmp);
-int read_saltandpass(char *rolename, unsigned char *salt, unsigned char *pass);
+int read_saltandpass(unsigned char *rolename, unsigned char *salt, unsigned char *pass);
 void add_kernel_acl(void);
 int add_role_acl(struct role_acl **role, char *rolename, u_int16_t type,
 		 int ignore);
@@ -146,4 +146,4 @@ void insert_learn_id_transition(unsigned int ***list, int real, int eff, int fs)
 void add_to_string_array(char ***array, char *str);
 void parse_learn_config(void);
 
-void check_pam_auth(char *rolename);
+void check_pam_auth(unsigned char *rolename);

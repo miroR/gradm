@@ -17,14 +17,14 @@ is_valid_elf_binary(const char *filename)
 
 	/* binary is 32bit */
 	if (header_elf.e_ident[EI_CLASS] == 1) {
-		if (strncmp(header_elf.e_ident, ELFMAG, SELFMAG))
+		if (strncmp((char *)header_elf.e_ident, ELFMAG, SELFMAG))
 			goto failure;
 
 		if (header_elf.e_type != ET_EXEC && header_elf.e_type != ET_DYN)
 			goto failure;
 	/* binary is 64bit */
 	} else if (header_elf64.e_ident[EI_CLASS] == 2) {
-		if (strncmp(header_elf64.e_ident, ELFMAG, SELFMAG))
+		if (strncmp((char *)header_elf64.e_ident, ELFMAG, SELFMAG))
 			goto failure;
 
 		if (header_elf64.e_type != ET_EXEC && header_elf64.e_type != ET_DYN)

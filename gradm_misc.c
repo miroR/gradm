@@ -3,7 +3,7 @@
 extern FILE *grlearn_configin;
 extern int grlearn_configparse(void);
 
-void check_pam_auth(char *rolename)
+void check_pam_auth(unsigned char *rolename)
 {
 	struct stat fstat;
 	int pid;

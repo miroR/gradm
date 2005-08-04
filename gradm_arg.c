@@ -312,7 +312,7 @@ parse_args(int argc, char *argv[])
 			entry.mode = GRADM_PASSSET;
 			check_acl_status(entry.mode);
 			if (argc == 3) {
-				strncpy(entry.rolename, argv[2], GR_SPROLE_LEN);
+				strncpy((char *)entry.rolename, argv[2], GR_SPROLE_LEN);
 				entry.rolename[GR_SPROLE_LEN - 1] = '\0';
 				printf("Setting up password for role %s\n",
 				       entry.rolename);
@@ -328,7 +328,7 @@ parse_args(int argc, char *argv[])
 		case 'a':
 			if (argc != 3)
 				show_help();
-			strncpy(entry.rolename, argv[2], GR_SPROLE_LEN);
+			strncpy((char *)entry.rolename, argv[2], GR_SPROLE_LEN);
 			entry.rolename[GR_SPROLE_LEN - 1] = '\0';
 			entry.mode = GRADM_SPROLE;
 			check_acl_status(entry.mode);
@@ -340,7 +340,7 @@ parse_args(int argc, char *argv[])
 		case 'p':
 			if (argc != 3)
 				show_help();
-			strncpy(entry.rolename, argv[2], GR_SPROLE_LEN);
+			strncpy((char *)entry.rolename, argv[2], GR_SPROLE_LEN);
 			entry.rolename[GR_SPROLE_LEN - 1] = '\0';
 			entry.mode = GRADM_SPROLEPAM;
 			check_pam_auth(entry.rolename);
@@ -352,7 +352,7 @@ parse_args(int argc, char *argv[])
 		case 'n':
 			if (argc != 3)
 				show_help();
-			strncpy(entry.rolename, argv[2], GR_SPROLE_LEN);
+			strncpy((char *)entry.rolename, argv[2], GR_SPROLE_LEN);
 			entry.rolename[GR_SPROLE_LEN - 1] = '\0';
 			entry.mode = GRADM_SPROLE;
 			check_acl_status(entry.mode);

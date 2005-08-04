@@ -1035,7 +1035,7 @@ setup_special_roles(struct gr_arg *grarg)
 	for_each_role(rtmp, current_role) {
 		if (rtmp->roletype & GR_ROLE_SPECIAL &&
 		    !(rtmp->roletype & (GR_ROLE_NOPW | GR_ROLE_PAM))) {
-			strncpy(entry.rolename, rtmp->rolename, GR_SPROLE_LEN);
+			strncpy((char *)entry.rolename, rtmp->rolename, GR_SPROLE_LEN);
 			entry.rolename[GR_SPROLE_LEN - 1] = '\0';
 			if (!read_saltandpass
 			    (entry.rolename, entry.salt, entry.sum)) {
@@ -1136,9 +1136,9 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 	memcpy(&retarg->role_db, role_db, sizeof (struct user_acl_role_db));
       set_pw:
 
-	strncpy(retarg->pw, entry->passwd, GR_PW_LEN - 1);
+	strncpy((char *)retarg->pw, (char *)entry->passwd, GR_PW_LEN - 1);
 	retarg->pw[GR_PW_LEN - 1] = '\0';
-	strncpy(retarg->sp_role, entry->rolename, GR_SPROLE_LEN);
+	strncpy((char *)retarg->sp_role, (char *)entry->rolename, GR_SPROLE_LEN);
 	retarg->sp_role[GR_SPROLE_LEN - 1] = '\0';
 
 	retarg->mode = entry->mode;

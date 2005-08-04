@@ -118,7 +118,7 @@ static __inline__ unsigned int full_name_hash(const unsigned char * name)
 static __inline__ unsigned long
 nhash(const char *name, const unsigned long sz)
 {
-	return full_name_hash(name) % sz;
+	return full_name_hash((const unsigned char *)name) % sz;
 }
 
 void insert_hash_entry(struct gr_hash_struct *hash, void *entry);
@@ -259,7 +259,7 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 		return match;
 	} else if (hash->type == GR_HASH_FILENAME) {
 		char *filename = (char *)entry;
-		u_int32_t key = full_name_hash(filename);
+		u_int32_t key = full_name_hash((unsigned char *)filename);
 		u_int32_t index = key % hash->table_size;
 		struct gr_learn_file_tmp_node *match;
 		unsigned char i = 0;
@@ -385,7 +385,7 @@ void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
 		hash->used_size++;
 	} else if (hash->type == GR_HASH_FILENAME) {
 		struct gr_learn_file_tmp_node *node = (struct gr_learn_file_tmp_node *)entry;
-		u_int32_t key = full_name_hash(node->filename);
+		u_int32_t key = full_name_hash((unsigned char *)node->filename);
 		u_int32_t index = key % hash->table_size;
 		struct gr_learn_file_tmp_node **curr;
 		unsigned char i = 0;
