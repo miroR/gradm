@@ -127,7 +127,7 @@ install: $(GRADM_BIN) gradm.8 policy grlearn
 		rm -f $(DESTDIR)/dev/grsec ; \
 		if [ ! -e $(DESTDIR)/dev/grsec ] ; then \
 			mkdir -p $(DESTDIR)/dev ; \
-			$(MKNOD) -m 0622 $(DESTDIR)/dev/grsec c 1 12 ; \
+			$(MKNOD) -m 0622 $(DESTDIR)/dev/grsec c 1 13 ; \
 		fi \
 	fi
 	@echo "Installing gradm manpage..."
