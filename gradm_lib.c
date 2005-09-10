@@ -279,7 +279,12 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 
 struct file_acl *lookup_acl_object(struct proc_acl *subject, struct file_acl *object)
 {
-	return (struct file_acl *)lookup_hash_entry(subject->hash, object);
+	struct file_acl *obj;
+	obj = (struct file_acl *)lookup_hash_entry(subject->hash, object);
+	if (obj && !(obj->mode & GR_DELETED))
+		return obj;
+	else
+		return NULL;
 }
 
 struct gr_learn_file_tmp_node *lookup_learn_object(struct gr_learn_file_node *subject, char *filename)
