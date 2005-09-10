@@ -464,7 +464,7 @@ display_all_dupes(struct proc_acl *subject, struct file_acl *filp2)
 	struct stat fstat;
 	struct file_acl ftmp;
 
-	for_each_object(tmp, subject)
+	for_each_object(tmp, subject) {
 	    if (!stat(tmp->filename, &fstat)) {
 		ftmp.inode = fstat.st_ino;
 		if (is_24_kernel)
@@ -472,9 +472,11 @@ display_all_dupes(struct proc_acl *subject, struct file_acl *filp2)
 		else
 			ftmp.dev = MKDEV_26(MAJOR_26(fstat.st_dev), MINOR_26(fstat.st_dev));
 		if (ftmp.inode == filp2->inode && ftmp.dev == filp2->dev)
-			fprintf(stderr, "%s\n", tmp->filename);
+			fprintf(stderr, "%s (due to symlinking/hardlinking)\n", tmp->filename);
+	    } else if (!strcmp(tmp->filename, filp2->filename)) {
+		fprintf(stderr, "%s\n", tmp->filename);
+	    }
 	}
-
 	return;
 }
 
