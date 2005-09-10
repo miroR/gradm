@@ -275,13 +275,13 @@ generate_hash(struct gr_pw_entry *entry)
 	sha256_ctx_t context;
 	char *pos;
 
-	pos = memchr(entry->passwd, '\n', strlen(entry->passwd));
+	pos = memchr(entry->passwd, '\n', strlen((char *)entry->passwd));
 	if (pos)
 		*pos = '\0';
 
 	SHA256Init(&context);
 	SHA256Update(&context, entry->salt, GR_SALT_SIZE);
-	SHA256Update(&context, entry->passwd, strlen(entry->passwd));
+	SHA256Update(&context, entry->passwd, strlen((char *)entry->passwd));
 	SHA256Final(&context, entry->sum);
 
 	return;
