@@ -77,16 +77,16 @@ conv_res(const char *lim)
 
 	switch (lim[i]) {
 	case 'm':
-		res = res * HZ * 60;
+		res = res * 60;
 		break;
 	case 'h':
-		res = res * HZ * 60 * 60;
+		res = res * 60 * 60;
 		break;
 	case 'd':
-		res = res * HZ * 60 * 60 * 24;
+		res = res * 60 * 60 * 24;
 		break;
 	case 's':
-		res = res * HZ;
+		res = res;
 		break;
 	case 'K':
 		res = res << 10;
