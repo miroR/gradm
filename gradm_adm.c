@@ -171,7 +171,7 @@ add_kernel_acl(void)
 {
 	add_role_acl(&current_role, gr_strdup(":::kernel:::"), role_mode_conv("sN"), 1);
 
-	add_proc_subject_acl(current_role, "/", proc_subject_mode_conv("o"), 0);
+	add_proc_subject_acl(current_role, "/", proc_subject_mode_conv("kvo"), 0);
 
 	add_proc_object_acl(current_subject, "/", proc_object_mode_conv("rwxcdl"), GR_FEXIST);
 	add_proc_object_acl(current_subject, GRSEC_DIR, proc_object_mode_conv("h"), GR_FEXIST);
