@@ -126,25 +126,14 @@ generate_salt(struct gr_pw_entry *entry)
 {
 	int fd;
 
-	if ((fd = open("/dev/random", O_RDONLY)) < 0) {
-		if ((fd = open("/dev/urandom", O_RDONLY)) < 0) {
-			fprintf(stderr,
-				"Unable to open /dev/urandom for reading.\n");
-			failure("open");
-		}
+	if ((fd = open("/dev/urandom", O_RDONLY)) < 0) {
+		fprintf(stderr,	"Unable to open /dev/urandom for reading.\n");
+		failure("open");
 	}
 
 	if (read(fd, entry->salt, GR_SALT_SIZE) != GR_SALT_SIZE) {
-		close(fd);
-		if ((fd = open("/dev/urandom", O_RDONLY)) < 0) {
-			fprintf(stderr,
-				"Unable to open /dev/urandom for reading.\n");
-			failure("open");
-		}
-		if (read(fd, entry->salt, GR_SALT_SIZE) != GR_SALT_SIZE) {
-			fprintf(stderr, "Unable to read from /dev/random\n");
-			failure("read");
-		}
+		fprintf(stderr, "Unable to read from /dev/urandom\n");
+		failure("read");
 	}
 
 	return;
