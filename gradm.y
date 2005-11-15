@@ -22,6 +22,7 @@ int current_nest_depth = 0;
 %token <string> ROLE_TRANSITION VARIABLE DEFINE DEFINE_NAME DISABLED
 %token <string> ID_NAME USER_TRANS_ALLOW GROUP_TRANS_ALLOW 
 %token <string> USER_TRANS_DENY GROUP_TRANS_DENY DOMAIN_TYPE DOMAIN
+%token <string> INTERFACE
 %token <num> OBJ_MODE SUBJ_MODE IPADDR IPNETMASK NOT
 %token <shortnum> IPPORT ROLE_TYPE 
 %type <num> subj_mode obj_mode ip_netmask invert_socket
@@ -269,6 +270,12 @@ obj_mode: /* empty */
 				{ $$ = $1; }
 	;
 
+interface: /* empty */
+		{ $$ = NULL; }
+	|	INTERFACE
+		{ $$ = $1; }
+	;
+
 invert_socket:	/* empty */
 		{ $$ = 0; }
 	|	NOT
@@ -300,17 +307,19 @@ role_allow_ip:			ROLE_ALLOW_IP IPADDR ip_netmask
 				}
 	;
 
-object_connect_ip_label:	CONNECT invert_socket IPADDR ip_netmask ip_ports ip_typeproto
+object_connect_ip_label:	CONNECT invert_socket interface IPADDR ip_netmask ip_ports ip_typeproto
 				{
-				 ip.addr = $3;
-				 ip.netmask = $4;
+				 ip.iface = $3;
+				 ip.addr = $4;
+				 ip.netmask = $5;
 				 add_ip_acl(current_subject, GR_IP_CONNECT | $2, &ip);
 				 memset(&ip, 0, sizeof(ip));
 				}
-	|			CONNECT invert_socket HOSTNAME ip_netmask ip_ports ip_typeproto
+	|			CONNECT invert_socket interface HOSTNAME ip_netmask ip_ports ip_typeproto
 				{
-				 ip.netmask = $4;
-				 add_host_acl(current_subject, GR_IP_CONNECT | $2, $3, &ip);
+				 ip.iface = $3;
+				 ip.netmask = $5;
+				 add_host_acl(current_subject, GR_IP_CONNECT | $2, $4, &ip);
 				 memset(&ip, 0, sizeof(ip));
 				 free($3);
 				}
@@ -321,17 +330,19 @@ object_connect_ip_label:	CONNECT invert_socket IPADDR ip_netmask ip_ports ip_typ
 				}
 	;
 
-object_bind_ip_label:		BIND invert_socket IPADDR ip_netmask ip_ports ip_typeproto
+object_bind_ip_label:		BIND invert_socket interface IPADDR ip_netmask ip_ports ip_typeproto
 				{
-				 ip.addr = $3;
-				 ip.netmask = $4;
+				 ip.iface = $3;
+				 ip.addr = $4;
+				 ip.netmask = $5;
 				 add_ip_acl(current_subject, GR_IP_BIND | $2, &ip);
 				 memset(&ip, 0, sizeof(ip));
 				}
-	|			BIND invert_socket HOSTNAME ip_netmask ip_ports ip_typeproto
+	|			BIND invert_socket interface HOSTNAME ip_netmask ip_ports ip_typeproto
 				{
-				 ip.netmask = $4;
-				 add_host_acl(current_subject, GR_IP_BIND | $2, $3, &ip);
+				 ip.iface = $3;
+				 ip.netmask = $5;
+				 add_host_acl(current_subject, GR_IP_BIND | $2, $4, &ip);
 				 memset(&ip, 0, sizeof(ip));
 				 free($3);
 				}

@@ -167,6 +167,7 @@ struct role_allowed_ip {
 };
 
 struct ip_acl {
+	char *iface;
 	u_int32_t addr;
 	u_int32_t netmask;
 	u_int16_t low, high;

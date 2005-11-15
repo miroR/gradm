@@ -124,7 +124,11 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 <IPIP_STATE>"!"				{
 					  return NOT;
 					}
-
+<IPIP_STATE>"iface:"[-a-zA-Z0-9_]{1,16}	{
+					  gr_line = yytext;
+					  gradmlval.string = gr_strdup(gr_line + 6);
+					  return INTERFACE;
+					}
 <IPIP_STATE>"disabled"			{
 					  return DISABLED;
 					}

@@ -111,6 +111,7 @@ add_ip_acl(struct proc_acl *subject, u_int8_t mode, struct ip_acl *acl_tmp)
 	*(subject->ips + subject->ip_num - 1) = p;
 
 	p->mode = mode;
+	p->iface = acl_tmp->iface;
 	p->addr = acl_tmp->addr;
 	p->netmask = acl_tmp->netmask;
 	p->low = acl_tmp->low;
