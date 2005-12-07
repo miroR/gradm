@@ -634,7 +634,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 			"\"%s\" references the same object as the following object(s):\n",
 			p->filename, current_role->rolename, 
 			subject->filename, lineno, 
-			current_acl_file, p->filename);
+			current_acl_file ? current_acl_file : "<builtin_fulllearn_policy>", p->filename);
 		display_all_dupes(subject, p);
 		fprintf(stderr, "specified on an earlier line."
 			"The RBAC system will not load until this"
