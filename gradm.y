@@ -27,6 +27,7 @@ int current_nest_depth = 0;
 %token <shortnum> IPPORT ROLE_TYPE 
 %type <num> subj_mode obj_mode ip_netmask invert_socket
 %type <shortnum> role_type
+%type <string> interface
 %type <var> variable_expression
 %left '&'
 %left '|'
