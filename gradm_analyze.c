@@ -292,12 +292,32 @@ handle_notrojan_mode(void)
 	return ret;
 }
 
-void
+int
 check_role_transitions(void)
 {
 	struct role_acl *role, *role2;
 	struct role_transition *trans;
+	int num_sproles = 0;
 	int found = 0;
+	int i;
+	int errors = 0;
+	struct role_acl **sprole_table;
+
+	for_each_role(role, current_role) {
+		if (role->roletype & GR_ROLE_SPECIAL)
+			num_sproles++;
+	}
+	sprole_table = (struct role_acl **)malloc(num_sproles * sizeof(struct role_acl *));
+	if (sprole_table == NULL)
+		failure("malloc");
+
+	i = 0;
+	for_each_role(role, current_role) {
+		if (role->roletype & GR_ROLE_SPECIAL) {
+			sprole_table[i] = role;
+			i++;
+		}
+	}
 
 	for_each_role(role, current_role) {
 		for_each_transition(trans, role->transitions) {
@@ -305,8 +325,15 @@ check_role_transitions(void)
 			for_each_role(role2, current_role) {
 				if (!(role2->roletype & GR_ROLE_SPECIAL))
 					continue;
-				if (!strcmp(role2->rolename, trans->rolename))
+				if (!strcmp(role2->rolename, trans->rolename)) {
 					found = 1;
+					for(i = 0; i < num_sproles; i++) {
+						if (sprole_table[i] == role2) {
+							sprole_table[i] = NULL;
+							break;
+						}
+					}
+				}
 			}
 			if (!found) {
 				fprintf(stderr,
@@ -314,12 +341,23 @@ check_role_transitions(void)
 					"%s.\nSpecial role %s does not exist.\n",
 					trans->rolename, role->rolename,
 					trans->rolename);
-				exit(EXIT_FAILURE);
+				errors++;
 			}
 		}
 	}
 
-	return;
+	for (i = 0; i < num_sproles; i++) {
+		if (sprole_table[i] != NULL) {
+			fprintf(stderr,
+				"Special role %s is not accessible from any role.  Make sure "
+				"you have a role_transitions line added in all roles that will "
+				"access the special role.\n", sprole_table[i]->rolename);
+			errors++;
+		}
+	}
+	free(sprole_table);
+
+	return errors;
 }
 
 void
@@ -331,7 +369,7 @@ analyze_acls(void)
 	struct role_acl *role;
 	int def_role_found = 0;
 
-	check_role_transitions();
+	errs_found = check_role_transitions();
 
 	for_each_role(role, current_role)
 		if (role->roletype & GR_ROLE_DEFAULT)
