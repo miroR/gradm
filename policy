@@ -110,6 +110,13 @@
 # except to port 80 of www.google.com with a stream tcp socket
 # the inverted socket matching also works on bind rules
 #
+# Per-interface socket policies:
+# Rules such as
+# bind iface:eth1 ourwebsite.com:80 stream tcp
+# are now allowed, giving you the ability to tie specific socket rules 
+# to a single interface (or by using the inverted rules, all but one 
+# interface).
+#
 # New learning system:
 # To learn on a given subject: add l (the letter l, not the number 1)
 # to the subject mode
