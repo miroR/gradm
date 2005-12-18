@@ -124,6 +124,15 @@
 # and then generate the rules after disabling the system after the 
 # learning phase with:
 # gradm -F -L /etc/grsec/learning.logs -O /etc/grsec/policy
+#
+# New PaX flag format (replaces PaX subject flags):
+# PaX flags can be forced on or off, regardless of the flags on the 
+# binary, by using + or - before the following PaX flag names:
+# PAX_SEGMEXEC
+# PAX_PAGEEXEC
+# PAX_MPROTECT
+# PAX_RANDMMAP
+# PAX_EMUTRAMP
 
 role admin sA
 subject / rvka
@@ -252,6 +261,10 @@ subject /usr/X11R6/bin/XFree86
 	+CAP_SYS_ADMIN
 	+CAP_SYS_TTY_CONFIG
 	+CAP_SYS_RAWIO
+
+	-PAX_SEGMEXEC
+	-PAX_PAGEEXEC
+	-PAX_MPROTECT
 
 subject /usr/bin/ssh
 	/etc/ssh/ssh_config r

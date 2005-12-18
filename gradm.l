@@ -107,7 +107,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = gr_strdup(gr_line);
 					  return SUBJ_NAME;
 					}
-<SUBJECT_STATE>[TKCAPRMSGOtolhpkvdbria]+	{
+<SUBJECT_STATE>[TKCAOtolhpkvdbria]+	{
 					  gradmlval.num = proc_subject_mode_conv(yytext);
 					  return SUBJ_MODE;
 					}
@@ -273,6 +273,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 [+-]"CAP_"[_A-Z]+			{
 					  gradmlval.string = gr_strdup(yytext);
 					  return CAP_NAME;
+					}
+[+-]"PAX_"[_A-Z]+			{
+					  gradmlval.string = gr_strdup(yytext);
+					  return PAX_NAME;
 					}
 "RES_"[A-Z]+				{
 					  BEGIN(RES_STATE);

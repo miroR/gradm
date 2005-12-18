@@ -846,21 +846,6 @@ proc_subject_mode_conv(const char *mode)
 		case 'A':
 			retmode |= GR_PROTSHM;
 			break;
-		case 'P':
-			retmode |= GR_PAXPAGE;
-			break;
-		case 'R':
-			retmode |= GR_PAXRANDMMAP;
-			break;
-		case 'M':
-			retmode |= GR_PAXMPROTECT;
-			break;
-		case 'S':
-			retmode |= GR_PAXSEGM;
-			break;
-		case 'G':
-			retmode |= GR_PAXGCC;
-			break;
 		case 'O':
 			retmode |= GR_IGNORE;
 			break;

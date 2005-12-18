@@ -37,7 +37,7 @@ OBJECTS=gradm.tab.o lex.gradm.o learn_pass1.tab.o learn_pass2.tab.o \
 	fulllearn_pass1.tab.o fulllearn_pass2.tab.o fulllearn_pass3.tab.o \
 	gradm_misc.o gradm_parse.o gradm_arg.o gradm_pw.o gradm_opt.o \
 	gradm_cap.o gradm_sha256.o gradm_adm.o gradm_analyze.o gradm_res.o \
-	gradm_human.o gradm_learn.o gradm_net.o gradm_nest.o \
+	gradm_human.o gradm_learn.o gradm_net.o gradm_nest.o gradm_pax.o \
 	gradm_sym.o gradm_newlearn.o gradm_fulllearn.o gradm_lib.o \
 	lex.fulllearn_pass1.o lex.fulllearn_pass2.o \
 	lex.fulllearn_pass3.o lex.learn_pass1.o lex.learn_pass2.o \

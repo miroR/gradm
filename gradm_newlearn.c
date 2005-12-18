@@ -1180,6 +1180,13 @@ int display_leaf(struct gr_learn_file_node *node,
 					fprintf(stream, "\t-%s\n", capability_list[i].cap_name);
 		}
 
+		for (i = 0; i < SIZE(paxflag_list); i++) {
+			if (node->subject->pax_flags & (1 << paxflag_list[i].paxflag_val))
+				fprintf(stream, "\t+%s\n", paxflag_list[i].paxflag_name);
+			else if (node->subject->pax_flags & (0x8000 | (1 << paxflag_list[i].paxflag_val)))
+				fprintf(stream, "\t-%s\n", paxflag_list[i].paxflag_name);
+		}
+
 		for(i = 0; i < SIZE(rlim_table); i++)
 			if (node->subject->resmask & (1 << i))
 				fprintf(stream, "\t%s %lu %lu\n", rlim_table[i],

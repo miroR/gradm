@@ -119,23 +119,18 @@ enum {
 	GR_LEARN 	= 0x00000008,
 	GR_IGNORE 	= 0x00000010,
 	GR_OVERRIDE 	= 0x00000020,
-	GR_PAXPAGE 	= 0x00000040,
-	GR_PAXSEGM 	= 0x00000080,
-	GR_PAXGCC 	= 0x00000100,
-	GR_PAXRANDMMAP 	= 0x00000200,
-	GR_PAXMPROTECT 	= 0x00000400,
-	GR_PROTSHM 	= 0x00000800,
-	GR_KILLPROC 	= 0x00001000,
-	GR_KILLIPPROC 	= 0x00002000,
-	GR_NOTROJAN 	= 0x00004000,
-	GR_PROTPROCFD 	= 0x00008000,
-	GR_PROCACCT 	= 0x00010000,
-	GR_RELAXPTRACE  = 0x00020000,
-	GR_NESTED	= 0x00040000,
-	GR_INHERITLEARN = 0x00080000,
-	GR_PROCFIND	= 0x00100000,
-	GR_POVERRIDE	= 0x00200000,
-	GR_KERNELAUTH	= 0x00400000
+	GR_PROTSHM 	= 0x00000040,
+	GR_KILLPROC 	= 0x00000080,
+	GR_KILLIPPROC 	= 0x00000100,
+	GR_NOTROJAN 	= 0x00000200,
+	GR_PROTPROCFD 	= 0x00000400,
+	GR_PROCACCT 	= 0x00000800,
+	GR_RELAXPTRACE  = 0x00001000,
+	GR_NESTED	= 0x00002000,
+	GR_INHERITLEARN = 0x00004000,
+	GR_PROCFIND	= 0x00008000,
+	GR_POVERRIDE	= 0x00010000,
+	GR_KERNELAUTH	= 0x00020000
 };
 
 /* internal use only.  not to be modified */
@@ -143,6 +138,11 @@ enum {
 struct capability_set {
 	char *cap_name;
 	u_int32_t cap_val;
+};
+
+struct paxflag_set {
+	char *paxflag_name;
+	u_int16_t paxflag_val;
 };
 
 struct rlimconv {
@@ -263,6 +263,7 @@ struct proc_acl {
 
 	struct file_acl **obj_hash;
 	u_int32_t obj_hash_size;
+	u_int16_t pax_flags;
 };
 
 struct gr_learn_ip_node {
@@ -315,6 +316,7 @@ struct gr_learn_subject_node {
 	u_int32_t cap_raise;
 	struct rlimit res[GR_NLIMITS];
 	u_int16_t resmask;
+	u_int16_t pax_flags;
 };
 
 struct gr_learn_file_node {
@@ -412,6 +414,7 @@ struct gr_arg_wrapper {
 
 char *rlim_table[GR_NLIMITS];
 struct capability_set capability_list[30];
+struct paxflag_set paxflag_list[5];
 
 int is_24_kernel;
 

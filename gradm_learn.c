@@ -135,6 +135,9 @@ void merge_acl_rules()
 					if (matchsubj->subject == NULL)
 						failure("calloc");
 				}
+
+				matchsubj->subject->pax_flags = subject->pax_flags;
+
 				matchsubj->subject->cap_raise |= ~subject->cap_drop;
 				matchsubj->subject->resmask |= subject->resmask;
 				for (i = 0; i < subject->user_trans_num; i++) {

@@ -18,7 +18,7 @@ int current_nest_depth = 0;
 
 %token <string> ROLE ROLE_NAME SUBJECT SUBJ_NAME OBJ_NAME HOSTNAME
 %token <string> RES_NAME RES_SOFTHARD CONNECT BIND IPTYPE
-%token <string> IPPROTO CAP_NAME ROLE_ALLOW_IP
+%token <string> IPPROTO CAP_NAME ROLE_ALLOW_IP PAX_NAME
 %token <string> ROLE_TRANSITION VARIABLE DEFINE DEFINE_NAME DISABLED
 %token <string> ID_NAME USER_TRANS_ALLOW GROUP_TRANS_ALLOW 
 %token <string> USER_TRANS_DENY GROUP_TRANS_DENY DOMAIN_TYPE DOMAIN
@@ -56,6 +56,7 @@ various_acls:			role_label
 	|			nested_label
 	|			object_file_label
 	|			object_cap_label
+	|			object_paxflag_label
 	|			object_res_label
 	|			object_connect_ip_label
 	|			object_bind_ip_label
@@ -246,6 +247,13 @@ object_file_label:		OBJ_NAME obj_mode
 object_cap_label:		CAP_NAME
 				{
 				 add_cap_acl(current_subject, $1);
+				 free($1);
+				}
+	;
+
+object_paxflag_label:		PAX_NAME
+				{
+				 add_paxflag_acl(current_subject, $1);
 				 free($1);
 				}
 	;

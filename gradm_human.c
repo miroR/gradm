@@ -57,11 +57,6 @@ static struct subj_mode_name_table {
 	GR_IGNORE, 'O'}, {
 	GR_PROCFIND, 'h'}, {
 	GR_PROTSHM, 'A'}, {
-	GR_PAXPAGE, 'P'}, {
-	GR_PAXSEGM, 'S'}, {
-	GR_PAXRANDMMAP, 'R'}, {
-	GR_PAXGCC, 'G'}, {
-	GR_PAXMPROTECT, 'M'}, {
 	GR_KILLPROC, 'K'}, {
 	GR_KILLIPPROC, 'C'}, {
 	GR_NOTROJAN, 'T'}, {
