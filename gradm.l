@@ -313,12 +313,12 @@ $HOME[/]?[^ \t\n]*			{
 [|&()-]					{
 						return *yytext;
 					}
-[{}]					;
+<*>[{}]					;
 <<EOF>>					{
 					  if (is_eof())
 						yyterminate();
 					}
-.					{ gradmerror("invalid character"); }
+<*>.					{ gradmerror("invalid character"); }
 
 %%
 
