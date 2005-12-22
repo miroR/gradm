@@ -783,7 +783,7 @@ role_mode_conv(const char *mode)
 		default:
 			fprintf(stderr, "Invalid role mode "
 				"\'%c\' found on line %lu "
-				"of %s\n", mode[i], lineno, current_acl_file);
+				"of %s\n", mode[len], lineno, current_acl_file);
 			exit(EXIT_FAILURE);
 		}
 	}
