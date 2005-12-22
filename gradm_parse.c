@@ -780,6 +780,11 @@ role_mode_conv(const char *mode)
 		case 'P':
 			retmode |= GR_ROLE_PAM;
 			break;
+		default:
+			fprintf(stderr, "Invalid role mode "
+				"\'%c\' found on line %lu "
+				"of %s\n", mode[i], lineno, current_acl_file);
+			exit(EXIT_FAILURE);
 		}
 	}
 
@@ -886,9 +891,10 @@ proc_subject_mode_conv(const char *mode)
 			retmode |= GR_KERNELAUTH;
 			break;
 		default:
-			fprintf(stderr, "Invalid proc subject mode "
+			fprintf(stderr, "Invalid subject mode "
 				"\'%c\' found on line %lu "
 				"of %s\n", mode[i], lineno, current_acl_file);
+			exit(EXIT_FAILURE);
 		}
 	}
 
