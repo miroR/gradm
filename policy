@@ -112,10 +112,13 @@
 #
 # Per-interface socket policies:
 # Rules such as
-# bind iface:eth1 ourwebsite.com:80 stream tcp
+# bind eth1:80 stream tcp
+# bind eth0#1:22 stream tcp
 # are now allowed, giving you the ability to tie specific socket rules 
 # to a single interface (or by using the inverted rules, all but one 
-# interface).
+# interface).  Virtual interfaces are specified by the <ifname>#<vindex>
+# syntax.  If an interface is specified, no IP/netmask or host may be
+# specified for the rule.
 #
 # New learning system:
 # To learn on a given subject: add l (the letter l, not the number 1)
