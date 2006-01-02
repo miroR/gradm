@@ -124,7 +124,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 <IPIP_STATE>"!"				{
 					  return NOT;
 					}
-<IPIP_STATE>[-a-zA-Z0-9_]{1,7}("#"[0-9]+)?	{
+<IPIP_STATE>[-a-zA-Z0-9_]{1,7}("#"[0-9]{1,3})?	{
 					  gr_line = yytext;
 					  gradmlval.string = gr_strdup(gr_line);
 					  gr_line = strchr(gradmlval.string, '#');
