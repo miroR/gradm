@@ -281,7 +281,7 @@ struct file_acl *lookup_acl_object(struct proc_acl *subject, struct file_acl *ob
 {
 	struct file_acl *obj;
 	obj = (struct file_acl *)lookup_hash_entry(subject->hash, object);
-	if (obj && !(obj->mode & GR_DELETED))
+	if (obj && !(obj->mode & GR_DELETED) && !(object->mode & GR_DELETED))
 		return obj;
 	else
 		return NULL;
