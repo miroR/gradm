@@ -368,6 +368,7 @@ analyze_acls(void)
 	unsigned int errs_found = 0;
 	struct role_acl *role;
 	int def_role_found = 0;
+	struct stat fstat;
 
 	errs_found = check_role_transitions();
 
@@ -445,7 +446,7 @@ analyze_acls(void)
 			errs_found++;
 		}
 
-		if (!check_permission(role, def_acl, "/proc/kcore", &chk)) {
+		if (!stat("/proc/kcore", &fstat) && !check_permission(role, def_acl, "/proc/kcore", &chk)) {
 			fprintf(stderr,
 				"Viewing access is allowed by role %s to /proc/kcore.  This would "
 				"allow an attacker to view the raw memory of processes "
@@ -503,7 +504,7 @@ analyze_acls(void)
 			errs_found++;
 		}
 
-		if (!check_permission(role, def_acl, "/sys", &chk)) {
+		if (!stat("/sys", &fstat) && !check_permission(role, def_acl, "/sys", &chk)) {
 			fprintf(stderr,
 				"Write access is allowed by role %s to /sys, the directory which "
 				"holds entries that allow modifying kernel variables.\n\n",
@@ -530,6 +531,21 @@ analyze_acls(void)
 		if (!check_permission(role, def_acl, "/usr/lib", &chk)) {
 			fprintf(stderr,
 				"Write access is allowed by role %s to /usr/lib, a directory which "
+				"holds system libraries.\n\n", role->rolename);
+			errs_found++;
+		}
+
+		if (!stat("/lib64", &fstat) && !check_permission(role, def_acl, "/lib64", &chk)) {
+			fprintf(stderr,
+				"Write access is allowed by role %s to /lib64, a directory which "
+				"holds system libraries.\n\n",
+				role->rolename);
+			errs_found++;
+		}
+
+		if (!stat("/usr/lib64", &fstat) && !check_permission(role, def_acl, "/usr/lib64", &chk)) {
+			fprintf(stderr,
+				"Write access is allowed by role %s to /usr/lib64, a directory which "
 				"holds system libraries.\n\n", role->rolename);
 			errs_found++;
 		}
