@@ -12,7 +12,7 @@
 # u -> This role is a user role
 # g -> This role is a group role
 # G -> This role can use gradm to authenticate to the kernel
-#      A polciy for gradm will automatically be added to the role
+#      A policy for gradm will automatically be added to the role
 # T -> Enable TPE for this role
 # l -> Enable learning for this role
 # P -> Use PAM authentication for this role.
