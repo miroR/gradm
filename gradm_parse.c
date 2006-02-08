@@ -576,8 +576,8 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	file_len++;
 
 	num_objects++;
-	/* one for the object, one for the filename, one for the name entry struct in the kernel*/
-	num_pointers += 3;
+	/* one for the object, one for the filename, one for the name entry struct, and one for the inodev_entry struct in the kernel*/
+	num_pointers += 4;
 
 	if (lstat(filename, &fstat)) {
 		dfile = add_deleted_file(filename);
