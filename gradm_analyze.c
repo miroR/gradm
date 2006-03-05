@@ -260,6 +260,8 @@ handle_notrojan_mode(void)
 					for_each_role(role2, current_role) {
 						if (!strcmp(role2->rolename, ":::kernel:::"))
 							continue;
+						if (role2->roletype & GR_ROLE_GOD)
+							continue;
 						for_each_subject(subj2, role2) {
 							if (subj2 == subj
 							    || (subj2->
