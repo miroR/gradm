@@ -86,6 +86,9 @@
 # user/group transitions:
 # You may now specify what users and groups a given subject can
 # transition to.  This can be done on an inclusive or exclusive basis.
+# Omitting these rules allows a process with proper privilege granted by
+# capabilities to transition to any user/group.
+#
 # Examples:
 # subject /bin/su
 # user_transition_allow root spender
