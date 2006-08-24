@@ -166,15 +166,7 @@ subject /
 	/dev/input	rw
 	/dev/psaux	rw
 	/dev/null	rw
-	/dev/tty0	rw
-	/dev/tty1	rw
-	/dev/tty2	rw
-	/dev/tty3	rw
-	/dev/tty4	rw
-	/dev/tty5	rw
-	/dev/tty6	rw
-	/dev/tty7	rw
-	/dev/tty8	rw
+	/dev/tty?	rw
 	/dev/console	rw
 	/dev/tty	rw
 	/dev/pts	rw
