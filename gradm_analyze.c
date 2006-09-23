@@ -116,7 +116,7 @@ check_learning(struct role_acl *role)
 	}
 
 	for_each_subject(tmp, role) {
-	    if (!gr_learn && tmp->mode & (GR_LEARN || GR_INHERITLEARN)) {
+	    if (!gr_learn && (tmp->mode & (GR_LEARN | GR_INHERITLEARN))) {
 			fprintf(stderr,
 				"Warning: You have enabled some form of "
 				"learning on the subject for %s in role "

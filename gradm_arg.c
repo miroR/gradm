@@ -221,7 +221,6 @@ parse_args(int argc, char *argv[])
 			check_acl_status(entry.mode);
 			parse_acls();
 			expand_acls();
-			analyze_acls();
 			gr_enable = 1;
 			break;
 		case 'F':
@@ -389,6 +388,8 @@ parse_args(int argc, char *argv[])
 		gr_enable = 0;
 
 	if (gr_enable) {
+		/* analyze here since we know if learning is being used */
+		analyze_acls();
 		check_acl_status(entry.mode);
 		if (verbose)
 			verbose_stats();
