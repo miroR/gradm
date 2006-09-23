@@ -89,6 +89,49 @@ check_subjects(struct role_acl *role)
 	return errs_found;
 }
 
+extern int gr_learn;
+
+static int
+check_learning(struct role_acl *role)
+{
+	struct proc_acl *tmp;
+	struct proc_acl *def_acl;
+	unsigned int errs_found = 0;
+
+	def_acl = role->root_label;
+	if (!def_acl)
+		return 0;
+	if (gr_learn)
+		return 0;
+
+	if (!gr_learn && role->roletype & GR_ROLE_LEARN) {
+		fprintf(stderr,
+			"Warning: You have enabled learning on the role "
+			"%s.  You have not used -L on the command "
+			"line however.  If you wish to use learning "
+			"on this role, use the -L argument to gradm.  "
+			"Otherwise, remove the learning flag on this role.\n",
+			role->rolename);
+		errs_found++;
+	}
+
+	for_each_subject(tmp, role) {
+	    if (!gr_learn && tmp->mode & (GR_LEARN || GR_INHERITLEARN)) {
+			fprintf(stderr,
+				"Warning: You have enabled some form of "
+				"learning on the subject for %s in role "
+				"%s.  You have not used -L on the command "
+				"line however.  If you wish to use learning "
+				"on this subject, use the -L argument to gradm.  "
+				"Otherwise, remove the learning flag on this subject.\n",
+				tmp->filename, role->rolename);
+		errs_found++;
+	    }
+	}
+
+	return errs_found;
+}
+
 static void
 check_default_objects(struct role_acl *role)
 {
@@ -403,6 +446,7 @@ analyze_acls(void)
 
 		check_default_objects(role);
 		errs_found += check_subjects(role);
+		errs_found += check_learning(role);
 
 		chk.type = CHK_FILE;
 		chk.u_modes = GR_FIND;

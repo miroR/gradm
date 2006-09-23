@@ -153,6 +153,8 @@ static FILE *open_learn_log(char *learn_log)
 	return learnfile;
 }
 
+int gr_learn = 0;
+
 void
 parse_args(int argc, char *argv[])
 {
@@ -161,7 +163,6 @@ parse_args(int argc, char *argv[])
 	int verbose = 0;
 	char *output_log = NULL;
 	char *learn_log = NULL;
-	int gr_learn = 0;
 	int gr_output = 0;
 	int gr_enable = 0;
 	int gr_fulllearn = 0;
