@@ -389,7 +389,8 @@ parse_args(int argc, char *argv[])
 
 	if (gr_enable) {
 		/* analyze here since we know if learning is being used */
-		analyze_acls();
+		if (!gr_fulllearn)
+			analyze_acls();
 		check_acl_status(entry.mode);
 		if (verbose)
 			verbose_stats();
