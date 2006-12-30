@@ -8,8 +8,8 @@
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
 #define GR_LEARN_CONFIG_PATH	GRSEC_DIR "/learn_config"
 
-#define GR_VERSION		"2.1.9"
-#define GRADM_VERSION		0x219
+#define GR_VERSION		"2.1.10"
+#define GRADM_VERSION		0x2110
 
 #define GR_PWONLY		0
 #define GR_PWANDSUM		1

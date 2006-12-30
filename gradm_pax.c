@@ -42,7 +42,7 @@ add_paxflag_acl(struct proc_acl *subject, const char *paxflag)
 	if (*paxflag == '+')
 		subject->pax_flags |= kpaxflag;
 	else
-		subject->pax_flags |= 0x8000 | kpaxflag;
+		subject->pax_flags |= (kpaxflag << 8);
 
 	return;
 }
