@@ -429,6 +429,9 @@ int ensure_role_security(struct gr_learn_group_node *group,
 
 void output_learn_header(FILE *stream)
 {
+	fprintf(stream, "role admin sA\n");
+	fprintf(stream, "subject / rvka\n");
+	fprintf(stream, "\t/ rwcdmlxi\n\n");
 	fprintf(stream, "role default\n");
 	fprintf(stream, "subject / {\n");
 	fprintf(stream, "\t/\t\t\t\th\n");
@@ -447,6 +450,9 @@ void output_role_info(struct gr_learn_group_node *group, struct gr_learn_user_no
 
 	if (user) {
 		fprintf(stream, "role %s u%s\n", user->rolename, strcmp(user->rolename, "root") ? "" : "G");
+		if (!strcmp(user->rolename, "root")) {
+			fprintf(stream, "role_transitions admin\n");
+		}
 		allowed_ips = user->allowed_ips;
 	} else {
 		fprintf(stream, "role %s g\n", group->rolename);
