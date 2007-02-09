@@ -614,7 +614,9 @@ int main(int argc, char *argv[])
 	special_role_uid = 0;
 	
 	tailor_to_kernel();
+#ifndef GRADM_DEBUG
 	no_coredump();
+#endif
 
 	main_stack = &include_stack;
 	memset(main_stack, 0, sizeof(struct include_entry));
