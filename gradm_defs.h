@@ -1,3 +1,6 @@
+#ifndef __GRADM_DEFS_H
+#define __GRADM_DEFS_H
+
 #ifndef GRSEC_DIR
 #define GRSEC_DIR		"/etc/grsec"
 #endif
@@ -353,14 +356,16 @@ struct deleted_file {
 	char *filename;
 	ino_t ino;
 	struct deleted_file *next;
-} *deleted_files;
+};
 
-unsigned long lineno;
+extern struct deleted_file *deleted_files;
 
-struct role_acl *current_role;
-struct proc_acl *current_subject;
+extern unsigned long lineno;
 
-char *current_acl_file;
+extern struct role_acl *current_role;
+extern struct proc_acl *current_subject;
+
+extern char *current_acl_file;
 
 enum {
 	GR_HASH_SUBJECT,
@@ -412,26 +417,30 @@ struct gr_arg_wrapper {
 	u_int32_t size;
 };
 
-char *rlim_table[GR_NLIMITS];
-struct capability_set capability_list[30];
-struct paxflag_set paxflag_list[5];
+extern char *rlim_table[GR_NLIMITS];
+extern struct capability_set capability_list[30];
+extern struct paxflag_set paxflag_list[5];
 
-int is_24_kernel;
+extern int is_24_kernel;
 
-uid_t special_role_uid;
+extern uid_t special_role_uid;
 
-u_int32_t num_subjects;
-u_int32_t num_roles;
-u_int32_t num_objects;
-u_int32_t num_pointers;
-u_int32_t num_domain_children;
+extern u_int32_t num_subjects;
+extern u_int32_t num_roles;
+extern u_int32_t num_objects;
+extern u_int32_t num_pointers;
+extern u_int32_t num_domain_children;
 
-char *current_learn_rolename;
-char *current_learn_subject;
-u_int16_t current_learn_rolemode;
+extern char *current_learn_rolename;
+extern char *current_learn_subject;
+extern u_int16_t current_learn_rolemode;
 
-char **dont_reduce_dirs;
-char **always_reduce_dirs;
-char **protected_paths;
-char **high_reduce_dirs;
-char **high_protected_paths;
+extern char **dont_reduce_dirs;
+extern char **always_reduce_dirs;
+extern char **protected_paths;
+extern char **high_reduce_dirs;
+extern char **high_protected_paths;
+
+extern int gr_learn;
+
+#endif

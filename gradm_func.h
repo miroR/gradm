@@ -1,3 +1,6 @@
+#ifndef __GRADM_FUNC_H
+#define __GRADM_FUNC_H
+
 void yyerror(const char *s);
 FILE *open_acl_file(const char *filename);
 void get_user_passwd(struct gr_pw_entry *entry, int mode);
@@ -148,3 +151,5 @@ void add_to_string_array(char ***array, char *str);
 void parse_learn_config(void);
 
 void check_pam_auth(unsigned char *rolename);
+
+#endif

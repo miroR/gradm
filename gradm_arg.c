@@ -54,23 +54,24 @@ conv_name_to_num(const char *filename, u_int32_t *dev, ino_t * inode)
 {
 	struct stat fstat;
 
-	if (stat(filename, &fstat)) {
+	if (stat(filename, &fstat) != 0) {
 		fprintf(stderr, "Unable to stat %s: %s\n", filename,
 			strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
-	if (is_24_kernel)
+	if (is_24_kernel != 0) {
 		*dev = MKDEV_24(MAJOR_24(fstat.st_dev), MINOR_24(fstat.st_dev));
-	else
+	} else {
 		*dev = MKDEV_26(MAJOR_26(fstat.st_dev), MINOR_26(fstat.st_dev));
+	}
 
 	*inode = fstat.st_ino;
 
 	return;
 }
 
-void verbose_stats(void)
+static void verbose_stats(void)
 {
 	struct role_acl *rtmp;
 	struct proc_acl *stmp;
@@ -80,34 +81,42 @@ void verbose_stats(void)
 	unsigned int chsobjs=0, tobjs=0;
 
 	for_each_role(rtmp, current_role) {
-		if (!strcmp(rtmp->rolename,":::kernel:::"))
+		if (strcmp(rtmp->rolename,":::kernel:::") == 0) {
 			continue;
+		}
 		troles++;
 		if (rtmp->roletype & GR_ROLE_SPECIAL) {
-			if (rtmp->roletype & (GR_ROLE_NOPW | GR_ROLE_PAM))
+			if (rtmp->roletype & (GR_ROLE_NOPW | GR_ROLE_PAM)) {
 				snroles++;
-			else
+			} else {
 				saroles++;
-			if (rtmp->roletype & GR_ROLE_GOD)
+			}
+			if (rtmp->roletype & GR_ROLE_GOD) {
 				aroles++;
-		} else if (rtmp->roletype & GR_ROLE_USER)
+			}
+		} else if (rtmp->roletype & GR_ROLE_USER) {
 			uroles++;
-		else if (rtmp->roletype & GR_ROLE_GROUP)
+		} else if (rtmp->roletype & GR_ROLE_GROUP) {
 			groles++;
+		} else {
+			/* default role */
+			;
+		}
 		
 		for_each_subject(stmp, rtmp) {
 			tsubjs++;
 
-			if (!(stmp->mode & GR_PROTECTED))
+			if ((stmp->mode & GR_PROTECTED) == 0)
 				ksubjs++;
-			if (!(stmp->mode & GR_PROTSHM))
+			if ((stmp->mode & GR_PROTSHM) == 0)
 				smsubjs++;
-			if (!(stmp->ips))
+			if (stmp->ips == NULL)
 				ussubjs++;
 
 			for_each_object(otmp, stmp) {
 				tobjs++;
-				if (otmp->mode & GR_SETID && !(rtmp->roletype & GR_ROLE_GOD))
+				if (otmp->mode & GR_SETID &&
+				    ((rtmp->roletype & GR_ROLE_GOD) == 0))
 					chsobjs++;
 			}
 		}
@@ -116,21 +125,21 @@ void verbose_stats(void)
 	printf("Policy statistics:\n");
 	printf("-------------------------------------------------------\n");
 	printf("Role summary:\n");
-	printf("\t%d user roles\n", uroles);
-	printf("\t%d group roles\n", groles);
-	printf("\t%d special roles with authentication\n", saroles);
-	printf("\t%d special roles without authentication\n", snroles);
-	printf("\t%d admin roles\n", aroles);
-	printf("\t%d total roles\n\n", troles);
+	printf("\t%u user roles\n", uroles);
+	printf("\t%u group roles\n", groles);
+	printf("\t%u special roles with authentication\n", saroles);
+	printf("\t%u special roles without authentication\n", snroles);
+	printf("\t%u admin roles\n", aroles);
+	printf("\t%u total roles\n\n", troles);
 	printf("Subject summary:\n");
-	printf("\t%d nested subjects\n", nsubjs);
-	printf("\t%d subjects can be killed by outside processes\n", ksubjs);
-	printf("\t%d subjects have unprotected shared memory\n", smsubjs);
-	printf("\t%d subjects with unrestricted sockets\n", ussubjs);
-	printf("\t%d total subjects\n\n", tsubjs);
+	printf("\t%u nested subjects\n", nsubjs);
+	printf("\t%u subjects can be killed by outside processes\n", ksubjs);
+	printf("\t%u subjects have unprotected shared memory\n", smsubjs);
+	printf("\t%u subjects with unrestricted sockets\n", ussubjs);
+	printf("\t%u total subjects\n\n", tsubjs);
 	printf("Object summary:\n");
-	printf("\t%d objects in non-admin roles allow chmod +s\n", chsobjs);
-	printf("\t%d total objects\n", tobjs);
+	printf("\t%u objects in non-admin roles allow chmod +s\n", chsobjs);
+	printf("\t%u total objects\n", tobjs);
 
 	return;
 }
@@ -139,11 +148,11 @@ static FILE *open_learn_log(char *learn_log)
 {
 	FILE *learnfile = NULL;
 
-	if (!strcmp(learn_log, "-"))
+	if (strcmp(learn_log, "-") == 0) {
 		learnfile = stdin;
-	else {
+	} else {
 		learnfile = fopen(learn_log, "r");
-		if (!learnfile) {
+		if (learnfile == NULL) {
 			fprintf(stderr, "Unable to open learning log: %s.\n"
 				"Error: %s\n", learn_log, strerror(errno));
 			exit(EXIT_FAILURE);

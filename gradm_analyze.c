@@ -89,8 +89,6 @@ check_subjects(struct role_acl *role)
 	return errs_found;
 }
 
-extern int gr_learn;
-
 static int
 check_learning(struct role_acl *role)
 {

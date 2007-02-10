@@ -101,7 +101,7 @@ void learn_pass1(FILE *stream)
 	return;
 }
 
-void merge_acl_rules()
+void merge_acl_rules(void)
 {
 	struct gr_learn_role_entry *matchrole = NULL;
 	struct gr_learn_file_node *matchsubj = NULL;

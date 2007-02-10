@@ -44,7 +44,7 @@ generic_rotr32(const u_int32_t x, const unsigned bits)
 #define H6         0x1f83d9ab
 #define H7         0x5be0cd19
 
-const static u_int32_t sha256_K[64] = {
+static const u_int32_t sha256_K[64] = {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
 	0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
 	0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
@@ -222,7 +222,7 @@ SHA256Update(sha256_ctx_t * C, const u_int8_t * input, u_int32_t inputLen)
 static void
 SHA256Final(sha256_ctx_t * C, u_int8_t * digest)
 {
-	const static u_int8_t padding[64] = { 0x80, };
+	static const u_int8_t padding[64] = { 0x80, };
 	u_int8_t bits[8];
 	u_int32_t t, index, padLen;
 	int i, j;

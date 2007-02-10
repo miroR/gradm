@@ -1,5 +1,5 @@
 ##############################################################################
-#gradm (c) 2002-2005 	Brad Spengler 		        http://grsecurity.net#
+#gradm (c) 2002-2006 	Brad Spengler 		        http://grsecurity.net#
 #--------------------------------------			---------------------#
 #gradm is licensed under the GNU GPL v2 or higher http://www.gnu.org         #
 ##############################################################################
@@ -41,7 +41,7 @@ OBJECTS=gradm.tab.o lex.gradm.o learn_pass1.tab.o learn_pass2.tab.o \
 	gradm_sym.o gradm_newlearn.o gradm_fulllearn.o gradm_lib.o \
 	lex.fulllearn_pass1.o lex.fulllearn_pass2.o \
 	lex.fulllearn_pass3.o lex.learn_pass1.o lex.learn_pass2.o \
-	grlearn_config.tab.o lex.grlearn_config.o
+	grlearn_config.tab.o lex.grlearn_config.o gradm_globals.o
 
 all: $(GRADM_BIN) $(GRADM_PAM) grlearn
 nopam: $(GRADM_BIN) grlearn
