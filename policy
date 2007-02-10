@@ -210,6 +210,7 @@ subject /
 	-CAP_SYS_PTRACE
 	-CAP_NET_ADMIN
 	-CAP_NET_BIND_SERVICE
+	-CAP_NET_RAW
 	-CAP_SYS_CHROOT
 	-CAP_SYS_BOOT
 
@@ -277,5 +278,19 @@ subject /usr/bin/ssh
 subject /sbin/klogd
 	+CAP_SYS_ADMIN
 
+subject /sbin/syslog-ng
+	+CAP_SYS_ADMIN
+
 subject /usr/sbin/cron
 	/dev/log rw
+
+subject /bin/login
+	/dev/log rw
+	/var/log/wtmp w
+	/var/log/faillog rwcd
+
+subject /sbin/getty
+	/var/log/wtmp w
+
+subject /sbin/init
+	/var/log/wtmp w
