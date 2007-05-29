@@ -120,6 +120,9 @@ high-protected-path /sys
 high-protected-path /etc/ppp/chap-secrets
 high-protected-path /etc/ppp/pap-secrets
 high-protected-path /etc/samba/smbpasswd
+#to protect kernel images
+high-protected-path /boot
+high-protected-path /usr/src
 
 inherit-learn /etc/cron.d
 inherit-learn /etc/cron.hourly

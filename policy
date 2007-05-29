@@ -183,6 +183,8 @@ subject /
 	/sbin		rx
 	/lib		rx
 	/usr		rx
+# compilation of kernel code should be done within the admin role	
+	/usr/src	h
 	/etc		rx
 	/proc		rwx
 	/proc/kcore	h
@@ -192,7 +194,8 @@ subject /
 	/var		rwxcd
 	/var/tmp	rwcd
 	/var/log	r
-	/boot		r
+# hide the kernel images
+	/boot		h
 	/etc/grsec	h
 	/etc/ssh	h
 
