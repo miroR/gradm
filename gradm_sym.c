@@ -59,7 +59,6 @@ struct var_object * union_objects(struct var_object *var1, struct var_object *va
 		found_dupe = 0;
 		for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
 			if (!strcmp(tmpvar1->filename, tmpvar2->filename)) {
-				add_var_object(&retvar, tmpvar2->filename, tmpvar1->mode | tmpvar2->mode);
 				found_dupe = 1;
 				break;
 			}
