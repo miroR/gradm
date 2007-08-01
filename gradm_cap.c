@@ -30,6 +30,8 @@ struct capability_set capability_list[] = {
 	{"CAP_SYS_TTY_CONFIG", 26},
 	{"CAP_MKNOD", 27},
 	{"CAP_LEASE", 28},
+	{"CAP_AUDIT_WRITE", 29},
+	{"CAP_AUDIT_CONTROL", 30},
 	{"CAP_ALL", ~0}
 };
 

@@ -11,8 +11,8 @@
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
 #define GR_LEARN_CONFIG_PATH	GRSEC_DIR "/learn_config"
 
-#define GR_VERSION		"2.1.10"
-#define GRADM_VERSION		0x2110
+#define GR_VERSION		"2.1.11"
+#define GRADM_VERSION		0x2111
 
 #define GR_PWONLY		0
 #define GR_PWANDSUM		1
@@ -418,7 +418,7 @@ struct gr_arg_wrapper {
 };
 
 extern char *rlim_table[GR_NLIMITS];
-extern struct capability_set capability_list[30];
+extern struct capability_set capability_list[32];
 extern struct paxflag_set paxflag_list[5];
 
 extern int is_24_kernel;
