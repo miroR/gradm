@@ -545,7 +545,7 @@ void show_policy(void) {
 		printf(" %s", rolet->rolename);
 	printf("\n");
 	for (proc = rolp->hash->first;proc;proc=proc->prev) {
-		printf("\tSUBJECT: %s dev:%d inode:%lu mode:%d c_raise:%x c_drop:%x\n",
+		printf("\tSUBJECT: %s dev:%lu inode:%lu mode:%lu c_raise:%x c_drop:%x\n",
 			proc->filename, proc->dev, proc->inode, proc->mode, ~proc->cap_drop,
 			proc->cap_drop);
 		for (i = 0; i < proc->ip_num; i++) {
@@ -588,14 +588,17 @@ void show_policy(void) {
 					else {
 						struct protoent *proto;
 						proto = getprotobynumber(c);
+					if(proto)
 						printf(" %s", proto->p_name);
+					else
+						printf(" %d", c);
 					}
 				}
 			}
 			printf("\n");
 		}
 		for (filp = proc->hash->first;filp;filp=filp->prev)
-                        printf("\t\tOBJECT: %s dev:%d inode:%lu mode:%d\n", filp->filename, filp->dev, filp->inode, filp->mode);
+                        printf("\t\tOBJECT: %s dev:%lu inode:%lu mode:%lu\n", filp->filename, filp->dev, filp->inode, filp->mode);
 		for (i=0;i<GR_NLIMITS;i++)
 			if (proc->resmask & (1 << i))
 				printf("\t\t%s: soft: %lu hard: %lu\n", rlim_table[i], proc->res[i].rlim_cur, proc->res[i].rlim_max);
