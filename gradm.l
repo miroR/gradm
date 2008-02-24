@@ -173,8 +173,13 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return IPNETMASK;
 					}
 <IPPORT_STATE>[0-9]{1,5}		{
+					  unsigned int portcheck = atoi(yytext);
 					  BEGIN(IP_STATE);
-					  gradmlval.shortnum = atoi(yytext);
+					  if (portcheck > 65535) {
+						gradmerror("invalid port number error");
+						exit(EXIT_FAILURE);
+					  }
+					  gradmlval.shortnum = portcheck;
 					  return IPPORT;
 					}
 
