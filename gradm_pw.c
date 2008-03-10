@@ -164,6 +164,8 @@ read_saltandpass(unsigned char *rolename, unsigned char *salt, unsigned char *pa
 		}
 	}
 
+	close(fd);
+
 	if (!found && !memcmp(rolename, &cmp, GR_SPROLE_LEN)) {
 		fprintf(stderr, "Your password file is not set up correctly.\n"
 			"Run gradm -P to set a password.\n");
