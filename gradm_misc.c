@@ -44,6 +44,7 @@ void parse_learn_config(void)
 		exit(EXIT_FAILURE);
 	}
 	grlearn_configparse();
+	fclose(grlearn_configin);
 	return;
 }
 

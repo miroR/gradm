@@ -25,6 +25,7 @@ static void parse_learn2_config(void)
                 exit(EXIT_FAILURE);
         }
         grlearn2_configparse();
+	fclose(grlearn_configin);
         return;
 }
 
@@ -239,7 +240,7 @@ int main(int argc, char *argv[])
 	ssize_t retval;
 	struct pollfd fds;
 	int fd;
-	pid_t pid, ppid;
+	pid_t pid;
 	struct sched_param schedulerparam;
 	unsigned int len;
 	int i;
@@ -300,7 +301,6 @@ int main(int argc, char *argv[])
 	fcntl(fd, F_SETFD, FD_CLOEXEC);
 	fcntl(fd2, F_SETFD, FD_CLOEXEC);
 
-	ppid = getppid();
 	pid = fork();
 
 	if (pid > 0) {
@@ -309,15 +309,15 @@ int main(int argc, char *argv[])
 		char b;
 
 		write_pid_log(getpid());
-		write(3, &b, 1);
+		write(4, &b, 1);
 		close(0);
 		close(1);
 		close(2);
-		close(3);
+		close(4);
 	} else {
 		char b;
-		write(3, &b, 1);
-		close(3);
+		write(4, &b, 1);
+		close(4);
 		fprintf(stdout, "Unable to fork.\n");
 		exit(EXIT_FAILURE);
 	}
