@@ -259,26 +259,32 @@ void add_rolelearn_acl(void)
 	return;
 }
 
-static void ipc_sig(int sig)
-{
-        signal(sig, SIG_IGN);
-
-	return;
-}
-
 void start_grlearn(char *logfile)
 {
 	pid_t pid;
+	int fds[2];
+	int ret;
 
-	signal(SIGUSR1, ipc_sig);
+	ret = pipe(fds);
+	if (ret == -1) {
+		fprintf(stderr, "Error creating pipe.\n");
+		exit(EXIT_FAILURE);
+	}
 
 	pid = fork();
 
 	if (!pid) {
+		close(fds[0]); // close read end
 		execl(GRLEARN_PATH, GRLEARN_PATH, logfile, NULL);
 		exit(EXIT_FAILURE);
 	} else if (pid > 0) {
-		pause(); // wait for child to send us SIGUSR1
+		char b;
+		close(fds[1]); // close write end
+		read(fds[0], &b, 1);
+		close(fds[0]);
+	} else {
+		fprintf(stderr, "Error starting grlearn.\n");
+		exit(EXIT_FAILURE);
 	}
 
 	return;

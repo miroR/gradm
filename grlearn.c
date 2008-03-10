@@ -21,7 +21,7 @@ static void parse_learn2_config(void)
 {
         grlearn_configin = fopen(GR_LEARN_CONFIG_PATH, "r");
         if (grlearn_configin == NULL) {
-                fprintf(stderr, "Unable to open %s: %s\n", GR_LEARN_CONFIG_PATH, strerror(errno));
+                fprintf(stdout, "Unable to open %s: %s\n", GR_LEARN_CONFIG_PATH, strerror(errno));
                 exit(EXIT_FAILURE);
         }
         grlearn2_configparse();
@@ -306,14 +306,18 @@ int main(int argc, char *argv[])
 	if (pid > 0) {
 		exit(EXIT_SUCCESS);
 	} else if (!pid) {
-		write_pid_log(getpid());
-		kill(ppid, SIGUSR1);
+		char b;
 
+		write_pid_log(getpid());
+		write(3, &b, 1);
 		close(0);
 		close(1);
 		close(2);
+		close(3);
 	} else {
-		kill(ppid, SIGUSR1);
+		char b;
+		write(3, &b, 1);
+		close(3);
 		fprintf(stdout, "Unable to fork.\n");
 		exit(EXIT_FAILURE);
 	}
