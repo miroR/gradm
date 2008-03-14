@@ -461,11 +461,11 @@ static void
 display_all_dupes(struct proc_acl *subject, struct file_acl *filp2)
 {
 	struct file_acl *tmp;
-	struct stat fstat;
+	struct stat64 fstat;
 	struct file_acl ftmp;
 
 	for_each_object(tmp, subject) {
-	    if (!stat(tmp->filename, &fstat)) {
+	    if (!stat64(tmp->filename, &fstat)) {
 		ftmp.inode = fstat.st_ino;
 		if (is_24_kernel)
 			ftmp.dev = MKDEV_24(MAJOR_24(fstat.st_dev), MINOR_24(fstat.st_dev));
@@ -523,7 +523,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 {
 	struct file_acl *p;
 	struct file_acl *p2;
-	struct stat fstat;
+	struct stat64 fstat;
 	struct deleted_file *dfile;
 	unsigned int file_len;
 	char *str;
@@ -579,7 +579,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	/* one for the object, one for the filename, one for the name entry struct, and one for the inodev_entry struct in the kernel*/
 	num_pointers += 4;
 
-	if (lstat(filename, &fstat)) {
+	if (lstat64(filename, &fstat)) {
 		dfile = add_deleted_file(filename);
 		fstat.st_ino = dfile->ino;
 		fstat.st_dev = 0;
