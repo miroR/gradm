@@ -428,9 +428,6 @@ analyze_acls(void)
 	}
 
 	for_each_role(role, current_role) {
-		if (role->roletype & GR_ROLE_SPECIAL)
-			continue;
-
 		def_acl = role->root_label;
 		if (!def_acl) {
 			fprintf(stderr, "There is no default subject for "
@@ -443,6 +440,11 @@ analyze_acls(void)
 		}
 
 		check_default_objects(role);
+
+		/* non-critical warnings aren't issued for special roles */
+		if (role->roletype & GR_ROLE_SPECIAL)
+			continue;
+
 		errs_found += check_subjects(role);
 		errs_found += check_learning(role);
 
