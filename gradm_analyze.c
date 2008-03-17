@@ -681,17 +681,17 @@ analyze_acls(void)
 		errs_found += check_path_env(role, def_acl);
 		errs_found += check_lib_paths(role, def_acl);
 		errs_found += check_lilo_conf(role, def_acl);
+	}
+	/* end of per-role checks */
 
-		errs_found += handle_notrojan_mode();
+	errs_found += handle_notrojan_mode();
 
-		if (errs_found) {
-			printf("There were %d holes found in your RBAC "
-			       "configuration.  These must be fixed before the "
-			       "RBAC system will be allowed to be enabled.\n",
-			       errs_found);
-			exit(EXIT_FAILURE);
-		}
-
+	if (errs_found) {
+		printf("There were %d holes found in your RBAC "
+		       "configuration.  These must be fixed before the "
+		       "RBAC system will be allowed to be enabled.\n",
+		       errs_found);
+		exit(EXIT_FAILURE);
 	}
 
 	return;
