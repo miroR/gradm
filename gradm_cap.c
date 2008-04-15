@@ -32,6 +32,7 @@ struct capability_set capability_list[] = {
 	{"CAP_LEASE", 28},
 	{"CAP_AUDIT_WRITE", 29},
 	{"CAP_AUDIT_CONTROL", 30},
+	{"CAP_SETFCAP", 31},
 	{"CAP_ALL", ~0}
 };
 
