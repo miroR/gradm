@@ -185,13 +185,13 @@ int full_reduce_id_node(struct gr_learn_file_node *subject,
 			FILE *unused2)
 {
 	if (subject->subject == NULL ||
-	    !(subject->subject->cap_raise & cap_conv("CAP_SETUID")))
+	    !cap_raised(subject->subject->cap_raise, CAP_SETUID))
 		free_subject_ids(&(subject->user_trans_list), 0);
 	else
 		free_subject_ids(&(subject->user_trans_list), 3);
 
 	if (subject->subject == NULL ||
-	    !(subject->subject->cap_raise & cap_conv("CAP_SETGID")))
+	    !cap_raised(subject->subject->cap_raise, CAP_SETGID))
 		free_subject_ids(&(subject->group_trans_list), 0);
 	else
 		free_subject_ids(&(subject->group_trans_list), 3);

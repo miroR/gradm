@@ -33,22 +33,87 @@ struct capability_set capability_list[] = {
 	{"CAP_AUDIT_WRITE", 29},
 	{"CAP_AUDIT_CONTROL", 30},
 	{"CAP_SETFCAP", 31},
+	{"CAP_MAC_OVERRIDE", 32},
+	{"CAP_MAC_ADMIN", 33},
 	{"CAP_ALL", ~0}
 };
 
-u_int32_t
+gr_cap_t cap_combine(gr_cap_t a, gr_cap_t b)
+{
+	int i;
+	gr_cap_t ret;
+
+	for (i = 0; i < 2; i++)
+		ret.cap[i] = a.cap[i] | b.cap[i];
+
+	return ret;		
+}
+
+gr_cap_t cap_drop(gr_cap_t a, gr_cap_t b)
+{
+	int i;
+	gr_cap_t ret;
+
+	for (i = 0; i < 2; i++)
+		ret.cap[i] = a.cap[i] &~ b.cap[i];
+
+	return ret;		
+}
+
+gr_cap_t cap_intersect(gr_cap_t a, gr_cap_t b)
+{
+	int i;
+	gr_cap_t ret;
+
+	for (i = 0; i < 2; i++)
+		ret.cap[i] = a.cap[i] & b.cap[i];
+
+	return ret;		
+}
+
+gr_cap_t cap_invert(gr_cap_t a)
+{
+	int i;
+	gr_cap_t ret;
+
+	for (i = 0; i < 2; i++)
+		ret.cap[i] = ~a.cap[i];
+
+	return ret;
+}
+
+int cap_isclear(gr_cap_t a)
+{
+	if (a.cap[0] || a.cap[1])
+		return 0;
+
+	return 1;
+}
+
+int cap_same(gr_cap_t a, gr_cap_t b)
+{
+	if (a.cap[0] == b.cap[0] && a.cap[1] == b.cap[1])
+		return 1;
+
+	return 0;
+}
+
+gr_cap_t
 cap_conv(const char *cap)
 {
+	gr_cap_t retcap = {{ 0, 0 }};
 	int i;
 
 	for (i = 0;
 	     i < sizeof (capability_list) / sizeof (struct capability_set); i++)
 		if (!strcmp(cap, capability_list[i].cap_name)) {
 			if (i == (sizeof (capability_list) /
-				  sizeof (struct capability_set) - 1))
-				return ~0;	/* CAP_ALL */
-			else
-				return (1 << (capability_list[i].cap_val));
+				  sizeof (struct capability_set) - 1)) {
+				retcap.cap[0] = ~0;
+				retcap.cap[1] = ~0; /* CAP_ALL */
+			} else
+				cap_raise(retcap, capability_list[i].cap_val);
+			return retcap;
 		}
 
 	fprintf(stderr, "Invalid capability name \"%s\" on line %lu of %s.\n"
@@ -57,13 +122,13 @@ cap_conv(const char *cap)
 
 	exit(EXIT_FAILURE);
 
-	return 0;
+	return retcap;
 }
 
 void
 add_cap_acl(struct proc_acl *subject, const char *cap)
 {
-	u_int32_t kcap = cap_conv(cap + 1);
+	gr_cap_t kcap = cap_conv(cap + 1);
 
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "
@@ -74,11 +139,11 @@ add_cap_acl(struct proc_acl *subject, const char *cap)
 	}
 
 	if (*cap == '+') {
-		subject->cap_drop &= ~kcap;
-		subject->cap_mask |= kcap;
+		subject->cap_drop = cap_drop(subject->cap_drop, kcap);
+		subject->cap_mask = cap_combine(subject->cap_mask, kcap);
 	} else {
-		subject->cap_drop |= kcap;
-		subject->cap_mask |= kcap;
+		subject->cap_drop = cap_combine(subject->cap_drop, kcap);
+		subject->cap_mask = cap_combine(subject->cap_mask, kcap);
 	}
 	return;
 }
@@ -86,8 +151,8 @@ add_cap_acl(struct proc_acl *subject, const char *cap)
 void
 modify_caps(struct proc_acl *proc, int cap)
 {
-	proc->cap_drop &= ~(1 << cap);
-	proc->cap_mask |= (1 << cap);
+	cap_lower(proc->cap_drop, cap);
+	cap_raise(proc->cap_mask, cap);
 
 	return;
 }

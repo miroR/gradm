@@ -498,7 +498,8 @@ int reduce_all_children(struct gr_learn_file_node *node)
 		if (!((*tmp)->leaves)) {
 			node->mode |= (*tmp)->mode;
 			if (node->subject && (*tmp)->subject) {
-				node->subject->cap_raise |= (*tmp)->subject->cap_raise;
+				node->subject->cap_raise = cap_combine(node->subject->cap_raise, 
+								       (*tmp)->subject->cap_raise);
 				node->subject->resmask |= (*tmp)->subject->resmask;
 				for (i = 0; i < GR_NLIMITS; i++) {
 					if ((*tmp)->subject->res[i].rlim_cur > node->subject->res[i].rlim_cur)
@@ -550,7 +551,8 @@ int reduce_all_leaves(struct gr_learn_file_node *node)
 		reduce_all_leaves(*tmp);
 		node->mode |= (*tmp)->mode;
 		if (node->subject && (*tmp)->subject) {
-			node->subject->cap_raise |= (*tmp)->subject->cap_raise;
+			node->subject->cap_raise = cap_combine(node->subject->cap_raise,
+							       (*tmp)->subject->cap_raise);
 			node->subject->resmask |= (*tmp)->subject->resmask;
 			for (i = 0; i < GR_NLIMITS; i++) {
 				if ((*tmp)->subject->res[i].rlim_cur > node->subject->res[i].rlim_cur)
@@ -1165,18 +1167,18 @@ int display_leaf(struct gr_learn_file_node *node,
 		}
 
 		for(i = raise_num = 0; i < ((sizeof(capability_list)/sizeof(struct capability_set)) - 1); i++)
-			if (node->subject->cap_raise & (1 << capability_list[i].cap_val))
+			if (cap_raised(node->subject->cap_raise, capability_list[i].cap_val))
 				raise_num++;
 
 		if (raise_num < ((sizeof(capability_list)/sizeof(struct capability_set)) - 1) / 2) {
 			fprintf(stream, "\t-CAP_ALL\n");
 			for(i = 0; i < ((sizeof(capability_list)/sizeof(struct capability_set)) - 1); i++)
-				if (node->subject->cap_raise & (1 << capability_list[i].cap_val))
+				if (cap_raised(node->subject->cap_raise, capability_list[i].cap_val))
 					fprintf(stream, "\t+%s\n", capability_list[i].cap_name);
 		} else {
 			fprintf(stream, "\t+CAP_ALL\n");
 			for(i = 0; i < ((sizeof(capability_list)/sizeof(struct capability_set)) - 1); i++)
-				if (!(node->subject->cap_raise & (1 << capability_list[i].cap_val)))
+				if (!cap_raised(node->subject->cap_raise, capability_list[i].cap_val))
 					fprintf(stream, "\t-%s\n", capability_list[i].cap_name);
 		}
 

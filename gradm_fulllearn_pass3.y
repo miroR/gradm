@@ -82,7 +82,7 @@ learn_log:
 					if (subject->subject == NULL)
 						failure("calloc");
 				}
-				subject->subject->cap_raise |= (1 << mode);
+				cap_raise(subject->subject->cap_raise, mode);
 			}
 			}
 			}

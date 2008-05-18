@@ -8,7 +8,8 @@ check_permission(struct role_acl *role, struct proc_acl *def_acl,
 	struct proc_acl *tmpp = def_acl;
 	struct file_acl *tmpg = NULL;
 	char *tmpname;
-	u_int32_t cap_drop = 0, cap_mask = 0;
+	gr_cap_t cap_drp = {{ 0, 0 }}, cap_mask = {{ 0, 0 }};
+	gr_cap_t cap_full = {{ ~0, ~0 }};
 
 	if (chk->type == CHK_FILE) {
 		tmpname = alloca(strlen(filename) + 1);
@@ -45,17 +46,18 @@ check_permission(struct role_acl *role, struct proc_acl *def_acl,
 		} while (parent_dir(filename, &tmpname));
 	} else if (chk->type == CHK_CAP) {
 		cap_mask = tmpp->cap_mask;
-		cap_drop = tmpp->cap_drop;
+		cap_drp = tmpp->cap_drop;
 
 		while ((tmpp = tmpp->parent_subject)) {
-			cap_drop |= tmpp->cap_drop & (tmpp->cap_mask & ~cap_mask);
-			cap_mask |= tmpp->cap_mask;
+			cap_drp = cap_combine(cap_drp, cap_intersect(tmpp->cap_drop,
+								       cap_drop(tmpp->cap_mask, cap_mask)));
+			cap_mask = cap_combine(cap_mask, tmpp->cap_mask);
 		}
 
-		if (((chk->w_caps == 0xffffffff)
-		     || !(cap_drop & chk->w_caps))
-		    && ((chk->u_caps == 0xffffffff)
-			|| (cap_drop & chk->u_caps)))
+		if (((cap_same(chk->w_caps, cap_full))
+		     || cap_isclear(cap_intersect(cap_drp, chk->w_caps)))
+		    && ((cap_same(chk->u_caps, cap_full))
+			|| !cap_isclear(cap_intersect(cap_drp, chk->u_caps))))
 			return 1;
 	}
 
@@ -412,6 +414,7 @@ analyze_acls(void)
 	struct role_acl *role;
 	int def_role_found = 0;
 	struct stat fstat;
+	gr_cap_t cap_full = {{ ~0, ~0 }};
 
 	errs_found = check_role_transitions();
 
@@ -606,8 +609,9 @@ analyze_acls(void)
 		}
 
 		chk.type = CHK_CAP;
-		chk.u_caps = cap_conv("CAP_SYS_MODULE") | cap_conv("CAP_SYS_RAWIO") | cap_conv("CAP_MKNOD");
-		chk.w_caps = 0xffffffff;
+		chk.u_caps = cap_combine(cap_combine(cap_conv("CAP_SYS_MODULE"), cap_conv("CAP_SYS_RAWIO")), 
+					 cap_conv("CAP_MKNOD"));
+		chk.w_caps = cap_full;
 
 		if (!check_permission(role, def_acl, "", &chk)) {
 			fprintf(stderr,
@@ -620,7 +624,7 @@ analyze_acls(void)
 		}
 
 		chk.u_caps = cap_conv("CAP_SYS_ADMIN");
-		chk.w_caps = 0xffffffff;
+		chk.w_caps = cap_full;
 
 		if (!check_permission(role, def_acl, "", &chk)) {
 			fprintf(stderr, "CAP_SYS_ADMIN is not "
@@ -632,7 +636,7 @@ analyze_acls(void)
 
 
 		chk.u_caps = cap_conv("CAP_SYS_BOOT");
-		chk.w_caps = 0xffffffff;
+		chk.w_caps = cap_full;
 
 		if (!check_permission(role, def_acl, "", &chk)) {
 			fprintf(stderr, "CAP_SYS_BOOT is not "
@@ -643,7 +647,7 @@ analyze_acls(void)
 		}
 
 		chk.u_caps = cap_conv("CAP_NET_ADMIN");
-		chk.w_caps = 0xffffffff;
+		chk.w_caps = cap_full;
 
 		if (!check_permission(role, def_acl, "", &chk)) {
 			fprintf(stderr, "CAP_NET_ADMIN is not "
@@ -654,7 +658,7 @@ analyze_acls(void)
 		}
 
 		chk.u_caps = cap_conv("CAP_NET_BIND_SERVICE");
-		chk.w_caps = 0xffffffff;
+		chk.w_caps = cap_full;
 
 		if (!check_permission(role, def_acl, "", &chk)) {
 			fprintf(stderr, "CAP_NET_BIND_SERVICE is not "
@@ -666,7 +670,7 @@ analyze_acls(void)
 		}
 
 		chk.u_caps = cap_conv("CAP_SYS_TTY_CONFIG");
-		chk.w_caps = 0xffffffff;
+		chk.w_caps = cap_full;
 
 		if (!check_permission(role, def_acl, "", &chk)) {
 			fprintf(stderr, "CAP_SYS_TTY_CONFIG is not "

@@ -11,8 +11,8 @@
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
 #define GR_LEARN_CONFIG_PATH	GRSEC_DIR "/learn_config"
 
-#define GR_VERSION		"2.1.11"
-#define GRADM_VERSION		0x2111
+#define GR_VERSION		"2.1.12"
+#define GRADM_VERSION		0x2112
 
 #define GR_PWONLY		0
 #define GR_PWANDSUM		1
@@ -43,6 +43,18 @@
 #endif
 #define GR_NLIMITS	(RLIMIT_LOCKS + 2)
 
+#undef CAP_TO_INDEX
+#undef CAP_TO_MASK
+#undef cap_raise
+#undef cap_lower
+#undef cap_raised
+#define CAP_TO_INDEX(x)     ((x) >> 5)        /* 1 << 5 == bits in __u32 */
+#define CAP_TO_MASK(x)      (1 << ((x) & 31)) /* mask for indexed __u32 */
+#define cap_raise(c, flag)  ((c).cap[CAP_TO_INDEX(flag)] |= CAP_TO_MASK(flag))
+#define cap_lower(c, flag)  ((c).cap[CAP_TO_INDEX(flag)] &= ~CAP_TO_MASK(flag))
+#define cap_raised(c, flag) ((c).cap[CAP_TO_INDEX(flag)] & CAP_TO_MASK(flag))
+#define CAP_SETUID 7
+#define CAP_SETGID 6
 enum {
 	GRADM_DISABLE 	= 0,
 	GRADM_ENABLE 	= 1,
@@ -138,9 +150,13 @@ enum {
 
 /* internal use only.  not to be modified */
 
+typedef struct _gr_cap_t {
+	u_int32_t cap[2];
+} gr_cap_t;
+
 struct capability_set {
 	char *cap_name;
-	u_int32_t cap_val;
+	int cap_val;
 };
 
 struct paxflag_set {
@@ -157,8 +173,8 @@ struct chk_perm {
 	unsigned short type;
 	u_int32_t w_modes;
 	u_int32_t u_modes;
-	u_int32_t w_caps;
-	u_int32_t u_caps;
+	gr_cap_t w_caps;
+	gr_cap_t u_caps;
 };
 
 struct role_allowed_ip {
@@ -238,8 +254,8 @@ struct proc_acl {
 	ino_t inode;
 	u_int32_t dev;
 	u_int32_t mode;
-	u_int32_t cap_mask;
-	u_int32_t cap_drop;
+	gr_cap_t cap_mask;
+	gr_cap_t cap_drop;
 
 	struct rlimit res[GR_NLIMITS];
 	u_int16_t resmask;
@@ -316,7 +332,7 @@ struct gr_learn_user_node {
 };
 
 struct gr_learn_subject_node {
-	u_int32_t cap_raise;
+	gr_cap_t cap_raise;
 	struct rlimit res[GR_NLIMITS];
 	u_int16_t resmask;
 	u_int16_t pax_flags;
@@ -418,7 +434,7 @@ struct gr_arg_wrapper {
 };
 
 extern char *rlim_table[GR_NLIMITS];
-extern struct capability_set capability_list[33];
+extern struct capability_set capability_list[35];
 extern struct paxflag_set paxflag_list[5];
 
 extern int is_24_kernel;
