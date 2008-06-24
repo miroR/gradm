@@ -1784,7 +1784,7 @@ insert_learn_role(struct gr_learn_role_entry ***role_list, char *rolename, u_int
 	(*((*role_list) + num))->rolemode = rolemode;
 
 	/* give every learned role a / subject */
-	insert_learn_role_subject(*((*role_list) + num), conv_filename_to_struct("/", GR_OVERRIDE));
+	insert_learn_role_subject(*((*role_list) + num), conv_filename_to_struct("/", GR_PROCFIND | GR_OVERRIDE));
 
 	return (*((*role_list) + num));
 }
