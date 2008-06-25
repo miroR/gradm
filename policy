@@ -126,6 +126,17 @@
 # New learning system:
 # To learn on a given subject: add l (the letter l, not the number 1)
 # to the subject mode
+# If you want to learn with the most restrictive policy, use the 
+# following:
+# subject /path/to/bin lo
+#    / h
+#    -CAP_ALL
+#    connect disabled
+#    bind disabled
+# Resource learning is also supported, so lines like
+#    RES_AS 0 0
+# can be used to learn a particular resource
+#
 # To learn on a given role, add l to the role mode
 # For both of these, to enable learning, enable the system like:
 # gradm -L /etc/grsec/learning.logs -E
