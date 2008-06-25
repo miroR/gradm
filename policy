@@ -157,6 +157,12 @@
 # PAX_MPROTECT
 # PAX_RANDMMAP
 # PAX_EMUTRAMP
+#
+#
+# Note that the omission of any feature of a role or subject
+# results in a default-allow
+# For instance, if no capability rules are added, an implicit +CAP_ALL is used
+#
 
 role admin sA
 subject / rvka
