@@ -11,8 +11,8 @@
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
 #define GR_LEARN_CONFIG_PATH	GRSEC_DIR "/learn_config"
 
-#define GR_VERSION		"2.1.12"
-#define GRADM_VERSION		0x2112
+#define GR_VERSION		"2.1.13"
+#define GRADM_VERSION		0x2113
 
 #define GR_PWONLY		0
 #define GR_PWANDSUM		1
@@ -271,6 +271,7 @@ struct proc_acl {
 	u_int32_t ip_type;
 	struct ip_acl **ips;
 	u_int32_t ip_num;
+	u_int32_t inaddr_any_override;
 
 	u_int32_t crashes;
 	unsigned long expires;
@@ -336,6 +337,7 @@ struct gr_learn_subject_node {
 	struct rlimit res[GR_NLIMITS];
 	u_int16_t resmask;
 	u_int16_t pax_flags;
+	u_int32_t inaddr_any_override;
 };
 
 struct gr_learn_file_node {

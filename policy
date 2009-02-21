@@ -113,6 +113,13 @@
 # except to port 80 of www.google.com with a stream tcp socket
 # the inverted socket matching also works on bind rules
 #
+# INADDR_ANY overriding
+# You can now force a given subject to bind to a particular IP address on the machine
+# This is useful for some chrooted environments, to ensure that the source IP they
+# use is one of your choosing
+# to use, add a line like:
+# ip_override 192.168.0.1
+#
 # Per-interface socket policies:
 # Rules such as
 # bind eth1:80 stream tcp

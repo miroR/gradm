@@ -22,7 +22,7 @@ int current_nest_depth = 0;
 %token <string> ROLE_TRANSITION VARIABLE DEFINE DEFINE_NAME DISABLED
 %token <string> ID_NAME USER_TRANS_ALLOW GROUP_TRANS_ALLOW 
 %token <string> USER_TRANS_DENY GROUP_TRANS_DENY DOMAIN_TYPE DOMAIN
-%token <string> INTERFACE
+%token <string> INTERFACE IPOVERRIDE
 %token <num> OBJ_MODE SUBJ_MODE IPADDR IPNETMASK NOT
 %token <shortnum> IPPORT ROLE_TYPE 
 %type <num> subj_mode obj_mode ip_netmask invert_socket
@@ -59,6 +59,7 @@ various_acls:			role_label
 	|			object_res_label
 	|			object_connect_ip_label
 	|			object_bind_ip_label
+	|			object_ip_override_label
 	;
 
 variable_expression:		VARIABLE
@@ -327,6 +328,13 @@ object_connect_ip_label:	CONNECT invert_socket IPADDR ip_netmask ip_ports ip_typ
 				CONNECT DISABLED
 				{
 				 add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
+				}
+	;
+
+object_ip_override_label:
+				IPOVERRIDE IPADDR
+				{
+				 current_subject->inaddr_any_override = $2;
 				}
 	;
 

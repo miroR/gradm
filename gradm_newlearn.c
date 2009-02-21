@@ -1204,6 +1204,11 @@ show_ips:
 			display_ip_tree(connect, GR_IP_CONNECT, stream);
 		else
 			fprintf(stream, "\tconnect\tdisabled\n");
+		if (node->subject->inaddr_any_override) {
+			struct in_addr addr;
+			addr.s_addr = node->subject->inaddr_any_override;
+			fprintf(stream, "\tip_override\t%s\n", inet_ntoa(addr));
+		}
 
 		fprintf(stream, "}\n\n");
 	} else {

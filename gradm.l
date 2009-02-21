@@ -34,7 +34,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 %x ROLE_STATE SUBJECT_STATE IP_STATE RES_STATE COMMENT_STATE ROLETYPE_STATE
 %x INCLUDE_STATE IPNETMASK_STATE IPPORT_STATE ROLETRANS_STATE
 %x VAR_STATE VAR_OBJ_STATE IDTRANS_STATE DOMAIN_STATE DOMAINTYPE_STATE
-%x DOMAINLIST_STATE IPIP_STATE
+%x DOMAINLIST_STATE IPIP_STATE IPONLY_STATE
 
 %%
 
@@ -140,6 +140,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  BEGIN(IP_STATE);
 					  gradmlval.string = gr_strdup(yytext);
 					  return HOSTNAME;
+					}
+<IPONLY_STATE>{IP}			{
+					  gradmlval.num = get_ip(yytext);
+					  return IPADDR;
 					}
 <IPIP_STATE>{IP}			{
 					  BEGIN(IP_STATE);
@@ -273,6 +277,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 "bind"					{
 					  BEGIN(IPIP_STATE);
 					  return BIND;
+					}
+"ip_override"				{
+					  BEGIN(IPONLY_STATE);
+					  return IPOVERRIDE;
 					}
 "include"[ \t]*[<][/].*[>]		{
 					  gr_line = strchr(yytext, '/');
