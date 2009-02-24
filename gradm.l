@@ -396,7 +396,8 @@ void add_include(char *includename)
 		return;
 
 	for (i = 0; i < n; i++) {
-		if (!strcmp(namelist[i]->d_name, ".") || !strcmp(namelist[i]->d_name, ".."))
+		if (!strcmp(namelist[i]->d_name, ".") || !strcmp(namelist[i]->d_name, "..") ||
+		    !strcmp(namelist[i]->d_name+strlen(namelist[i]->d_name)-1, "~"))
 			continue;
 		tmp = calloc(1, sizeof(struct include_entry));
 		if (tmp == NULL)
@@ -414,6 +415,12 @@ void add_include(char *includename)
 			exit(EXIT_FAILURE);
 		}
 		if (S_ISDIR(fstat.st_mode)) {
+			/* ignore the .svn and CVS directories */
+		    	if (!strcmp(namelist[i]->d_name, ".svn") || !strcmp(namelist[i]->d_name, "CVS")) {
+				free(tmp);
+				free(path);
+				continue;
+			}
 			fprintf(stderr, "Including the nested directory %s is not currently supported.\n", path);
 			exit(EXIT_FAILURE);
 		}
