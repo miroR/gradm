@@ -11,8 +11,8 @@
 #define GR_PW_PATH 		GRSEC_DIR "/pw"
 #define GR_LEARN_CONFIG_PATH	GRSEC_DIR "/learn_config"
 
-#define GR_VERSION		"2.1.13"
-#define GRADM_VERSION		0x2113
+#define GR_VERSION		"2.1.14"
+#define GRADM_VERSION		0x2114
 
 #define GR_PWONLY		0
 #define GR_PWANDSUM		1
@@ -41,7 +41,24 @@
 #ifndef RLIMIT_LOCKS
 #define RLIMIT_LOCKS 10
 #endif
-#define GR_NLIMITS	(RLIMIT_LOCKS + 2)
+#ifndef RLIMIT_SIGPENDING
+#define RLIMIT_SIGPENDING 11
+#endif
+#ifndef RLIMIT_MSGQUEUE
+#define RLIMIT_MSGQUEUE 12
+#endif
+#ifndef RLIMIT_NICE
+#define RLIMIT_NICE 13
+#endif
+#ifndef RLIMIT_RTPRIO
+#define RLIMIT_RTPRIO 14
+#endif
+#ifndef RLIMIT_RTTIME
+#define RLIMIT_RTTIME 15
+#endif
+
+#define GR_NLIMITS	32
+#define GR_CRASH_RES	31
 
 #undef CAP_TO_INDEX
 #undef CAP_TO_MASK
@@ -258,7 +275,7 @@ struct proc_acl {
 	gr_cap_t cap_drop;
 
 	struct rlimit res[GR_NLIMITS];
-	u_int16_t resmask;
+	u_int32_t resmask;
 
 	u_int8_t user_trans_type;
 	u_int8_t group_trans_type;
@@ -335,7 +352,7 @@ struct gr_learn_user_node {
 struct gr_learn_subject_node {
 	gr_cap_t cap_raise;
 	struct rlimit res[GR_NLIMITS];
-	u_int16_t resmask;
+	u_int32_t resmask;
 	u_int16_t pax_flags;
 	u_int32_t inaddr_any_override;
 };

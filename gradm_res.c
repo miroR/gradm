@@ -17,7 +17,12 @@ char *rlim_table[] = {
 	[RLIMIT_MEMLOCK] = "RES_MEMLOCK",
 	[RLIMIT_AS] = "RES_AS",
 	[RLIMIT_LOCKS] = "RES_LOCKS",
-	[RLIMIT_LOCKS + 1] = "RES_CRASH"
+	[RLIMIT_SIGPENDING] = "RES_SIGPENDING",
+	[RLIMIT_MSGQUEUE] = "RES_MSGQUEUE",
+	[RLIMIT_NICE] = "RES_NICE",
+	[RLIMIT_RTPRIO] = "RES_RTPRIO",
+	[RLIMIT_RTTIME] = "RES_RTTIME",
+	[GR_CRASH_RES] = "RES_CRASH"
 };
 
 static unsigned short
@@ -37,7 +42,7 @@ name_to_res(const char *name)
 	return 0;
 }
 
-static unsigned short
+static unsigned int
 res_to_mask(unsigned short res)
 {
 	return (1 << res);
