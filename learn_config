@@ -107,6 +107,7 @@ high-protected-path /etc/ssh
 high-protected-path /proc/kcore
 high-protected-path /proc/sys
 high-protected-path /proc/bus
+high-protected-path /proc/slabinfo
 high-protected-path /etc/passwd
 high-protected-path /etc/shadow
 high-protected-path /etc/shadow-
