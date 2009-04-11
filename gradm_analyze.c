@@ -608,6 +608,16 @@ analyze_acls(void)
 			errs_found++;
 		}
 
+		if (!stat("/proc/slabinfo", &fstat) && !check_permission(role, def_acl, "/proc/slabinfo", &chk)) {
+			fprintf(stderr,
+				"Reading access is allowed by role %s to "
+				"/proc/slabinfo, an entry that provides "
+				"useful information to an attacker "
+				"for reliable heap exploitation in the "
+				"kernel.\n\n", role->rolename);
+			errs_found++;
+		}
+
 		if (!check_permission(role, def_acl, "/boot", &chk)) {
 			fprintf(stderr,
 				"Reading access is allowed by role %s to "

@@ -211,6 +211,7 @@ subject /
 	/usr/src	h
 	/etc		rx
 	/proc		rwx
+	/proc/slabinfo	h
 	/proc/kcore	h
 	/proc/sys	r
 	/root		r
