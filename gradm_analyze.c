@@ -608,6 +608,18 @@ analyze_acls(void)
 			errs_found++;
 		}
 
+		if (!check_permission(role, def_acl, "/boot", &chk)) {
+			fprintf(stderr,
+				"Reading access is allowed by role %s to "
+				"/boot, the directory which holds kernel "
+				"images.  The ability to read these "
+				"images provides an attacker with very "
+				"useful information for launching \"ret-to-libc\" "
+				"style attacks against the kernel"
+				".\n\n", role->rolename);
+			errs_found++;
+		}
+
 		chk.type = CHK_CAP;
 		chk.u_caps = cap_combine(cap_combine(cap_conv("CAP_SYS_MODULE"), cap_conv("CAP_SYS_RAWIO")), 
 					 cap_conv("CAP_MKNOD"));
