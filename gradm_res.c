@@ -31,6 +31,8 @@ name_to_res(const char *name)
 	int i;
 
 	for (i = 0; i < SIZE(rlim_table); i++) {
+		if (!rlim_table[i])
+			continue;
 		if (!strcmp(rlim_table[i], name))
 			return i;
 	}
