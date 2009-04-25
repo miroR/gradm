@@ -163,6 +163,7 @@ static FILE *open_learn_log(char *learn_log)
 }
 
 int gr_learn = 0;
+int gr_enable = 0;
 
 void
 parse_args(int argc, char *argv[])
@@ -173,7 +174,6 @@ parse_args(int argc, char *argv[])
 	char *output_log = NULL;
 	char *learn_log = NULL;
 	int gr_output = 0;
-	int gr_enable = 0;
 	int gr_fulllearn = 0;
 	struct gr_pw_entry entry;
 	struct gr_arg_wrapper *grarg;

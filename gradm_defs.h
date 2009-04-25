@@ -5,6 +5,7 @@
 #define GRSEC_DIR		"/etc/grsec"
 #endif
 #define GRLEARN_PATH		"/sbin/grlearn"
+#define GRADM_PATH		"/sbin/gradm"
 #define GRPAM_PATH		"/sbin/gradm_pam"
 #define GRDEV_PATH		"/dev/grsec"
 #define GR_POLICY_PATH 		GRSEC_DIR "/policy"

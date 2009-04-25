@@ -54,6 +54,8 @@ find_gradm_path(char *gradm_realpath)
 	return;
 }
 
+extern int gr_enable;
+
 void
 add_gradm_acl(struct role_acl *role)
 {
@@ -66,6 +68,16 @@ add_gradm_acl(struct role_acl *role)
 	find_gradm_path(gradm_realpath);
 
 	gradm_name = gr_strdup(gradm_realpath);
+	if (gr_enable && strcmp(gradm_name, GRADM_PATH)) {
+		printf("You are attempting to use a gradm binary other "
+		       "than the installed version.  Depending on your "
+		       "policy, you could be locking yourself out of "
+		       "your machine by enabling the RBAC system with "
+		       "this binary.  Press \'y\' if you wish to ignore "
+		       "this warning, or any other key to cancel.\n>");
+		if (getchar() != 'y')
+			exit(EXIT_FAILURE);
+	}
 
 	add_proc_subject_acl(role, gradm_name, proc_subject_mode_conv("ado"), 0);
 
