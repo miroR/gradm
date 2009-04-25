@@ -228,9 +228,9 @@ parse_args(int argc, char *argv[])
 				show_help();
 			entry.mode = GRADM_ENABLE;
 			check_acl_status(entry.mode);
+			gr_enable = 1;
 			parse_acls();
 			expand_acls();
-			gr_enable = 1;
 			break;
 		case 'F':
 			if (argc > 7)
