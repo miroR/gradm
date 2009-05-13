@@ -75,12 +75,25 @@ learn_log:
 			if (strcmp($17, ""))
 				insert_learn_object(subject, conv_filename_to_struct($17, mode | GR_FIND));
 			else if ((strlen($9) > 1) && !res1 && !res2) {
+				// capability
 				if (subject->subject == NULL) {
 					subject->subject = calloc(1, sizeof(struct gr_learn_subject_node));
 					if (subject->subject == NULL)
 						failure("calloc");
 				}
 				cap_raise(subject->subject->cap_raise, mode);
+			} else if (strlen($9) > 1) {
+				// resource
+				if (subject->subject == NULL) {
+					subject->subject = calloc(1, sizeof(struct gr_learn_subject_node));
+					if (subject->subject == NULL)
+						failure("calloc");
+				}
+				if (mode < GR_NLIMITS) {
+					subject->subject->resmask |= (1 << mode);
+					subject->subject->res[mode].rlim_cur = res1;
+					subject->subject->res[mode].rlim_max = res2;
+				}
 			}
 			free($9);
 			free($11);
