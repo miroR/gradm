@@ -110,6 +110,7 @@ high-protected-path /proc/bus
 high-protected-path /proc/slabinfo
 high-protected-path /etc/passwd
 high-protected-path /etc/shadow
+high-protected-path /var/backups
 high-protected-path /etc/shadow-
 high-protected-path /etc/gshadow
 high-protected-path /etc/gshadow-
