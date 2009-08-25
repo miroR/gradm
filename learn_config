@@ -125,6 +125,7 @@ high-protected-path /etc/ppp/pap-secrets
 high-protected-path /etc/samba/smbpasswd
 #to protect kernel images
 high-protected-path /boot
+high-protected-path /lib/modules
 high-protected-path /usr/src
 
 inherit-learn /etc/cron.d

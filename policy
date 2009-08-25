@@ -219,8 +219,9 @@ subject /
 	/var		rwxcd
 	/var/tmp	rwcd
 	/var/log	r
-# hide the kernel images
+# hide the kernel images and modules
 	/boot		h
+	/lib/modules	h
 	/etc/grsec	h
 	/etc/ssh	h
 
