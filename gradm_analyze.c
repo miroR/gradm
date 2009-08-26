@@ -513,7 +513,7 @@ analyze_acls(void)
 			errs_found++;
 		}
 
-		if (!check_permission(role, def_acl, "/lib/modules", &chk)) {
+		if (!stat("/lib/modules", &fstat) && !check_permission(role, def_acl, "/lib/modules", &chk)) {
 			fprintf(stderr,
 				"Writing access is allowed by role %s to /lib/modules, the directory which "
 				"holds kernel modules.\n\n",
@@ -638,7 +638,7 @@ analyze_acls(void)
 			errs_found++;
 		}
 
-		if (!check_permission(role, def_acl, "/lib/modules", &chk)) {
+		if (!stat("/lib/modules", &fstat) && !check_permission(role, def_acl, "/lib/modules", &chk)) {
 			fprintf(stderr,
 				"Reading access is allowed by role %s to "
 				"/lib/modules, the directory which holds kernel "
