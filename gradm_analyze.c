@@ -626,6 +626,16 @@ analyze_acls(void)
 			errs_found++;
 		}
 
+		if (!stat("/proc/modules", &fstat) && !check_permission(role, def_acl, "/proc/modules", &chk)) {
+			fprintf(stderr,
+				"Reading access is allowed by role %s to "
+				"/proc/modules, an entry that provides "
+				"useful kernel addresses to an attacker "
+				"for reliable exploitation of the "
+				"kernel.\n\n", role->rolename);
+			errs_found++;
+		}
+
 		if (!check_permission(role, def_acl, "/boot", &chk)) {
 			fprintf(stderr,
 				"Reading access is allowed by role %s to "

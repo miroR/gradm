@@ -213,6 +213,7 @@ subject /
 	/proc		rwx
 	/proc/slabinfo	h
 	/proc/kcore	h
+	/proc/modules   h
 	/proc/sys	r
 	/root		r
 	/tmp		rwcd
