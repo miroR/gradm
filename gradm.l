@@ -87,6 +87,8 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 <SUBJECT_STATE>[/][^ :\t\n]*		{ 
 					  gradmlval.string = gr_strdup(yytext);
+					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
+						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
 					}
 <SUBJECT_STATE>["][/][^:\n]*["]		{
@@ -94,10 +96,14 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
 					  gradmlval.string = gr_strdup(gr_line);
+					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
+						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
 					}
 <SUBJECT_STATE>$HOME[/]?[^ :\t\n]*	{ 
 					  gradmlval.string = gr_strdup(yytext);
+					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
+						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
 					}
 <SUBJECT_STATE>["]$HOME[/]?[^:\n]*["]		{
@@ -105,6 +111,8 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
 					  gradmlval.string = gr_strdup(gr_line);
+					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
+						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
 					}
 <SUBJECT_STATE>[TKCAOtolhpkvdbria]+	{
@@ -179,10 +187,8 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 <IPPORT_STATE>[0-9]{1,5}		{
 					  unsigned int portcheck = atoi(yytext);
 					  BEGIN(IP_STATE);
-					  if (portcheck > 65535) {
+					  if (portcheck > 65535)
 						gradmerror("invalid port number error");
-						exit(EXIT_FAILURE);
-					  }
 					  gradmlval.shortnum = portcheck;
 					  return IPPORT;
 					}
@@ -217,6 +223,8 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 <VAR_OBJ_STATE>[/][^ \t\n]*		{
 					  gradmlval.string = gr_strdup(yytext);
+					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
+						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
 <VAR_OBJ_STATE>["][/].*["]		{
@@ -224,6 +232,8 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
 					  gradmlval.string = gr_strdup(gr_line);
+					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
+						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
 <VAR_OBJ_STATE>[rwxahitmlLFRWXAIMdDcCspo]+	{
@@ -303,6 +313,8 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 
 [/][^ \t\n]*				{
 					  gradmlval.string = gr_strdup(yytext);
+					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
+						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
 ["][/].*["]				{
@@ -310,10 +322,14 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
 					  gradmlval.string = gr_strdup(gr_line);
+					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
+						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
 $HOME[/]?[^ \t\n]*			{
 					  gradmlval.string = gr_strdup(yytext);
+					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
+						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
 ["]$HOME[/]?.*["]			{
@@ -321,6 +337,8 @@ $HOME[/]?[^ \t\n]*			{
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
 					  gradmlval.string = gr_strdup(gr_line);
+					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
+						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
 [rwxahitmlLFRWXAIMcCdDspo]+		{
