@@ -365,6 +365,13 @@ check_role_transitions(void)
 	}
 
 	for_each_role(role, current_role) {
+		if (role->transitions && !(role->roletype & GR_ROLE_AUTH)) {
+			fprintf(stderr, "Error in role %s: a transition to a special role exists, "
+					"but the \"G\" flag is not present on the role to grant it "
+					"permission to use gradm to change to the special role.\n",
+					role->rolename);
+			errors++;
+		}
 		for_each_transition(trans, role->transitions) {
 			found = 0;
 			for_each_role(role2, current_role) {
