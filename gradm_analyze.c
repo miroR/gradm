@@ -155,6 +155,41 @@ check_default_objects(struct role_acl *role)
 	return;
 }
 
+static void
+check_socket_policies(struct role_acl *role)
+{
+	struct proc_acl *tmp;
+	struct ip_acl *tmpi;
+	int has_connect;
+	int has_bind;
+	unsigned int i;
+
+	for_each_subject(tmp, role) {
+		has_connect = 0;
+		has_bind = 0;
+		for (i = 0; i < tmp->ip_num; i++) {
+			tmpi = tmp->ips[i];
+			if (tmpi->mode & GR_IP_BIND)
+				has_bind = 1;
+			if (tmpi->mode & GR_IP_CONNECT)
+				has_connect = 1;
+		}
+		/* if we have either a bind or a connect, but not either
+		   and not both */
+		if (has_bind ^ has_connect) {
+			fprintf(stderr, "A %s rule exists but a %s rule is missing for "
+				"role %s subject %s\nThe RBAC system will "
+				"not load until you correct this "
+				"error.\n", has_connect ? "connect" : "bind",
+				has_bind ? "connect" : "bind",  
+				role->rolename, tmp->filename);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	return;
+}
+
 static int
 check_lilo_conf(struct role_acl *role, struct proc_acl *def_acl)
 {
@@ -450,6 +485,7 @@ analyze_acls(void)
 		}
 
 		check_default_objects(role);
+		check_socket_policies(role);
 
 		/* non-critical warnings aren't issued for special roles */
 		if (role->roletype & GR_ROLE_SPECIAL)
