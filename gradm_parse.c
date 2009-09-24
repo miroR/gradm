@@ -206,7 +206,7 @@ add_deleted_file(char *filename)
 {
 	struct deleted_file *dfile;
 	struct deleted_file *retfile;
-	static ino_t ino = 0;
+	static ino_t ino = 0x10000000;
 
 	ino++;
 
