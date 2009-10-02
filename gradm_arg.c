@@ -167,6 +167,7 @@ static FILE *open_learn_log(char *learn_log)
 
 int gr_learn = 0;
 int gr_enable = 0;
+int gr_check = 0;
 
 void
 parse_args(int argc, char *argv[])
@@ -228,13 +229,15 @@ parse_args(int argc, char *argv[])
 			check_acl_status(GRADM_STATUS);
 			break;
 		case 'C':
+			if (argc > 3 || gr_enable)
+				show_help();
+			gr_check = 1;
 			parse_acls();
 			expand_acls();
 			analyze_acls();
-			exit(EXIT_SUCCESS);
 			break;
 		case 'E':
-			if (argc > 5)
+			if (argc > 5 || gr_check)
 				show_help();
 			entry.mode = GRADM_ENABLE;
 			check_acl_status(entry.mode);
@@ -391,6 +394,12 @@ parse_args(int argc, char *argv[])
 			show_help();
 			break;
 		}
+	}
+
+	if (gr_check) {
+		if (verbose)
+			verbose_stats();
+		exit(EXIT_SUCCESS);
 	}
 
 	if ((gr_output && !gr_learn)) {
