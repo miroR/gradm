@@ -703,6 +703,18 @@ analyze_acls(void)
 			errs_found++;
 		}
 
+		if (!stat("/proc/kallsyms", &fstat) && !check_permission(role, def_acl, "/proc/kallsyms", &chk)) {
+			fprintf(stderr,
+				"Reading access is allowed by role %s to "
+				"/proc/kallsyms, a pseudo-file that "
+				"holds a mapping between kernel "
+				"addresses and symbols.  This information "
+				"is very useful to an attacker in "
+				"sophisticated kernel exploits.\n\n",
+				role->rolename);
+			errs_found++;
+		}
+
 		chk.type = CHK_CAP;
 		chk.u_caps = cap_combine(cap_combine(cap_conv("CAP_SYS_MODULE"), cap_conv("CAP_SYS_RAWIO")), 
 					 cap_conv("CAP_MKNOD"));
