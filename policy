@@ -224,6 +224,7 @@ subject /
 	/proc		rwx
 	/proc/slabinfo	h
 	/proc/kcore	h
+	/proc/kallsyms  h
 	/proc/modules   h
 	/proc/sys	r
 	/root		r
