@@ -26,14 +26,21 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 				return;
 
 		pwd = getpwnam(idname);
-
 		if (!pwd) {
-			fprintf(stderr, "User %s on line %lu of %s "
-				"does not exist.\nThe RBAC system will "
-				"not be allowed to be enabled until "
-				"this error is fixed.\n", idname,
-				lineno, current_acl_file);
-			exit(EXIT_FAILURE);
+			/* now try it as a uid */
+			unsigned long theuid = 0;
+			char *endptr;
+			theuid = strtoul(idname, &endptr, 10);
+			if (*endptr != '\0')
+				pwd = getpwuid((int)theuid);
+			if (!pwd || theuid > INT_MAX) {
+				fprintf(stderr, "User %s on line %lu of %s "
+					"does not exist.\nThe RBAC system will "
+					"not be allowed to be enabled until "
+					"this error is fixed.\n", idname,
+					lineno, current_acl_file);
+				exit(EXIT_FAILURE);
+			}
 		}
 
 		/* increment pointer count upon allocation of user transition list */
@@ -61,12 +68,20 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 		grp = getgrnam(idname);
 
 		if (!grp) {
-			fprintf(stderr, "Group %s on line %lu of %s "
-				"does not exist.\nThe RBAC system will "
-				"not be allowed to be enabled until "
-				"this error is fixed.\n", idname,
-				lineno, current_acl_file);
-			exit(EXIT_FAILURE);
+			/* now try it as a gid */
+			unsigned long thegid = 0;
+			char *endptr;
+			thegid = strtoul(idname, &endptr, 10);
+			if (*endptr != '\0')
+				grp = getgrgid((int)thegid);
+			if (!grp || thegid > INT_MAX) {
+				fprintf(stderr, "Group %s on line %lu of %s "
+					"does not exist.\nThe RBAC system will "
+					"not be allowed to be enabled until "
+					"this error is fixed.\n", idname,
+					lineno, current_acl_file);
+				exit(EXIT_FAILURE);
+			}
 		}
 
 		/* increment pointer count upon allocation of group transition list */
@@ -122,12 +137,20 @@ add_domain_child(struct role_acl *role, char *idname)
 		pwd = getpwnam(idname);
 
 		if (!pwd) {
-			fprintf(stderr, "User %s on line %lu of %s "
-				"does not exist.\nThe RBAC system will "
-				"not be allowed to be enabled until "
-				"this error is fixed.\n", idname,
-				lineno, current_acl_file);
-			exit(EXIT_FAILURE);
+			/* now try it as a uid */
+			unsigned long theuid = 0;
+			char *endptr;
+			theuid = strtoul(idname, &endptr, 10);
+			if (*endptr != '\0')
+				pwd = getpwuid((int)theuid);
+			if (!pwd || theuid > INT_MAX) {
+				fprintf(stderr, "User %s on line %lu of %s "
+					"does not exist.\nThe RBAC system will "
+					"not be allowed to be enabled until "
+					"this error is fixed.\n", idname,
+					lineno, current_acl_file);
+				exit(EXIT_FAILURE);
+			}
 		}
 
 		role->domain_child_num++;
@@ -137,12 +160,20 @@ add_domain_child(struct role_acl *role, char *idname)
 		grp = getgrnam(idname);
 
 		if (!grp) {
-			fprintf(stderr, "Group %s on line %lu of %s "
-				"does not exist.\nThe RBAC system will "
-				"not be allowed to be enabled until "
-				"this error is fixed.\n", idname,
-				lineno, current_acl_file);
-			exit(EXIT_FAILURE);
+			/* now try it as a gid */
+			unsigned long thegid = 0;
+			char *endptr;
+			thegid = strtoul(idname, &endptr, 10);
+			if (*endptr != '\0')
+				grp = getgrgid((int)thegid);
+			if (!grp || thegid > INT_MAX) {
+				fprintf(stderr, "Group %s on line %lu of %s "
+					"does not exist.\nThe RBAC system will "
+					"not be allowed to be enabled until "
+					"this error is fixed.\n", idname,
+					lineno, current_acl_file);
+				exit(EXIT_FAILURE);
+			}
 		}
 
 		role->domain_child_num++;
@@ -310,12 +341,20 @@ add_role_acl(struct role_acl **role, char *rolename, u_int16_t type, int ignore)
 			pwd = getpwnam(rolename);
 
 			if (!pwd) {
-				fprintf(stderr, "User %s on line %lu of %s "
-					"does not exist.\nThe RBAC system will "
-					"not be allowed to be enabled until "
-					"this error is fixed.\n", rolename,
-					lineno, current_acl_file);
-				exit(EXIT_FAILURE);
+				/* now try it as a uid */
+				unsigned long theuid = 0;
+				char *endptr;
+				theuid = strtoul(rolename, &endptr, 10);
+				if (*endptr != '\0')
+					pwd = getpwuid((int)theuid);
+				if (!pwd || theuid > INT_MAX) {
+					fprintf(stderr, "User %s on line %lu of %s "
+						"does not exist.\nThe RBAC system will "
+						"not be allowed to be enabled until "
+						"this error is fixed.\n", rolename,
+						lineno, current_acl_file);
+					exit(EXIT_FAILURE);
+				}
 			}
 
 			rtmp->uidgid = pwd->pw_uid;
@@ -323,12 +362,20 @@ add_role_acl(struct role_acl **role, char *rolename, u_int16_t type, int ignore)
 			grp = getgrnam(rolename);
 
 			if (!grp) {
-				fprintf(stderr, "Group %s on line %lu of %s "
-					"does not exist.\nThe RBAC system will "
-					"not be allowed to be enabled until "
-					"this error is fixed.\n", rolename,
-					lineno, current_acl_file);
-				exit(EXIT_FAILURE);
+				/* now try it as a gid */
+				unsigned long thegid = 0;
+				char *endptr;
+				thegid = strtoul(rolename, &endptr, 10);
+				if (*endptr != '\0')
+					grp = getgrgid((int)thegid);
+				if (!grp || thegid > INT_MAX) {
+					fprintf(stderr, "Group %s on line %lu of %s "
+						"does not exist.\nThe RBAC system will "
+						"not be allowed to be enabled until "
+						"this error is fixed.\n", rolename,
+						lineno, current_acl_file);
+					exit(EXIT_FAILURE);
+				}
 			}
 
 			rtmp->uidgid = grp->gr_gid;
