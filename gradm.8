@@ -10,6 +10,9 @@ gradm \- Administration program for the grsecurity RBAC system
 .B \-R
 ]
 [
+.B \-C
+]
+[
 .B \-F
 ]
 [
@@ -73,6 +76,11 @@ Enable the RBAC system
 Reload the RBAC system (only valid while in admin mode)
 .TP
 
+.B \-C
+Perform a check of the RBAC policy, running the same analysis
+against it that is performed when enabling.
+.TP
+
 .B \-F
 Toggle full learning mode.
 If used only with -L, it enables the RBAC system in full learning
@@ -128,8 +136,9 @@ out of an admin role without exiting your shell.
 .TP
 
 .B \-V
-Displays verbose policy statistics when enabling the RBAC system.
-Can only be used with -E, -R, or -F -L <filename>
+Displays verbose policy statistics when enabling the RBAC system
+or checking the RBAC policy.
+Can only be used with -C, -E, -R, or -F -L <filename>
 .TP
 
 .B \-h

@@ -158,4 +158,8 @@ void parse_learn_config(void);
 
 void check_pam_auth(unsigned char *rolename);
 
+void add_replace_string(char *name, char *replacewith);
+char *lookup_replace_string(char *name);
+char *process_string_replace(char *str);
+
 #endif

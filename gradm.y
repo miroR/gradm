@@ -22,7 +22,7 @@ int current_nest_depth = 0;
 %token <string> ROLE_TRANSITION VARIABLE DEFINE DEFINE_NAME DISABLED
 %token <string> ID_NAME USER_TRANS_ALLOW GROUP_TRANS_ALLOW 
 %token <string> USER_TRANS_DENY GROUP_TRANS_DENY DOMAIN_TYPE DOMAIN
-%token <string> INTERFACE IPOVERRIDE
+%token <string> INTERFACE IPOVERRIDE REPLACE REP_ARG
 %token <num> OBJ_MODE SUBJ_MODE IPADDR IPNETMASK NOT
 %token <shortnum> IPPORT ROLE_TYPE 
 %type <num> subj_mode obj_mode ip_netmask invert_socket
@@ -39,6 +39,7 @@ compiled_acl:			various_acls
 	;
 
 various_acls:			role_label
+	|			replace_rule
 	|			domain_label
 	|			role_allow_ip
 	|			role_transitions
@@ -62,6 +63,11 @@ various_acls:			role_label
 	|			object_ip_override_label
 	;
 
+replace_rule:			REPLACE REP_ARG REP_ARG
+				{
+					add_replace_string($2, $3);
+				}
+	;
 variable_expression:		VARIABLE
 				{
 					$$ = sym_retrieve($1);

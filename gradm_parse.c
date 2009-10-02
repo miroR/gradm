@@ -636,7 +636,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 			subject->filename, lineno, 
 			current_acl_file ? current_acl_file : "<builtin_fulllearn_policy>", p->filename);
 		display_all_dupes(subject, p);
-		fprintf(stderr, "specified on an earlier line."
+		fprintf(stderr, "specified on an earlier line.  "
 			"The RBAC system will not load until this"
 			" error is fixed.\n");
 		exit(EXIT_FAILURE);

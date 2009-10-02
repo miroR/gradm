@@ -21,6 +21,7 @@ show_help(void)
 	       "Options:\n"
 	       "	-E, --enable	Enable the grsecurity RBAC system\n"
 	       "	-D, --disable	Disable the grsecurity RBAC system\n"
+	       "	-C, --check	Check RBAC policy for errors\n"
 	       "	-S, --status	Check status of RBAC system\n"
 	       "	-F, --fulllearn Enable full system learning\n"
 	       "	-P [rolename], --passwd\n"
@@ -178,12 +179,13 @@ parse_args(int argc, char *argv[])
 	struct gr_pw_entry entry;
 	struct gr_arg_wrapper *grarg;
 	char cwd[PATH_MAX];
-	const char *const short_opts = "SVEFuDP::RL:O:M:a:p:n:hv";
+	const char *const short_opts = "SVECFuDP::RL:O:M:a:p:n:hv";
 	const struct option long_opts[] = {
 		{"help", 0, NULL, 'h'},
 		{"version", 0, NULL, 'v'},
 		{"status", 0, NULL, 'S'},
 		{"enable", 0, NULL, 'E'},
+		{"check", 0, NULL, 'C'},
 		{"disable", 0, NULL, 'D'},
 		{"passwd", 2, NULL, 'P'},
 		{"auth", 1, NULL, 'a'},
@@ -222,6 +224,12 @@ parse_args(int argc, char *argv[])
 			if (argc > 2)
 				show_help();
 			check_acl_status(GRADM_STATUS);
+			break;
+		case 'C':
+			parse_acls();
+			expand_acls();
+			analyze_acls();
+			exit(EXIT_SUCCESS);
 			break;
 		case 'E':
 			if (argc > 5)

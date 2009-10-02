@@ -34,7 +34,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 %x ROLE_STATE SUBJECT_STATE IP_STATE RES_STATE COMMENT_STATE ROLETYPE_STATE
 %x INCLUDE_STATE IPNETMASK_STATE IPPORT_STATE ROLETRANS_STATE
 %x VAR_STATE VAR_OBJ_STATE IDTRANS_STATE DOMAIN_STATE DOMAINTYPE_STATE
-%x DOMAINLIST_STATE IPIP_STATE IPONLY_STATE
+%x DOMAINLIST_STATE IPIP_STATE IPONLY_STATE REP_STATE
 
 %%
 
@@ -85,23 +85,23 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 <SUBJECT_STATE>":"			{ 
 					  return ':';
 					}
-<SUBJECT_STATE>[/][^ :\t\n]*		{ 
-					  gradmlval.string = gr_strdup(yytext);
+<SUBJECT_STATE>([/]|$[(])[^ :\t\n]*	{
+					  gradmlval.string = process_string_replace(yytext);
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
 					}
-<SUBJECT_STATE>["][/][^:\n]*["]		{
+<SUBJECT_STATE>["]([/]|$[(])[^:\n]*["]	{
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = gr_strdup(gr_line);
+					  gradmlval.string = process_string_replace(gr_line);
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
 					}
 <SUBJECT_STATE>$HOME[/]?[^ :\t\n]*	{ 
-					  gradmlval.string = gr_strdup(yytext);
+					  gradmlval.string = process_string_replace(yytext);
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
@@ -110,7 +110,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = gr_strdup(gr_line);
+					  gradmlval.string = process_string_replace(gr_line);
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
@@ -192,7 +192,22 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.shortnum = portcheck;
 					  return IPPORT;
 					}
-
+<REP_STATE>[^ "':()\t\n]+		{
+					  gradmlval.string = gr_strdup(yytext);
+					  return REP_ARG;
+					}
+<REP_STATE>["][^"\t\n]+["]		{
+					  gr_line = yytext;
+					  gr_line++;
+					  *(gr_line + strlen(gr_line) - 1) = '\0';
+					  gradmlval.string = gr_strdup(gr_line);
+					  return REP_ARG;
+					}
+"replace"				{
+					  old_state = YYSTATE;
+					  BEGIN(REP_STATE);
+					  return REPLACE;
+					}
 "define"				{
 					  old_state = YYSTATE;
 					  BEGIN(VAR_STATE);
@@ -311,17 +326,17 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return RES_NAME;
 					}
 
-[/][^ \t\n]*				{
-					  gradmlval.string = gr_strdup(yytext);
+([/]|$[(])[^ \t\n]*				{
+					  gradmlval.string = process_string_replace(yytext);
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
-["][/].*["]				{
+["]([/]|$[(]).*["]				{
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = gr_strdup(gr_line);
+					  gradmlval.string = process_string_replace(gr_line);
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return OBJ_NAME;

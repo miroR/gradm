@@ -165,6 +165,17 @@
 # PAX_RANDMMAP
 # PAX_EMUTRAMP
 #
+# New feature for easier policy maintenance:
+# replace <variable name> <replace string>
+# e.g.:
+# replace CVSROOT /home/cvs
+# now $(CVSROOT) can be used in any subject or object pathname, like:
+# $(CVSROOT)/grsecurity r
+# This will translate to /home/cvs/grsecurity r
+# This feature makes it easier to update policies by naming specific
+# paths by their function, then only having to update those paths once
+# to have it affect a large number of subjects/objects.
+#
 #
 # Note that the omission of any feature of a role or subject
 # results in a default-allow
