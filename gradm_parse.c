@@ -574,6 +574,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	struct deleted_file *dfile;
 	unsigned int file_len;
 	char *str;
+	static int link_count = 0;
 
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "
@@ -631,12 +632,20 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 		fstat.st_ino = dfile->ino;
 		fstat.st_dev = 0;
 		mode |= GR_DELETED;
+		link_count = 0;
 	} else if (S_ISLNK(fstat.st_mode)) {
-		char buf[PATH_MAX];
-		memset(&buf, 0, sizeof (buf));
-		realpath(filename, buf);
-		if(!add_proc_object_acl(subject, gr_strdup(buf), mode, type | GR_SYMLINK))
-			return 0;
+		if (link_count > MAX_SYMLINK_DEPTH) {
+			fprintf(stderr, "Error: Too many levels of symbolic links when accessing "
+					"%s\n", filename);
+			exit(EXIT_FAILURE);
+		} else {
+			char buf[PATH_MAX];
+			memset(&buf, 0, sizeof (buf));
+			realpath(filename, buf);
+			link_count++;
+			if(!add_proc_object_acl(subject, gr_strdup(buf), mode, type | GR_SYMLINK))
+				return 0;
+		}
 	}
 
 	if ((p =

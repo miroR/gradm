@@ -38,6 +38,7 @@
 
 #define MAX_INCLUDE_DEPTH	20
 #define MAX_NEST_DEPTH		8
+#define MAX_SYMLINK_DEPTH	8
 
 #ifndef RLIMIT_LOCKS
 #define RLIMIT_LOCKS 10
