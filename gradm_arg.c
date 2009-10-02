@@ -399,7 +399,7 @@ parse_args(int argc, char *argv[])
 	if (gr_check) {
 		if (verbose)
 			verbose_stats();
-		exit(EXIT_SUCCESS);
+		return;
 	}
 
 	if ((gr_output && !gr_learn)) {
