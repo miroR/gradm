@@ -601,7 +601,26 @@ void show_policy(void) {
 		printf("\tSUBJECT: %s dev:%lu inode:%lu mode:%lu c_raise:%x c_drop:%x\n",
 			proc->filename, proc->dev, proc->inode, proc->mode, cap_invert(proc->cap_drop),
 			proc->cap_drop);
-
+		if (proc->user_trans_num > 0) {
+			printf("\tUSER_TRANSITIONS_");
+			if (proc->user_trans_type & GR_ID_ALLOW)
+				printf("ALLOW:");
+			else
+				printf("DENY:");
+			for (i = 0; i < proc->user_trans_num; i++)
+				printf(" %u", proc->user_transitions[i]);
+			printf("\n");
+		}
+		if (proc->group_trans_num > 0) {
+			printf("\tGROUP_TRANSITIONS_");
+			if (proc->group_trans_type & GR_ID_ALLOW)
+				printf("ALLOW:");
+			else
+				printf("DENY:");
+			for (i = 0; i < proc->group_trans_num; i++)
+				printf(" %u", proc->group_transitions[i]);
+			printf("\n");
+		}
 		for (i = 0; i < proc->ip_num; i++) {
 			char ipaddr[4];
 			int c;
