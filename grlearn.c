@@ -54,7 +54,7 @@ void term_handler(int sig)
 {
 	signal(sig, SIG_IGN);
 	if (fd2 >= 0)
-		write(fd2, writebuf, writep - writebuf);
+		ignore_ret = write(fd2, writebuf, writep - writebuf);
 	exit(0);	
 }
 
@@ -68,7 +68,7 @@ int stop_daemon(void)
 	if (fd < 0)
 		exit(EXIT_FAILURE);
 
-	read(fd, &learn_pid, sizeof(learn_pid));
+	ignore_ret = read(fd, &learn_pid, sizeof(learn_pid));
 
 	/* send SIGTERM, will be handled */
 	kill(learn_pid, 15);
@@ -99,7 +99,7 @@ int write_pid_log(pid_t pid)
 			exit(EXIT_FAILURE);
 		}
 
-		read(fd, &learn_pid, sizeof(learn_pid));
+		ignore_ret = read(fd, &learn_pid, sizeof(learn_pid));
 		close(fd);
 		unlink(GR_LEARN_PID_PATH);
 
@@ -122,7 +122,7 @@ start:
 		exit(EXIT_FAILURE);
 	}
 
-	write(fd, &pid, sizeof(pid));
+	ignore_ret = write(fd, &pid, sizeof(pid));
 
 	close(fd);
 
@@ -244,6 +244,7 @@ int main(int argc, char *argv[])
 	struct sched_param schedulerparam;
 	unsigned int len;
 	int i;
+	int ignore_ret;
 
 	if (argc != 2)
 		return 1;
@@ -278,7 +279,7 @@ int main(int argc, char *argv[])
 	}
 
 	setpriority(PRIO_PROCESS, 0, -20);
-	nice(-19);
+	ignore_ret = nice(-19);
 	schedulerparam.sched_priority = sched_get_priority_max(SCHED_FIFO);
 	sched_setscheduler(0, SCHED_FIFO, &schedulerparam);
 
@@ -309,14 +310,14 @@ int main(int argc, char *argv[])
 		char b;
 
 		write_pid_log(getpid());
-		write(4, &b, 1);
+		ignore_ret = write(4, &b, 1);
 		close(0);
 		close(1);
 		close(2);
 		close(4);
 	} else {
 		char b;
-		write(4, &b, 1);
+		ignore_ret = write(4, &b, 1);
 		close(4);
 		fprintf(stdout, "Unable to fork.\n");
 		exit(EXIT_FAILURE);
@@ -338,7 +339,7 @@ int main(int argc, char *argv[])
 						memcpy(writep, p, len);
 						writep += len;
 					} else {
-						write(fd2, writebuf, writep - writebuf);
+						ignore_ret = write(fd2, writebuf, writep - writebuf);
 						memset(writebuf, 0, sizeof(4 * MAX_ENTRY_SIZE));
 						writep = writebuf;
 					}
