@@ -52,6 +52,8 @@ void add_always_reduce(char *str)
 /* handle flushing of buffer when grlearn is stopped */
 void term_handler(int sig)
 {
+	int ignore_ret;
+
 	signal(sig, SIG_IGN);
 	if (fd2 >= 0)
 		ignore_ret = write(fd2, writebuf, writep - writebuf);
@@ -61,6 +63,7 @@ void term_handler(int sig)
 int stop_daemon(void)
 {
 	int fd;
+	int ignore_ret;
 	pid_t learn_pid;
 
 	fd = open(GR_LEARN_PID_PATH, O_RDONLY);
@@ -88,6 +91,7 @@ int write_pid_log(pid_t pid)
 	pid_t learn_pid;
 	char pathname[PATH_MAX] = {0};
 	char procname[64] = {0};
+	int ignore_ret;
 
 	if (!stat(GR_LEARN_PID_PATH, &fstat)) {
 		fd = open(GR_LEARN_PID_PATH, O_RDONLY);
