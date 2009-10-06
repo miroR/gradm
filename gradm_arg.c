@@ -204,7 +204,10 @@ parse_args(int argc, char *argv[])
 		{NULL, 0, NULL, 0}
 	};
 
-	getcwd(cwd, PATH_MAX - 1);
+	if (!getcwd(cwd, PATH_MAX - 1)) {
+		fprintf(stderr, "Error getting current directory.\n");
+		exit(EXIT_FAILURE);
+	}
 
 	err = mlock(&entry, sizeof (entry));
 	if (err && !getuid())
