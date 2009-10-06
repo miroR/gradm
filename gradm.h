@@ -18,6 +18,7 @@
 #include <grp.h>
 #include <fnmatch.h>
 #include <elf.h>
+#include <limits.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/poll.h>
