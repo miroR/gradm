@@ -292,7 +292,7 @@ void start_grlearn(char *logfile)
 	} else if (pid > 0) {
 		char b;
 		close(fds[1]); // close write end
-		read(fds[0], &b, 1);
+		(void)read(fds[0], &b, 1);
 		close(fds[0]);
 	} else {
 		fprintf(stderr, "Error starting grlearn.\n");

@@ -68,7 +68,7 @@ char *process_string_replace(char *str)
 	p2 = strchr(p, ')');
 	if (p2 == NULL) {
 		fprintf(stderr, "Error: Missing terminating \")\" for symbol on line %ld "
-				"of %s.\n", p + 2, lineno, current_acl_file);
+				"of %s.\n", lineno, current_acl_file);
 		exit(EXIT_FAILURE);
 	}
 	*p2 = '\0';

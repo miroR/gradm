@@ -641,7 +641,10 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 		} else {
 			char buf[PATH_MAX];
 			memset(&buf, 0, sizeof (buf));
-			realpath(filename, buf);
+			if (!realpath(filename, buf)) {
+				fprintf(stderr, "Error determining real path for %s\n", filename);
+				exit(EXIT_FAILURE);
+			}
 			link_count++;
 			if(!add_proc_object_acl(subject, gr_strdup(buf), mode, type | GR_SYMLINK))
 				return 0;
