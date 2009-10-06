@@ -13,9 +13,11 @@ LLEX=/usr/bin/lex
 FLEX=/usr/bin/flex
 LEX := $(shell if [ -x $(FLEX) ]; then echo $(FLEX); else echo $(LLEX); fi)
 LEXFLAGS=-B
-BYACC=/usr/bin/byacc
+#ubuntu broke byacc for who knows why, disable it
+#BYACC=/usr/bin/byacc
 BISON=/usr/bin/bison
-YACC := $(shell if [ -x $(BYACC) ]; then echo $(BYACC); else echo $(BISON); fi)
+#YACC := $(shell if [ -x $(BYACC) ]; then echo $(BYACC); else echo $(BISON); fi)
+YACC=$BISON
 MKNOD=/bin/mknod
 #for dietlibc
 #CC=/usr/bin/diet /usr/bin/gcc
