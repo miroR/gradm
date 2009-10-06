@@ -17,7 +17,7 @@ LEXFLAGS=-B
 #BYACC=/usr/bin/byacc
 BISON=/usr/bin/bison
 #YACC := $(shell if [ -x $(BYACC) ]; then echo $(BYACC); else echo $(BISON); fi)
-YACC=$BISON
+YACC=$(BISON)
 MKNOD=/bin/mknod
 #for dietlibc
 #CC=/usr/bin/diet /usr/bin/gcc
