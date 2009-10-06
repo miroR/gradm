@@ -285,7 +285,8 @@ check_path_env(struct role_acl *role, struct proc_acl *def_acl)
 	while ((p2 = strchr(p, ':'))) {
 		*p2++ = '\0';
 		memset(pathbuf, 0, sizeof(pathbuf));
-		realpath(p, pathbuf);
+		if (!realpath(p, pathbuf))
+			goto next;
 		if (!stat(pathbuf, &fstat)
 		    && !check_permission(role, def_acl, pathbuf, &chk)) {
 			fprintf(stderr,
@@ -295,11 +296,14 @@ check_path_env(struct role_acl *role, struct proc_acl *def_acl)
 				role->rolename, pathbuf);
 			errs_found++;
 		}
+next:
 		p = p2;
 	}
 
 	memset(pathbuf, 0, sizeof(pathbuf));
-	realpath(p, pathbuf);
+	if (!realpath(p, pathbuf))
+		goto reterr;
+
 	if (!stat(pathbuf, &fstat) && !check_permission(role, def_acl, pathbuf, &chk)) {
 		fprintf(stderr,
 			"Write access is allowed by role %s to %s, a directory which "
@@ -309,6 +313,7 @@ check_path_env(struct role_acl *role, struct proc_acl *def_acl)
 		errs_found++;
 	}
 
+reterr:
 	return errs_found;
 }
 

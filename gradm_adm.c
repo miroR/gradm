@@ -291,8 +291,10 @@ void start_grlearn(char *logfile)
 		exit(EXIT_FAILURE);
 	} else if (pid > 0) {
 		char b;
+		int read_bytes;
+
 		close(fds[1]); // close write end
-		(void)read(fds[0], &b, 1);
+		read_bytes = read(fds[0], &b, 1);
 		close(fds[0]);
 	} else {
 		fprintf(stderr, "Error starting grlearn.\n");
