@@ -57,7 +57,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.shortnum = role_mode_conv(yytext);
 					  return ROLE_TYPE;
 					}
-<DOMAINTYPE_STATE>([ug]l?)|(l?[ug])	{
+<DOMAINTYPE_STATE>([ug][GTl]*)|([GTl]*[ug])	{
 					  BEGIN(DOMAINLIST_STATE);
 					  gradmlval.string = gr_strdup(yytext);
 					  return DOMAIN_TYPE;
