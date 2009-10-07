@@ -31,7 +31,7 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 			unsigned long theuid = 0;
 			char *endptr;
 			theuid = strtoul(idname, &endptr, 10);
-			if (*endptr != '\0')
+			if (*endptr == '\0')
 				pwd = getpwuid((int)theuid);
 			if (!pwd || theuid > INT_MAX) {
 				fprintf(stderr, "User %s on line %lu of %s "
@@ -72,7 +72,7 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 			unsigned long thegid = 0;
 			char *endptr;
 			thegid = strtoul(idname, &endptr, 10);
-			if (*endptr != '\0')
+			if (*endptr == '\0')
 				grp = getgrgid((int)thegid);
 			if (!grp || thegid > INT_MAX) {
 				fprintf(stderr, "Group %s on line %lu of %s "
@@ -141,7 +141,7 @@ add_domain_child(struct role_acl *role, char *idname)
 			unsigned long theuid = 0;
 			char *endptr;
 			theuid = strtoul(idname, &endptr, 10);
-			if (*endptr != '\0')
+			if (*endptr == '\0')
 				pwd = getpwuid((int)theuid);
 			if (!pwd || theuid > INT_MAX) {
 				fprintf(stderr, "User %s on line %lu of %s "
@@ -164,7 +164,7 @@ add_domain_child(struct role_acl *role, char *idname)
 			unsigned long thegid = 0;
 			char *endptr;
 			thegid = strtoul(idname, &endptr, 10);
-			if (*endptr != '\0')
+			if (*endptr == '\0')
 				grp = getgrgid((int)thegid);
 			if (!grp || thegid > INT_MAX) {
 				fprintf(stderr, "Group %s on line %lu of %s "
@@ -345,7 +345,7 @@ add_role_acl(struct role_acl **role, char *rolename, u_int16_t type, int ignore)
 				unsigned long theuid = 0;
 				char *endptr;
 				theuid = strtoul(rolename, &endptr, 10);
-				if (*endptr != '\0')
+				if (*endptr == '\0')
 					pwd = getpwuid((int)theuid);
 				if (!pwd || theuid > INT_MAX) {
 					fprintf(stderr, "User %s on line %lu of %s "
@@ -366,7 +366,7 @@ add_role_acl(struct role_acl **role, char *rolename, u_int16_t type, int ignore)
 				unsigned long thegid = 0;
 				char *endptr;
 				thegid = strtoul(rolename, &endptr, 10);
-				if (*endptr != '\0')
+				if (*endptr == '\0')
 					grp = getgrgid((int)thegid);
 				if (!grp || thegid > INT_MAX) {
 					fprintf(stderr, "Group %s on line %lu of %s "
