@@ -126,6 +126,14 @@ transmit_to_kernel(struct gr_arg_wrapper *buf)
 	return err;
 }
 
+void ctrl_sighandler(int sig)
+{
+	signal(sig, SIG_IGN);
+
+	ioctl(0, TIOCNXCL);
+	exit(EXIT_FAILURE);
+}
+
 void check_acl_status(u_int16_t reqmode)
 {
 	int fd;
@@ -133,6 +141,7 @@ void check_acl_status(u_int16_t reqmode)
 	struct gr_arg arg;
 	struct gr_arg_wrapper wrapper;
 
+	signal(SIGINT, ctrl_sighandler);
 	ioctl(0, TIOCEXCL);
 
 	wrapper.version = GRADM_VERSION;
