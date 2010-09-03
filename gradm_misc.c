@@ -128,7 +128,15 @@ transmit_to_kernel(struct gr_arg_wrapper *buf)
 
 void ctrl_sighandler(int sig)
 {
+	struct termios term;
 	signal(sig, SIG_IGN);
+
+	tcgetattr(STDIN_FILENO, &term);
+	term.c_lflag |= ECHO;
+	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+
+	printf("\n");
+	fflush(stdout);
 
 	ioctl(0, TIOCNXCL);
 	exit(EXIT_FAILURE);
