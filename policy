@@ -371,6 +371,12 @@ subject /bin/login
 	/var/log/wtmp w
 	/var/log/faillog rwcd
 
+subject /bin/su
+	/dev/log rw
+
+subject /usr/bin/sudo
+	/dev/log rw
+
 subject /sbin/getty
 	/var/log/wtmp w
 
