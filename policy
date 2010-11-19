@@ -100,7 +100,7 @@
 #
 # Domains:
 # With domains you can combine users that don't share a common
-# GID as well as groups so that they share a single policy
+no# GID as well as groups so that they share a single policy
 # Domains work just like roles, with the only exception being that
 # the line starting with "role" is replaced with one of the following:
 # domain somedomainname u user1 user2 user3 user4 ... usern
@@ -326,6 +326,12 @@ subject /usr/X11R6/bin/XFree86
 
 subject /usr/bin/ssh
 	/etc/ssh/ssh_config r
+
+subject /usr/bin/postgres
+	/dev/log rw
+
+subject /usr/bin/exim
+	/dev/log rw
 
 subject /sbin/klogd
 	+CAP_SYS_ADMIN
