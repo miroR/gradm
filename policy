@@ -311,6 +311,7 @@ subject /usr/sbin/sshd dpo
 	+CAP_SYS_CHROOT
 	+CAP_SYS_RESOURCE
 	+CAP_SYS_TTY_CONFIG
+	+CAP_AUDIT_WRITE
 
 subject /usr/X11R6/bin/XFree86
 	/dev/mem	rw
