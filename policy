@@ -200,6 +200,7 @@ define grsec_denied {
 	/proc/slabinfo	h
 	/proc/modules	h
 	/proc/kallsyms	h
+	# hide and suppress logs about accessing this path
 	/lib/modules	hs
 }
 # usage:
