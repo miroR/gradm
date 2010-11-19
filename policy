@@ -342,6 +342,9 @@ subject /sbin/syslog-ng
 subject /usr/sbin/cron
 	/dev/log rw
 
+subject /usr/sbin/crond
+	/dev/log rw
+
 subject /bin/login
 	/dev/log rw
 	/var/log/wtmp w
