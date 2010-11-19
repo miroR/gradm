@@ -222,6 +222,7 @@ subject /
 	/bin		rx
 	/sbin		rx
 	/lib		rx
+	/lib64		rx
 	/usr		rx
 # compilation of kernel code should be done within the admin role	
 	/usr/src	h
@@ -288,11 +289,13 @@ subject /usr/sbin/sshd dpo
 	/etc/grsec	h
 	/home
 	/lib		rx
+	/lib64		rx
 	/root
 	/proc		r
 	/proc/kcore	h
 	/proc/sys	h
 	/usr/lib	rx
+	/usr/lib64	rx
 	/usr/share/zoneinfo r
 	/var/log
 	/var/mail
