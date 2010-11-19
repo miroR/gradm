@@ -308,6 +308,7 @@ subject /usr/sbin/sshd dpo
 	/var/run
 	/var/run/sshd
 	/var/run/utmp		rw
+	/var/run/utmpx		rw
 
 	-CAP_ALL
 	+CAP_CHOWN
