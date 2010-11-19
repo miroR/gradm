@@ -274,7 +274,8 @@ subject /
 # config file or taking the port it reserved to run a trojaned service)
 
 subject /usr/sbin/sshd dpo
-	/		h
+	/
+	/*		h
 	/bin/bash	x
 	/dev		h
 	/dev/log	rw
@@ -292,8 +293,11 @@ subject /usr/sbin/sshd dpo
 	/lib64		rx
 	/root
 	/proc		r
+	/proc/*/oom_adj rw
 	/proc/kcore	h
 	/proc/sys	h
+	/proc/sys/kernel/ngroups_max r
+	/selinux	r
 	/usr/lib	rx
 	/usr/lib64	rx
 	/usr/share/zoneinfo r
@@ -301,6 +305,7 @@ subject /usr/sbin/sshd dpo
 	/var/mail
 	/var/log/lastlog	rw
 	/var/log/wtmp		w
+	/var/run
 	/var/run/sshd
 	/var/run/utmp		rw
 
