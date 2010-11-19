@@ -309,6 +309,7 @@ subject /usr/sbin/sshd dpo
 	/var/run/sshd
 	/var/run/utmp		rw
 	/var/run/utmpx		rw
+	/var/run/.nscd_socket	rw
 
 	-CAP_ALL
 	+CAP_CHOWN
