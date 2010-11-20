@@ -3,7 +3,7 @@
 # Role flags:
 # A -> This role is an administrative role, thus it has special privilege normal
 #      roles do not have.  In particular, this role bypasses the 
-#      additional ptrace restrictions
+#      additional ptrace restrictions and AT_SECURE subject mode
 # N -> Don't require authentication for this role.  To access
 #      the role, use gradm -n <rolename>
 # s -> This role is a special role, meaning it does not belong to a
@@ -82,6 +82,9 @@
 #      in this subject, and inheritance flags added to executable objects
 #      in this subject
 # a -> allow this process to talk to the /dev/grsec device
+# s -> enable AT_SECURE when entering this subject
+#      (enables the same environment sanitization that occurs in glibc
+#	upon execution of a suid binary)
 #
 # user/group transitions:
 # You may now specify what users and groups a given subject can
