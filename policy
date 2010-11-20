@@ -360,6 +360,9 @@ subject /sbin/klogd
 subject /sbin/syslog-ng
 	+CAP_SYS_ADMIN
 
+subject /usr/sbin/rsyslogd
+	+CAP_SYS_ADMIN
+
 subject /usr/sbin/cron
 	/dev/log rw
 
