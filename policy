@@ -334,6 +334,13 @@ subject /usr/sbin/sshd dpo
 	# to access user keys
 	+CAP_DAC_OVERRIDE
 
+subject /usr/X11R6/bin/Xorg
+	/dev/mem	rw
+
+	+CAP_SYS_ADMIN
+	+CAP_SYS_TTY_CONFIG
+	+CAP_SYS_RAWIO
+
 subject /usr/X11R6/bin/XFree86
 	/dev/mem	rw
 
@@ -385,3 +392,7 @@ subject /sbin/getty
 
 subject /sbin/init
 	/var/log/wtmp w
+
+subject /usr/bin/xauth
+	/home r
+	/home/*/.Xauthority-* rwcdl
