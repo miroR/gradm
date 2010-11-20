@@ -3,7 +3,7 @@
 # Role flags:
 # A -> This role is an administrative role, thus it has special privilege normal
 #      roles do not have.  In particular, this role bypasses the 
-#      additional ptrace restrictions and AT_SECURE subject mode
+#      additional ptrace restrictions
 # N -> Don't require authentication for this role.  To access
 #      the role, use gradm -n <rolename>
 # s -> This role is a special role, meaning it does not belong to a
