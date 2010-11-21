@@ -38,6 +38,7 @@ struct family_set sock_families[] = {
 	{ "isdn", AF_ISDN },
 	{ "phonet", AF_PHONET },
 	{ "ieee802154", AF_IEEE802154 },
+	{ "caif", AF_CAIF },
 	{ "all", -1 }
 };
 

@@ -95,8 +95,11 @@
 #ifndef AF_IEEE802154
 #define AF_IEEE802154 36
 #endif
+#ifndef AF_CAIF
+#define AF_CAIF 37
+#endif
 #undef AF_MAX
-#define AF_MAX 37
+#define AF_MAX 38
 
 #define GR_NLIMITS	32
 #define GR_CRASH_RES	31
