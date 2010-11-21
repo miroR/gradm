@@ -133,6 +133,21 @@
 # syntax.  If an interface is specified, no IP/netmask or host may be
 # specified for the rule.
 #
+# Allowing additional socket families:
+# Before v2.2.1 of the RBAC system, a subject that specified
+# connect/bind rules limited only the socket usage of IPv4, allowing
+# any other socket families to be used.  Starting with v2.2.1 of the 
+# RBAC system, when connect/bind rules are used, additional rules
+# will be required to unlock the use of additional socket families 
+# (outside of the common unix/local family).  Multiple families can be
+# specified per line.
+# To enable use of IPv6, add the line:
+# sock_allow_family ipv6
+# To enable use of netlink, add the line:
+# sock_allow_family netlink
+# To enable all other families, add the line:
+# sock_allow_family all
+#
 # New learning system:
 # To learn on a given subject: add l (the letter l, not the number 1)
 # to the subject mode
