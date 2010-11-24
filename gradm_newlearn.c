@@ -1768,8 +1768,8 @@ void insert_ip(struct gr_learn_ip_node **base, u_int32_t ip, u_int16_t port, u_i
 
 static int strcompare(const void *x, const void *y)
 {
-        struct gr_learn_file_tmp_node *x1 = *(struct gr_learn_file_tmp_node **) x;
-        struct gr_learn_file_tmp_node *y1 = *(struct gr_learn_file_tmp_node **) y;
+        const struct gr_learn_file_tmp_node *x1 = *(const struct gr_learn_file_tmp_node * const *) x;
+        const struct gr_learn_file_tmp_node *y1 = *(const struct gr_learn_file_tmp_node * const *) y;
 
 	if (x1 == NULL && y1 == NULL)
 		return 0;
