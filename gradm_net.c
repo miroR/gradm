@@ -49,7 +49,7 @@ add_sock_family(struct proc_acl *subject, char *family)
 
 	if (!strcmp(family, "all")) {
 		for (i = 0; i < SIZE(current_subject->sock_families); i++) {
-			current_subject->sock_families[i] = -1;
+			subject->sock_families[i] = -1;
 		}
 		return;
 	}
@@ -67,7 +67,7 @@ add_sock_family(struct proc_acl *subject, char *family)
 		exit(EXIT_FAILURE);
 	}
 
-	current_subject->sock_families[sock_families[i].family_val / 32] |=
+	subject->sock_families[sock_families[i].family_val / 32] |=
 				(1 << (sock_families[i].family_val % 32));
 
 	return;
