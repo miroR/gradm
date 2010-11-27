@@ -48,7 +48,7 @@ add_sock_family(struct proc_acl *subject, char *family)
 	int i;
 
 	if (!strcmp(family, "all")) {
-		for (i = 0; i < SIZE(current_subject->sock_families); i++) {
+		for (i = 0; i < SIZE(subject->sock_families); i++) {
 			subject->sock_families[i] = -1;
 		}
 		return;
