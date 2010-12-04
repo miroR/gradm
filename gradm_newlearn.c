@@ -1235,9 +1235,9 @@ show_ips:
 				 node->subject->sock_families[1] != 0))
 				;
 			else if (cnt > 10)
-				fprintf(stream, "\tsock_family all\n");
+				fprintf(stream, "\tsock_allow_family all\n");
 			else {
-				fprintf(stream, "\tsock_family");
+				fprintf(stream, "\tsock_allow_family");
 				for (i = 0; i < AF_MAX; i++) {
 					if ((bind || connect) && (i == AF_UNIX || i == AF_LOCAL || i == AF_INET))
 						continue;
