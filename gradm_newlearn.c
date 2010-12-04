@@ -1231,8 +1231,8 @@ show_ips:
 			   the default, then don't add a sock_family rule
 			*/
 			if ((bind || connect) &&
-				((node->subject->sock_families[0] & ~((1 << AF_UNIX) | (1 << AF_LOCAL) | (1 << AF_INET))) ||
-				 node->subject->sock_families[1] != 0))
+				!(node->subject->sock_families[0] & ~((1 << AF_UNIX) | (1 << AF_LOCAL) | (1 << AF_INET))) &&
+				node->subject->sock_families[1] == 0)
 				;
 			else if (cnt > 10)
 				fprintf(stream, "\tsock_allow_family all\n");
