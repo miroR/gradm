@@ -1239,6 +1239,44 @@ void display_tree(struct gr_learn_file_node *base, FILE *stream)
 }
 
 #ifdef GRADM_DEBUG
+void check_high_protected_path_enforcement(struct gr_learn_file_node *subject)
+{
+	struct gr_learn_file_node *find;
+	struct gr_learn_file_tmp_node **tmptable;
+	char **tmp;
+	unsigned int len;
+	unsigned long i;
+
+	tmp = high_protected_paths;
+	if (tmp == NULL)
+		return;
+
+	tmptable = (struct gr_learn_file_tmp_node **)subject->hash->table;
+
+	while (*tmp) {
+		len = strlen(*tmp);
+		for (i = 0; i < subject->hash->table_size; i++) {
+			if (tmptable[i] == NULL)
+				continue;
+			if (!tmptable[i]->mode)
+				continue;
+			if (!strncmp(tmptable[i]->filename, *tmp, len) &&
+			    (tmptable[i]->filename[len] == '\0' || tmptable[i]->filename[len] == '/'))
+				goto next;
+		}
+		/* for all the ones that we didn't have a matching access from
+		   the learning logs, find the object that matches us and make sure it's hidden
+		*/
+		find = find_file(subject->object_list, *tmp);
+		assert(find != NULL);
+		if (find->mode != 0)
+			printf("Failed to enforce high-protected rule %s by object %s\n", *tmp, find->filename);
+next:
+		tmp++;
+	}
+	return;
+}
+
 void check_conformity_with_learned_rules(struct gr_learn_file_node *subject)
 {
 	struct gr_learn_file_node *tmp;
@@ -1369,6 +1407,7 @@ int display_leaf(struct gr_learn_file_node *node,
 #ifdef GRADM_DEBUG
 			check_file_node_list_integrity(&object->leaves);
 			check_conformity_with_learned_rules(node);
+			check_high_protected_path_enforcement(node);
 #endif
 			display_tree(object, stream);
 		}

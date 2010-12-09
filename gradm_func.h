@@ -170,6 +170,7 @@ void add_sock_family(struct proc_acl *subject, char *family);
 #ifdef GRADM_DEBUG
 void check_file_node_list_integrity(struct gr_learn_file_node **filelist);
 void check_conformity_with_learned_rules(struct gr_learn_file_node *subject);
+void check_high_protected_path_enforcement(struct gr_learn_file_node *subject);
 #endif
 
 #endif
