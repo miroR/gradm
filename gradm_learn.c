@@ -252,7 +252,7 @@ void display_learn_logs(FILE *stream)
 		if (allowed_ips && !(grlearn_options & GR_DONT_LEARN_ALLOWED_IPS))
 			traverse_ip_tree(allowed_ips, NULL, &display_only_ip, 0, stream);
 		if (subjects) {
-			sort_file_node_list(&default_role_entry->subject_list->leaves);
+			sort_file_node_list(default_role_entry->subject_list);
 			display_tree(subjects, stream);
 		}
 
@@ -271,7 +271,7 @@ void display_learn_logs(FILE *stream)
 		if (allowed_ips && !(grlearn_options & GR_DONT_LEARN_ALLOWED_IPS))
 			traverse_ip_tree(allowed_ips, NULL, &display_only_ip, 0, stream);
 		if (subjects) {
-			sort_file_node_list(&group_role_list->subject_list->leaves);
+			sort_file_node_list(group_role_list->subject_list);
 			display_tree(subjects, stream);
 		}
 
@@ -290,7 +290,7 @@ void display_learn_logs(FILE *stream)
 		if (allowed_ips && !(grlearn_options & GR_DONT_LEARN_ALLOWED_IPS))
 			traverse_ip_tree(allowed_ips, NULL, &display_only_ip, 0, stream);
 		if (subjects) {
-			sort_file_node_list(&user_role_list->subject_list->leaves);
+			sort_file_node_list(user_role_list->subject_list);
 			display_tree(subjects, stream);
 		}
 
@@ -309,7 +309,7 @@ void display_learn_logs(FILE *stream)
 		if (allowed_ips && !(grlearn_options & GR_DONT_LEARN_ALLOWED_IPS))
 			traverse_ip_tree(allowed_ips, NULL, &display_only_ip, 0, stream);
 		if (subjects) {
-			sort_file_node_list(&special_role_list->subject_list->leaves);
+			sort_file_node_list(special_role_list->subject_list);
 			display_tree(subjects, stream);
 		}
 
