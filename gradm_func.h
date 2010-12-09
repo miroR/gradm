@@ -163,8 +163,13 @@ void add_replace_string(char *name, char *replacewith);
 char *lookup_replace_string(char *name);
 char *process_string_replace(char *str);
 
-void sort_file_node_list(struct gr_learn_file_node **filelist);
+void sort_file_node_list(struct gr_learn_file_node *root);
 
 void add_sock_family(struct proc_acl *subject, char *family);
+
+#ifdef GRADM_DEBUG
+void check_file_node_list_integrity(struct gr_learn_file_node **filelist);
+void check_conformity_with_learned_rules(struct gr_learn_file_node *subject);
+#endif
 
 #endif

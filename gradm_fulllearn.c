@@ -122,11 +122,25 @@ int full_reduce_object_node(struct gr_learn_file_node *subject,
 		insert_file(&(subject->object_list), tmptable[i]->filename, tmptable[i]->mode, 0);
 	}
 
+#ifdef GRADM_DEBUG
+	printf("\nBeginning first stage object reduction...\n");
+	check_file_node_list_integrity(&subject->object_list);
+#endif
 	first_stage_reduce_tree(subject->object_list);
+#ifdef GRADM_DEBUG
+	printf("Beginning second stage object reduction...\n");
+	check_file_node_list_integrity(&subject->object_list);
+#endif
 	second_stage_reduce_tree(subject->object_list);
-
+#ifdef GRADM_DEBUG
+	printf("Beginning high protected path enforcement...\n");
+	check_file_node_list_integrity(&subject->object_list);
+#endif
 	enforce_high_protected_paths(subject);
-
+#ifdef GRADM_DEBUG
+	printf("Beginning third stage object reduction...\n");
+	check_file_node_list_integrity(&subject->object_list);
+#endif
 	third_stage_reduce_tree(subject->object_list);
 
 	printf("done.\n");
@@ -483,16 +497,14 @@ void generate_full_learned_acls(FILE *learnlog, FILE *stream)
 			current_learn_rolename = group->rolename;
 			current_learn_rolemode = GR_ROLE_GROUP;
 			output_role_info(group, NULL, stream);
-			if (group->subject_list)
-				sort_file_node_list(&group->subject_list->leaves);
+			sort_file_node_list(group->subject_list);
 			traverse_file_tree(group->subject_list, &fulllearn_pass3, NULL, stream);
 		} else {
 			for_each_removable_list_entry(user, group->users) {
 				current_learn_rolename = user->rolename;
 				current_learn_rolemode = GR_ROLE_USER;
 				output_role_info(NULL, user, stream);
-				if (user->subject_list)
-					sort_file_node_list(&user->subject_list->leaves);
+				sort_file_node_list(user->subject_list);
 				traverse_file_tree(user->subject_list, &fulllearn_pass3, NULL, stream);
 				tmpuser = user->next;
 				free_role_user_full(user);

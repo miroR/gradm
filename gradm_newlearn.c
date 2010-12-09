@@ -115,56 +115,98 @@ void traverse_roles(struct gr_learn_group_node *grouplist,
 	return;
 }
 
-/* this sort currently destroys ->prev pointers, so don't
-   use this for sorting for anything but the final printing of objects
+/* uses mergesort, preserves prev and next functionality,
+   filelist may be modified by the sort
+   modified from algorithm by Simon Tatham
 */
-void sort_file_node_list(struct gr_learn_file_node **filelist)
+void sort_file_node_list(struct gr_learn_file_node *root)
 {
+	struct gr_learn_file_node **filelist;
 	int count = 0;
-	int i, j;
-	struct gr_learn_file_node *cur, *next, *prev;
-	int cmp;
+	int i;
+	int list_size = 1;
+	int num_merges;
+	int left_size, right_size;
+	struct gr_learn_file_node *cur, *left, *right, *end;
+	char *basename;
+	unsigned int baselen;
+
+	if (root == NULL)
+		return;
+
+	filelist = &root->leaves;
 
 	if (*filelist == NULL)
 		return;
 
+	basename = root->filename;
+	baselen = strlen(basename);
+	/* special case the root / */
+	if (baselen == 1)
+		baselen = 0;
+
 	for_each_list_entry(cur, *filelist) {
-		sort_file_node_list(&cur->leaves);
+		sort_file_node_list(cur);
 		count++;
 	}
 
 	if (count < 2)
 		return;
 
-	cur = *filelist;
-	prev = cur;
-	next = cur->next;
-	
-	
-	for (i = 0; i < count - 1; i++) {
-		for (j = 0; j < count - i - 1; j++) {
-			cmp = strcmp(cur->filename, next->filename);
-			if (cmp > 0) {
-				cur->next = next->next;
-				next->next = cur;
-				if (cur == *filelist) {
-					*filelist = next;
-					prev = next;
-				} else {
-					prev->next = next;
-					prev = next;
-				}
-				if (next)
-					next = cur->next;
-			} else {
-				prev = cur;
-				cur = next;
-				next = cur->next;
+	while (1) {
+		left = *filelist;
+		*filelist = NULL;
+		end = NULL;
+
+		num_merges = 0;
+
+		while (left) {
+			num_merges++;
+			right = left;
+			left_size = 0;
+
+			for (i = 0; i < list_size; i++) {
+				left_size++;
+				right = right->next;
+				if (right == NULL)
+					break;
 			}
+
+			right_size = list_size;
+
+			while (left_size > 0 || (right_size > 0 && right != NULL)) {
+				if (left_size == 0) {
+					cur = right;
+					right = right->next;
+					right_size--;
+				} else if (right_size == 0 || right == NULL ||
+					   strcmp(left->filename + baselen + 1, right->filename + baselen + 1) <= 0) {
+					cur = left;
+					left = left->next;
+					left_size--;
+				} else {
+					cur = right;
+					right = right->next;
+					right_size--;
+				}
+
+				if (end)
+					end->next = cur;
+				else
+					*filelist = cur;
+				cur->prev = end;
+				end = cur;
+			}
+
+			left = right;
 		}
-		cur = *filelist;
-		prev = cur;
-		next = cur->next;
+
+		end->next = NULL;
+
+		if (num_merges <= 1)
+			return;
+
+		list_size <<= 1;
 	}
 
 	return;
@@ -178,11 +220,11 @@ int display_role(struct gr_learn_group_node *group, struct gr_learn_user_node *u
 
 	if (user) {
 		if (user->subject_list)
-			sort_file_node_list(&user->subject_list->leaves);
+			sort_file_node_list(user->subject_list);
 		subject = user->subject_list;
 	} else {
 		if (group->subject_list)
-			sort_file_node_list(&group->subject_list->leaves);
+			sort_file_node_list(group->subject_list);
 		subject = group->subject_list;
 	}
 
@@ -576,6 +618,7 @@ unsigned long count_nested_depth(struct gr_learn_file_node *node)
 	return depth;
 }	
 
+/* this reduces all files in a directory, but not including any subdirectories */
 int reduce_all_children(struct gr_learn_file_node *node)
 {
 	unsigned long not_leaf = 0;
@@ -677,15 +720,11 @@ void greatest_occurring_modes(struct gr_learn_file_node *node, u_int32_t *modear
 	u_int16_t max, max2;
 	int i;
 
-	tmp = node->leaves;
-
-	while (tmp) {
+	for_each_list_entry(tmp, node->leaves) {
 		for (i = 0; i < 12; i++) {
 			if (tmp->mode == modes[i])
 				counts[i]++;
 		}
-
-		tmp++;
 	}
 
 	max = 0;
@@ -895,6 +934,10 @@ final:
 		return NULL;
 }
 
+/* for this stage based on some heuristics we decide if for a given directory,
+   all files within it should be reduced, or if all files and subdirectories in
+   it should be reduced
+*/
 int second_reduce_node(struct gr_learn_file_node *node,
 		       struct gr_learn_file_node *unused1, FILE *unused)
 {
@@ -943,19 +986,21 @@ void third_stage_reduce_tree(struct gr_learn_file_node *base)
 }
 
 struct gr_learn_file_node *do_find_insert_file(struct gr_learn_file_node **base,
-					char *filename, unsigned int filelen,
-					struct gr_learn_file_node **parent)
+					char *filename, unsigned int filelen)
 {
 	struct gr_learn_file_node *node, *tmpnode, *ret;
 	unsigned int baselen;
 
+	/* base needs to at least contain a root node for /, if it doesn't then we add it here */
 	if (!*base) {
-		*parent = *base;
 		*base = (struct gr_learn_file_node *)gr_stat_alloc(sizeof(struct gr_learn_file_node));
+		/* the base has a NULL parent */
+		(*base)->parent = NULL;
 		return *base;
 	}
 
 	baselen = strlen((*base)->filename);
+	/* simple lookup, the basename we gave was a match for the filename we were trying to add */
 	if ((filelen == baselen) && !strcmp((*base)->filename, filename))
 		return *base;
 
@@ -966,68 +1011,146 @@ struct gr_learn_file_node *do_find_insert_file(struct gr_learn_file_node **base,
 	*/
 	if (!node && (baselen < filelen) && (baselen == 1 || filename[baselen] == '/') &&
 	    !strncmp((*base)->filename, filename, baselen)) {
-		*parent = *base;
 		(*base)->leaves = node = (struct gr_learn_file_node *)gr_stat_alloc(sizeof(struct gr_learn_file_node));
+		node->parent = *base;
 		cachednode = *base;
 		cachedlen = baselen;
 		return node;
 	} else if (!node) {
+		/* there are no leaves for this base, and it didn't match the filename we're inserting */
 		return NULL;
 	}
 
 	for_each_list_entry(tmpnode, node) {
-		ret = do_find_insert_file(&tmpnode, filename, filelen, parent);
+		ret = do_find_insert_file(&tmpnode, filename, filelen);
 		if (ret)
 			return ret;
 	}
 	
+	/* this is not a match for the file we're inserting */
 	if ((baselen >= filelen) || (baselen != 1 && filename[baselen] != '/') ||
-	    strncmp((*base)->filename, filename, baselen)) {
+	    strncmp((*base)->filename, filename, baselen))
 		return NULL;
-	}
 
 	cachednode = *base;
 	cachedlen = baselen;
-	*parent = *base;
 	ret = (struct gr_learn_file_node *)gr_stat_alloc(sizeof(struct gr_learn_file_node));
+	ret->parent = *base;
 
 	establish_new_head((*base)->leaves, ret, tmpnode);
 
 	return ret;
 }
 
+#ifdef GRADM_DEBUG
+static struct gr_learn_file_node *find_file(struct gr_learn_file_node *filelist, char *filename)
+{
+	struct gr_learn_file_node *tmp, *ret;
+	unsigned int alen, blen;
+
+	if (filelist == NULL)
+		return NULL;
+
+	alen = strlen(filelist->filename);
+	blen = strlen(filename);
+
+	/* return if we've found a perfect match */
+	if (alen == blen && !strcmp(filelist->filename, filename))
+		return filelist;
+
+	if (alen >= blen)
+		return NULL;
+
+	/* if this is a subdirectory match, then work our way up through the leaves to find
+	   the most specific match to return
+	*/
+	if (!strncmp(filelist->filename, filename, alen) && (alen == 1 || filename[alen] == '/')) {
+		for_each_list_entry(tmp, filelist->leaves) {
+			ret = find_file(tmp, filename);
+			if (ret != NULL)
+				return ret;
+		}
+		return filelist;
+	}
+
+	/* if this wasn't a subdirectory match, then try to match against the other nodes at the
+	   current level
+	*/
+	for_each_list_entry(tmp, filelist->leaves) {
+		ret = find_file(tmp, filename);
+		if (ret)
+			return ret;
+	}
+
+	return NULL;
+}
+#endif
+
 struct gr_learn_file_node *find_insert_file(struct gr_learn_file_node **base,
-					char *filename, unsigned int filelen,
-					struct gr_learn_file_node **parent)
+					char *filename, unsigned int filelen)
 {
 	if (cachednode && (cachedlen < filelen) && !strncmp(cachednode->filename, filename, cachedlen)
 	    && filename[cachedlen] == '/') {
-		return do_find_insert_file(&cachednode, filename, filelen, parent);
+		return do_find_insert_file(&cachednode, filename, filelen);
 	} else if (cachednode && (cachedlen >= filelen)) {
 		cachednode = NULL;
 		cachedlen = 0;
 	}
 
-	return do_find_insert_file(base, filename, filelen, parent);
+	return do_find_insert_file(base, filename, filelen);
 }
 
+void update_parent_pointers(struct gr_learn_file_node *base)
+{
+	struct gr_learn_file_node *tmp;
+	if (base->leaves == NULL)
+		return;
 
+	for_each_list_entry(tmp, base->leaves)
+		tmp->parent = base;
+
+	return;
+}
+
+void do_replace_file(struct gr_learn_file_node **base, struct gr_learn_file_node *replace)
+{
+	struct gr_learn_file_node *node;
+
+	node = find_insert_file(base, replace->filename, strlen(replace->filename));
+
+	assert(node != NULL);
+
+	node->mode = replace->mode;
+	node->dont_display = 0;
+
+	assert(node->leaves == NULL);
+	node->leaves = replace->leaves;
+
+	assert(node->filename == NULL);
+	node->filename = gr_strdup(replace->filename);
+
+	/* important: we need to update all the parent pointers for these directly-linked nodes */
+	update_parent_pointers(node);
+
+	return;
+}
 
 void do_insert_file(struct gr_learn_file_node **base, char *filename, u_int32_t mode, u_int8_t subj)
 {
 	struct gr_learn_file_node *node;
-	struct gr_learn_file_node *parent = NULL;
 
-	node = find_insert_file(base, filename, strlen(filename), &parent);
+	node = find_insert_file(base, filename, strlen(filename));
+
+	assert(node != NULL);
 
 	node->mode |= mode;
 	node->dont_display = 0;
-	node->parent = parent;
+
 	if (node->filename == NULL)
 		node->filename = gr_strdup(filename);
 
 	if (subj)
-		insert_file(&(node->object_list), "/", 0, 0);		
+		insert_file(&(node->object_list), "/", 0, 0);
 
 	return;
 }
@@ -1049,13 +1172,20 @@ void insert_file(struct gr_learn_file_node **base, char *filename, u_int32_t mod
 	return;
 }
 
+/* if this node has above the threshold number of leaves, then
+   terminate each leaf at its next path component and reinsert them
+   all as directories into the tree
+   then, re-anchor each leaf to the newly created directory nodes
+
+   this algorithm gets called against every node/leaf in the tree
+*/
+
 int first_reduce_node(struct gr_learn_file_node *node,
 		       struct gr_learn_file_node *unused1, FILE *unused)
 {
 	unsigned long thresh = 5;	
 	unsigned long num = count_nodes(node->leaves);
 	struct gr_learn_file_node *tmp, *tmp2;
-	struct gr_learn_file_node *parent = NULL;
 	char *p, *p2;
 	unsigned int node_len = strlen(node->filename);
 	int removed = 0;
@@ -1082,12 +1212,13 @@ int first_reduce_node(struct gr_learn_file_node *node,
 
 
 	/* we're pulling out each leaf in this node and re-inserting it
+	   we need to find where to insert the node, and then copy the unlinked
+	   one in directly, preserving any attached leaves it may have
 	*/
 	for_each_removable_list_entry(tmp, node->leaves) {
-		parent = NULL;
 		tmp = unlink_file_node_entry(tmp, &node->leaves, &tmp2);
 		removed = 1;
-		do_insert_file(&node, tmp2->filename, tmp2->mode, 0);
+		do_replace_file(&node, tmp2);
 		free(tmp2->filename);
 		gr_stat_free(tmp2);
 		for_each_removable_list_entry_end(tmp);
@@ -1106,6 +1237,74 @@ void display_tree(struct gr_learn_file_node *base, FILE *stream)
 	traverse_file_tree(base, &display_leaf, NULL, stream);
 	return;
 }
+
+#ifdef GRADM_DEBUG
+void check_conformity_with_learned_rules(struct gr_learn_file_node *subject)
+{
+	struct gr_learn_file_node *tmp;
+	struct gr_learn_file_tmp_node **tmptable;
+	unsigned long i, table_size;
+
+	tmptable = (struct gr_learn_file_tmp_node **)subject->hash->table;
+	table_size = subject->hash->table_size;
+
+	for (i = 0; i < table_size; i++) {
+		if (tmptable[i] == NULL)
+			continue;
+		tmp = find_file(subject->object_list, tmptable[i]->filename);
+		assert(tmp != NULL);
+		if ((tmp->mode & tmptable[i]->mode) != tmptable[i]->mode)
+			printf("Nonconformance detected in object %s with mode %x, %s requires %x\n", tmp->filename, tmp->mode, tmptable[i]->filename, tmptable[i]->mode);
+	}
+
+	return;
+}
+
+void check_file_node_list_integrity(struct gr_learn_file_node **filelist)
+{
+	struct gr_learn_file_node *node;
+	unsigned int parentlen, ourlen;
+	struct gr_learn_file_node *tmpnode;
+	int i;
+
+	if (*filelist == NULL)
+		return;
+
+	for_each_list_entry(node, *filelist) {
+		check_file_node_list_integrity(&node->leaves);
+		if (strcmp(node->filename, "/") && node->parent == NULL)
+			goto inconsistency;
+		else if (node->parent == NULL)
+			goto ok;
+		parentlen = strlen(node->parent->filename);
+		ourlen = strlen(node->filename);
+		if (parentlen >= ourlen)
+			goto inconsistency;
+		if (strncmp(node->filename, node->parent->filename, parentlen))
+			goto inconsistency;
+		if (parentlen != 1 && node->filename[parentlen] != '/')
+			goto inconsistency;
+		if (node->next && node->next->prev != node)
+			goto inconsistency;
+		if (node->prev && node->prev->next != node)
+			goto inconsistency;
+		tmpnode = node;
+		i = 4096;
+		while (tmpnode->parent && i) {
+			tmpnode = tmpnode->parent;
+			i--;
+		}
+		if (i == 0)
+			goto inconsistency;
+		goto ok;
+inconsistency:
+		printf("Inconsistency detected with file %s, parent %s\n", node->filename, node->parent ? node->parent->filename : "NULL");
+ok:
+		;
+	}
+	
+}
+#endif
 
 int display_leaf(struct gr_learn_file_node *node,
 		       struct gr_learn_file_node *unused1, FILE *stream)
@@ -1166,7 +1365,11 @@ int display_leaf(struct gr_learn_file_node *node,
 		}
 
 		if (object) {
-			sort_file_node_list(&object->leaves);
+			sort_file_node_list(object);
+#ifdef GRADM_DEBUG
+			check_file_node_list_integrity(&object->leaves);
+			check_conformity_with_learned_rules(node);
+#endif
 			display_tree(object, stream);
 		}
 		if (!node->subject) {

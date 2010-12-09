@@ -19,6 +19,7 @@
 #include <fnmatch.h>
 #include <elf.h>
 #include <limits.h>
+#include <assert.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/poll.h>
