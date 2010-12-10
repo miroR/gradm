@@ -365,6 +365,12 @@ handle_notrojan_mode(void)
 								     role2->rolename, subj2->filename,
 								     obj2->filename, subj->filename);
 								break;
+							} else if (obj2) {
+								/* if we found a match, but it wasn't writable, then just break
+								   otherwise we'd end up matching on a directory whose
+								   mode doesn't apply to what we're looking up
+								*/
+								break;
 							}
 						}
 					}
