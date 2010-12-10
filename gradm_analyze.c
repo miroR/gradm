@@ -335,22 +335,19 @@ handle_notrojan_mode(void)
 			for_each_object(obj, subj) {
 				if (!(obj->mode & GR_EXEC))
 					continue;
-				if ((objname =
-				     malloc(strlen(obj->filename) + 1)) == NULL)
-					failure("malloc");
-				strcpy(objname, obj->filename);
-				do {
-					for_each_role(role2, current_role) {
-						if (!strcmp(role2->rolename, ":::kernel:::"))
+				for_each_role(role2, current_role) {
+					if (!strcmp(role2->rolename, ":::kernel:::"))
+						continue;
+					if (role2->roletype & GR_ROLE_GOD)
+						continue;
+					for_each_subject(subj2, role2) {
+						if (subj2 == subj
+						    || (subj2->
+							filename[0] !=
+							'/'))
 							continue;
-						if (role2->roletype & GR_ROLE_GOD)
-							continue;
-						for_each_subject(subj2, role2) {
-							if (subj2 == subj
-							    || (subj2->
-								filename[0] !=
-								'/'))
-								continue;
+						objname = gr_strdup(obj->filename);
+						do {
 							obj2 = lookup_acl_object_by_name(subj2, objname);
 							if (obj2 && obj2->mode & GR_WRITE) {
 								ret++;
@@ -372,10 +369,10 @@ handle_notrojan_mode(void)
 								*/
 								break;
 							}
-						}
+						} while (parent_dir(obj->filename, &objname));
+						free(objname);
 					}
-				} while (parent_dir(obj->filename, &objname));
-				free(objname);
+				}
 			}
 		}
 	}
