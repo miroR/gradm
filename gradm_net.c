@@ -1,6 +1,7 @@
 #include "gradm.h"
 
 struct family_set sock_families[] = {
+	{ "unspec", AF_UNSPEC },
 	{ "unix", AF_UNIX },
 	{ "local", AF_LOCAL },
 	{ "inet", AF_INET },
