@@ -667,6 +667,14 @@ analyze_acls(void)
 			errs_found++;
 		}
 
+		if (!stat("/sys", &fstat) && !check_permission(role, def_acl, "/sys", &chk)) {
+			fprintf(stderr,
+				"Read access is allowed by role %s to /sys, the directory which "
+				"holds entries that often leak information from the kernel.\n\n",
+				role->rolename);
+			errs_found++;
+		}
+
 		if (!stat("/proc/slabinfo", &fstat) && !check_permission(role, def_acl, "/proc/slabinfo", &chk)) {
 			fprintf(stderr,
 				"Reading access is allowed by role %s to "

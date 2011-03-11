@@ -263,6 +263,7 @@ subject /
 	/etc		rx
 	/proc		rwx
 	/proc/sys	r
+	/sys		h
 	/root		r
 	/tmp		rwcd
 	/var		rwxcd
