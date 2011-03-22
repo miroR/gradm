@@ -39,6 +39,9 @@
 #define PATH_MAX 		4096
 #define MAX_LINE_LEN 		5000
 
+// CAP_SYSLOG
+#define CAP_MAX			34 
+
 #define MAX_INCLUDE_DEPTH	20
 #define MAX_NEST_DEPTH		8
 #define MAX_SYMLINK_DEPTH	8
@@ -530,7 +533,7 @@ struct gr_arg_wrapper {
 };
 
 extern char *rlim_table[GR_NLIMITS];
-extern struct capability_set capability_list[35];
+extern struct capability_set capability_list[CAP_MAX+2];
 extern struct paxflag_set paxflag_list[5];
 extern struct family_set sock_families[AF_MAX+2];
 
