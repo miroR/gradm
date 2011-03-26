@@ -53,7 +53,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 <*>[ \t]+				;
 <COMMENT_STATE>.*			;
 
-<ROLETYPE_STATE>[ugslGNATP]*		{
+<ROLETYPE_STATE>[ugslGNATPR]*		{
 					  gradmlval.shortnum = role_mode_conv(yytext);
 					  return ROLE_TYPE;
 					}

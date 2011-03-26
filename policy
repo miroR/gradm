@@ -16,6 +16,16 @@
 # T -> Enable TPE for this role
 # l -> Enable learning for this role
 # P -> Use PAM authentication for this role.
+# R -> Enable persistence of special role.  Normal special roles will
+#      be removed upon exit of the process that entered the role, or
+#      upon unauth (this is what changes the apache process' role back 
+#      to its normal role after being restarted from the admin role, for
+#      instance).  Role persistence allows a special role to be used for
+#      system shutdown, as the point at which the admin's shell/SSH 
+#      session is terminated won't cause the rest of the shutdown 
+#      sequence to execute with reduced privilege.  Do *NOT* use this 
+#      flag with any role that does anything but shut the system down.
+
 #
 # a role can only be one of user, group, or special
 #
@@ -224,6 +234,31 @@ define grsec_denied {
 # usage:
 # $grsec_denied
 
+role shutdown sA
+subject / rvka
+	/
+	/dev
+	/dev/urandom	r
+	/dev/random	r
+	/bin		rx
+	/sbin		rx
+	/lib		rx
+	/lib64		rx
+	/usr		rx
+	/sbin rx
+	/sbin rx
+	/proc r
+	$grsec_denied
+	-CAP_ALL
+	connect disabled
+	bind disabled
+
+subject /sbin/poweroff rvkao
+	/rwcdmlxi
+subject /sbin/reboot rvkao
+	/rwcdmlxi
+subject /sbin/shutdown rvkao
+	/rwcdmlxi
 
 role admin sA
 subject / rvka

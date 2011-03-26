@@ -481,6 +481,21 @@ analyze_acls(void)
 	}
 
 	for_each_role(role, current_role) {
+		if ((role->roletype & (GR_ROLE_GOD | GR_ROLE_PERSIST) == 
+		     (GR_ROLE_GOD | GR_ROLE_PERSIST)) &&
+		    !strcmp(role->rolename, "admin")) {
+			fprintf(stderr, "The admin role has been marked 
+			"as a persistent role.  This severely compromises "
+			"security as any process restarted via an admin "
+			"role will retain the admin role indefinitely.\n"
+			"Please create a specific role for the handling "
+			"of system shutdown (the common use case of "
+			"persistent special roles).  The RBAC system will "
+			"not be allowed to be enabled until this error is "
+			"fixed.\n");
+			exit(EXIT_FAILURE);
+		}
+
 		def_acl = role->root_label;
 		if (!def_acl) {
 			fprintf(stderr, "There is no default subject for "

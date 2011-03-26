@@ -14,8 +14,8 @@
 #define GR_LEARN_PIPE_PATH	GRSEC_DIR "/.grlearn.pipe"
 #define GR_LEARN_PID_PATH	GRSEC_DIR "/.grlearn.pid"
 
-#define GR_VERSION		"2.2.1"
-#define GRADM_VERSION		0x2201
+#define GR_VERSION		"2.2.2"
+#define GRADM_VERSION		0x2202
 
 #define GR_PWONLY		0
 #define GR_PWANDSUM		1
@@ -195,6 +195,7 @@ enum {
 	GR_ROLE_TPE 	= 0x0100,
 	GR_ROLE_DOMAIN 	= 0x0200,
 	GR_ROLE_PAM 	= 0x0400,
+	GR_ROLE_PERSIST = 0x0800
 };
 
 enum {
