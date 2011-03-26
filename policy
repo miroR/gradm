@@ -239,6 +239,7 @@ define grsec_denied {
 	/proc/kallsyms	h
 	# hide and suppress logs about accessing this path
 	/lib/modules	hs
+	/etc/ssh	h
 }
 # usage:
 # $grsec_denied
@@ -249,6 +250,7 @@ subject / rvka
 	/dev
 	/dev/urandom	r
 	/dev/random	r
+	/etc		r
 	/bin		rx
 	/sbin		rx
 	/lib		rx
@@ -315,8 +317,6 @@ subject /
 	/var/log	r
 # hide the kernel images and modules
 	$grsec_denied
-
-	/etc/ssh	h
 
 # if sshd needs to be restarted, it can be done through the admin role
 # restarting sshd should be followed immediately by a gradm -u
