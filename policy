@@ -252,9 +252,7 @@ subject / rvka
 	connect disabled
 	bind disabled
 
-subject /sbin/poweroff rvkao
-	/rwcdmlxi
-subject /sbin/reboot rvkao
+subject /sbin/halt rvkao
 	/rwcdmlxi
 subject /sbin/shutdown rvkao
 	/rwcdmlxi
