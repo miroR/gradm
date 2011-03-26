@@ -88,7 +88,9 @@
 # L -> audit link creation
 # f -> needed to mark the pipe used for communication with init
 #      to transfer the privilege of the persistent role; only valid
-#      within a persistent role
+#      within a persistent role.  Transfer only occurs when the file is 
+#      opened for writing
+#
 # new subject modes:
 # O -> disable "writable library" restrictions for this task
 # t -> allow this process to ptrace any process (use with caution)
