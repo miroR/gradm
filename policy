@@ -253,9 +253,9 @@ subject / rvka
 	bind disabled
 
 subject /sbin/halt rvkao
-	/rwcdmlxi
+	/ rwcdmlxi
 subject /sbin/shutdown rvkao
-	/rwcdmlxi
+	/ rwcdmlxi
 
 role admin sA
 subject / rvka
