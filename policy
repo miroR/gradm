@@ -25,7 +25,8 @@
 #      session is terminated won't cause the rest of the shutdown 
 #      sequence to execute with reduced privilege.  Do *NOT* use this 
 #      flag with any role that does anything but shut the system down.
-
+#      For usability reasons, we allow the removal of persistence through
+#      the normal unauth process (so persistence only survives exit).
 #
 # a role can only be one of user, group, or special
 #
