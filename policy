@@ -243,7 +243,7 @@ define grsec_denied {
 # usage:
 # $grsec_denied
 
-role shutdown sAR
+role shutdown sARG
 subject / rvka
 	/
 	/dev
