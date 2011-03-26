@@ -246,8 +246,6 @@ subject / rvka
 	/lib		rx
 	/lib64		rx
 	/usr		rx
-	/sbin rx
-	/sbin rx
 	/proc r
 	$grsec_denied
 	-CAP_ALL
