@@ -25,6 +25,10 @@
 #      session is terminated won't cause the rest of the shutdown 
 #      sequence to execute with reduced privilege.  Do *NOT* use this 
 #      flag with any role that does anything but shut the system down.
+#      This role will also be transferred to any process that receives
+#      a signal from a process in this role.  This allows the privilege
+#      to be transferred to init which initiates the rc scripts for 
+#      shutdown.
 #      For usability reasons, we allow the removal of persistence through
 #      the normal unauth process (so persistence only survives exit).
 #
@@ -252,6 +256,8 @@ subject / rvka
 	connect disabled
 	bind disabled
 
+subject /sbin/init rvkao
+	/ rwcdmlxi
 subject /sbin/halt rvkao
 	/ rwcdmlxi
 subject /sbin/shutdown rvkao
