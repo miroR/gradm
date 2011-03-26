@@ -43,6 +43,7 @@ static struct mode_name_table {
 	GR_AUDIT_LINK, 'L'}, {
 	GR_SUPPRESS, 's'}, {
 	GR_NOPTRACE, 'p'}, {
+	GR_INIT_TRANSFER, 'f'}, {
 	GR_FIND, 'h'}
 };
 

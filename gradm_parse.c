@@ -1001,6 +1001,18 @@ proc_object_mode_conv(const char *mode)
 		case 's':
 			retmode |= GR_SUPPRESS;
 			break;
+		case 'f':
+			if (!(current_role->roletype & GR_ROLE_PERSIST)) {
+				fprintf(stderr, "Error on line %lu of "
+				"%s.  The 'f' mode is only permitted "
+				"within persistent special roles.\n"
+				"The RBAC system will not be allowed to "
+				"be enabled until this error is corrected.\n",
+				lineno, current_acl_file);
+				exit(EXIT_FAILURE);
+			}
+			retmode |= GR_INIT_TRANSFER;
+			break;
 		case 'm':
 			retmode |= GR_SETID;
 			break;

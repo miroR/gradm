@@ -25,10 +25,9 @@
 #      session is terminated won't cause the rest of the shutdown 
 #      sequence to execute with reduced privilege.  Do *NOT* use this 
 #      flag with any role that does anything but shut the system down.
-#      This role will also be transferred to any process that receives
-#      a signal from a process in this role.  This allows the privilege
-#      to be transferred to init which initiates the rc scripts for 
-#      shutdown.
+#      This role will also be transferred to the init process upon
+#      writing to /dev/initctl.  This allows init to execute the rc 
+#      scripts for shutdown with the necessary privilege.
 #      For usability reasons, we allow the removal of persistence through
 #      the normal unauth process (so persistence only survives exit).
 #
@@ -87,6 +86,9 @@
 #	(hardlinking requires at a minimum c and l modes, and the target
 #	 link cannot have any greater permission than the source file)
 # L -> audit link creation
+# f -> needed to mark the pipe used for communication with init
+#      to transfer the privilege of the persistent role; only valid
+#      within a persistent role
 # new subject modes:
 # O -> disable "writable library" restrictions for this task
 # t -> allow this process to ptrace any process (use with caution)
@@ -260,8 +262,10 @@ subject /sbin/init rvkao
 	/ rwcdmlxi
 subject /sbin/halt rvkao
 	/ rwcdmlxi
+	/dev/initctl rwf
 subject /sbin/shutdown rvkao
 	/ rwcdmlxi
+	/dev/initctl rwf
 
 role admin sA
 subject / rvka

@@ -255,7 +255,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
-<VAR_OBJ_STATE>[rwxahitmlLFRWXAIMdDcCspo]+	{
+<VAR_OBJ_STATE>[rwxahitmlLFRWXAIMdDcCspof]+	{
 					  gradmlval.num = proc_object_mode_conv(yytext);
 					  return OBJ_MODE;
 					}
@@ -369,7 +369,7 @@ $HOME[/]?[^ \t\n]*			{
 						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
-[rwxahitmlLFRWXAIMcCdDspo]+		{
+[rwxahitmlLFRWXAIMcCdDspof]+		{
 					  gradmlval.num = proc_object_mode_conv(yytext);
 					  return OBJ_MODE;
 					}
