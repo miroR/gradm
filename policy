@@ -262,7 +262,7 @@ subject / rvka
 	/ rwcdmlxi
 
 role default G
-role_transitions admin
+role_transitions admin shutdown
 subject /
 	/		r
 	/opt		rx
