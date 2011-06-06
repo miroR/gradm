@@ -12,6 +12,37 @@ void add_grlearn_option(u_int32_t option)
 
 int is_protected_path(char *filename, u_int32_t mode)
 {
+	if (is_read_protected_path(filename, mode) ||
+	    is_write_protected_path(filename, mode))
+		return 1;
+	return 0;
+}
+
+int is_read_protected_path(char *filename, u_int32_t mode)
+{
+	char **tmp;
+	unsigned int len;
+
+	if (!(mode & GR_READ))
+		return 0;
+
+	tmp = read_protected_paths;
+	if (tmp == NULL)
+		return 0;
+
+	while (*tmp) {
+		len = strlen(*tmp);
+		if (!strncmp(filename, *tmp, len) &&
+		    (filename[len] == '\0' || filename[len] == '/'))
+			return 1;
+		tmp++;
+	}
+
+	return 0;
+}
+
+int is_write_protected_path(char *filename, u_int32_t mode)
+{
 	char **tmp;
 	unsigned int len;
 

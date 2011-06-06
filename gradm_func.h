@@ -94,6 +94,8 @@ void add_fulllearn_acl(void);
 void insert_ip(struct gr_learn_ip_node **base, u_int32_t ip, u_int16_t port, u_int8_t proto,
 		u_int8_t socktype);
 int is_protected_path(char *filename, u_int32_t mode);
+int is_read_protected_path(char *filename, u_int32_t mode);
+int is_write_protected_path(char *filename, u_int32_t mode);
 
 void add_grlearn_option(u_int32_t option);
 struct gr_learn_role_entry *
