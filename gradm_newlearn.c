@@ -1302,7 +1302,7 @@ void check_high_protected_path_enforcement(struct gr_learn_file_node *subject)
 				continue;
 			if (!tmptable[i]->mode)
 				continue;
-			if (!match_filename(filename, *tmp, len, is_glob))
+			if (!match_filename(tmptable[i]->filename, *tmp, len, is_glob))
 				goto next;
 		}
 		/* for all the ones that we didn't have a matching access from
