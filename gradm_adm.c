@@ -150,9 +150,11 @@ add_gradm_pam_acl(struct role_acl *role)
 	add_ip_acl(current_subject, GR_IP_BIND, &ip);
 
 	add_proc_object_acl(current_subject, "/", proc_object_mode_conv("h"), GR_FEXIST);
+	add_proc_object_acl(current_subject, "/etc/default/passwd", proc_object_mode_conv("r"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/etc/ld.so.cache", proc_object_mode_conv("r"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/etc/ld.so.preload", proc_object_mode_conv("r"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/etc/localtime", proc_object_mode_conv("r"), GR_FEXIST);
+	add_proc_object_acl(current_subject, "/etc/login.defs", proc_object_mode_conv("r"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/etc/protocols", proc_object_mode_conv("r"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/etc/passwd", proc_object_mode_conv("r"), GR_FEXIST);
 	add_proc_object_acl(current_subject, "/etc/shadow", proc_object_mode_conv("r"), GR_FEXIST);
@@ -184,6 +186,8 @@ add_gradm_pam_acl(struct role_acl *role)
 	add_cap_acl(current_subject, "-CAP_ALL", NULL);
 	add_cap_acl(current_subject, "+CAP_IPC_LOCK", NULL);
 	add_cap_acl(current_subject, "+CAP_AUDIT_WRITE", NULL);
+
+	add_sock_family(current_subject, "netlink");
 
 	return;
 }
