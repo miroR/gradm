@@ -1,51 +1,54 @@
 #include "gradm.h"
 
+struct file_acl *get_matching_object(struct proc_acl *subject, const char *filename)
+{
+	struct file_acl *tmpf = NULL;
+	struct proc_acl *tmpp = subject;
+	struct file_acl *tmpg = NULL;
+	char *tmpname = alloca(strlen(filename) + 1);
+
+	strcpy(tmpname, filename);
+
+	do {
+		tmpp = subject;
+		do {
+			tmpf = lookup_acl_object_by_name(tmpp, tmpname);
+			if (!tmpf)
+				tmpf = lookup_acl_object_by_inodev(tmpp, tmpname);
+			if (tmpf) {
+				/* check globbed objects */
+				for_each_globbed(tmpg, tmpf) {
+					if (!fnmatch(tmpg->filename, filename, 0))
+						return tmpg;
+				}
+				return tmpf;
+			}
+		} while ((tmpp = tmpp->parent_subject));
+	} while (parent_dir(filename, &tmpname));
+
+	// won't get here
+	return NULL;
+}
+
 static int
 check_permission(struct role_acl *role, struct proc_acl *def_acl,
 		 const char *filename, struct chk_perm *chk)
 {
 	struct file_acl *tmpf = NULL;
 	struct proc_acl *tmpp = def_acl;
-	struct file_acl *tmpg = NULL;
-	char *tmpname;
 	gr_cap_t cap_drp = {{ 0, 0 }}, cap_mask = {{ 0, 0 }};
 	gr_cap_t cap_full = {{ ~0, ~0 }};
 
 	if (chk->type == CHK_FILE) {
-		tmpname = alloca(strlen(filename) + 1);
-		strcpy(tmpname, filename);
-
-		do {
-			tmpp = def_acl;
-			do {
-				tmpf = lookup_acl_object_by_name(tmpp, tmpname);
-				if (!tmpf)
-					tmpf = lookup_acl_object_by_inodev(tmpp, tmpname);
-				if (tmpf) {
-					/* check globbed objects */
-					for_each_globbed(tmpg, tmpf) {
-						if (!fnmatch(tmpg->filename, filename, 0)) {
-							if (((chk->w_modes == 0xffff)
-							     || (tmpg->mode & chk->w_modes))
-							    && ((chk->u_modes == 0xffff)
-								|| !(tmpg->mode & chk->u_modes))) {
-								return 1;
-							} else {
-								return 0;
-							}
-						}
-					}
-					if (((chk->w_modes == 0xffff)
-					     || (tmpf->mode & chk->w_modes))
-					    && ((chk->u_modes == 0xffff)
-						|| !(tmpf->mode & chk->u_modes))) {
-						return 1;
-					} else {
-						return 0;
-					}
-				}
-			} while ((tmpp = tmpp->parent_subject));
-		} while (parent_dir(filename, &tmpname));
+		tmpf = get_matching_object(def_acl, filename);
+		if (((chk->w_modes == 0xffff)
+		     || (tmpf->mode & chk->w_modes))
+		     && ((chk->u_modes == 0xffff)
+		     || !(tmpf->mode & chk->u_modes))) {
+			return 1;
+		} else {
+			return 0;
+		}
 	} else if (chk->type == CHK_CAP) {
 		cap_mask = tmpp->cap_mask;
 		cap_drp = tmpp->cap_drop;
