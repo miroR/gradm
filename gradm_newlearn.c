@@ -1407,7 +1407,7 @@ int display_leaf(struct gr_learn_file_node *node, void *rolename, FILE *stream)
 		bind = node->bind_list;
 		conv_subj_mode_to_str(node->mode, modes, sizeof(modes));
 		if (rolename)
-			fprintf(stream, "#Role: %s\n", rolename);
+			fprintf(stream, "# Role: %s\n", rolename);
 		fprintf(stream, "subject %s %s {\n", node->filename, modes);
 
 		if (node->user_trans_list) {
