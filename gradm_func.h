@@ -30,6 +30,7 @@ void add_paxflag_acl(struct proc_acl *subject, const char *paxflag);
 void add_gradm_acl(struct role_acl *role);
 void add_gradm_pam_acl(struct role_acl *role);
 void add_grlearn_acl(struct role_acl *role);
+struct file_acl *get_matching_object(struct proc_acl *subject, const char *filename);
 void add_domain_child(struct role_acl *role, char *idname);
 void change_current_acl_file(const char *filename);
 struct gr_arg_wrapper *conv_user_to_kernel(struct gr_pw_entry *entry);

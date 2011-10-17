@@ -3,7 +3,7 @@
 extern FILE *gradmin;
 extern int gradmparse(void);
 
-static int get_id_from_role_name(char *rolename, u_int16_t type)
+static int get_id_from_role_name(const char *rolename, u_int16_t type)
 {
 	unsigned long the_id = 0;
 	struct passwd *pwd;
@@ -118,10 +118,23 @@ static int
 is_role_dupe(struct role_acl *role, const char *rolename, const u_int16_t type)
 {
 	struct role_acl *tmp;
+	int id;
+	int i;
 
-	for_each_role(tmp, role)
-	    if ((tmp->roletype & (GR_ROLE_USER | GR_ROLE_GROUP | GR_ROLE_SPECIAL) & type) && !strcmp(tmp->rolename, rolename))
-		return 1;
+	if ((type & GR_ROLE_ISID) || ((type & (GR_ROLE_USER | GR_ROLE_GROUP)) && !(type & GR_ROLE_DOMAIN))) {
+		id = get_id_from_role_name(rolename, type);
+	}
+
+	for_each_role(tmp, role) {
+		if ((tmp->roletype & (GR_ROLE_USER | GR_ROLE_GROUP | GR_ROLE_SPECIAL) & type) && !strcmp(tmp->rolename, rolename))
+			return 1;
+		if ((tmp->roletype & GR_ROLE_DOMAIN) && (type & (GR_ROLE_USER | GR_ROLE_GROUP))) {
+			for (i = 0; i < tmp->domain_child_num; i++) {
+				if (tmp->domain_children[i] == id)
+					return 1;
+			}
+	    	}
+	}
 
 	return 0;
 }
@@ -135,7 +148,7 @@ add_domain_child(struct role_acl *role, char *idname)
 		exit(EXIT_FAILURE);
 	}
 
-	if (is_role_dupe(current_role, idname, role->roletype)) {
+	if (is_role_dupe(current_role, idname, role->roletype | GR_ROLE_ISID)) {
 		fprintf(stderr, "Duplicate role %s on line %lu of %s.\n"
 			"The RBAC system will not be allowed to be "
 			"enabled until this error is fixed.\n",
