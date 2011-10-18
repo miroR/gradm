@@ -30,6 +30,9 @@ void add_paxflag_acl(struct proc_acl *subject, const char *paxflag);
 void add_gradm_acl(struct role_acl *role);
 void add_gradm_pam_acl(struct role_acl *role);
 void add_grlearn_acl(struct role_acl *role);
+int add_globbed_object_acl(struct proc_acl *subject, char *filename,
+                  u_int32_t mode, int type, char *policy_file, unsigned long line);
+struct file_acl *get_exact_matching_object(struct proc_acl *subject, const char *filename);
 struct file_acl *get_matching_object(struct proc_acl *subject, const char *filename);
 void add_domain_child(struct role_acl *role, char *idname);
 void change_current_acl_file(const char *filename);
@@ -134,9 +137,9 @@ int ensure_subject_security(struct gr_learn_file_node *subject,
 			FILE *unused2);
 
 void check_acl_status(u_int16_t reqmode);
-struct file_acl *lookup_acl_object_by_name(struct proc_acl *subject, char *name);
-struct file_acl *lookup_acl_object_by_inodev(struct proc_acl *subject, char *name);
-struct proc_acl *lookup_acl_subject_by_name(struct role_acl *role, char *name);
+struct file_acl *lookup_acl_object_by_name(struct proc_acl *subject, const char *name);
+struct file_acl *lookup_acl_object_by_inodev(struct proc_acl *subject, const char *name);
+struct proc_acl *lookup_acl_subject_by_name(struct role_acl *role, const char *name);
 struct file_acl *lookup_acl_object(struct proc_acl *subject, struct file_acl *object);
 struct proc_acl *lookup_acl_subject(struct role_acl *role, struct proc_acl *subject);
 
