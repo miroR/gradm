@@ -275,6 +275,8 @@ static void add_fulllearn_shutdown_acl(void)
 	ADD_OBJ("/proc/modules", "h");
 	ADD_OBJ("/proc/kallsyms", "h");
 	ADD_OBJ("/lib/modules", "hs");
+	ADD_OBJ("/lib32/modules", "hs");
+	ADD_OBJ("/lib64/modules", "hs");
 	ADD_OBJ("/etc/ssh", "h");
 	add_cap_acl(current_subject, "-CAP_ALL", NULL);
 
