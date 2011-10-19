@@ -472,6 +472,8 @@ subject /usr/bin/xauth
 
 # prevent ld.so breakouts of subjects with /lib rx
 
+# many distros clutter up /lib with shell scripts
+# that can be easily hijacked for malicious purposes
 subject /lib o
 	/ h
 	-CAP_ALL
