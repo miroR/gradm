@@ -469,3 +469,17 @@ subject /sbin/init
 subject /usr/bin/xauth
 	/home r
 	/home/*/.Xauthority-* rwcdl
+
+# prevent ld.so breakouts of subjects with /lib rx
+
+subject /lib/ld-linux.so.2 o
+	/ h
+	-CAP_ALL
+	connect disabled
+	bind disabled
+
+subject /lib64/ld-linux-x86-64.so.2 o
+	/ h
+	-CAP_ALL
+	connect disabled
+	bind disabled
