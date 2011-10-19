@@ -472,6 +472,12 @@ subject /usr/bin/xauth
 
 # prevent ld.so breakouts of subjects with /lib rx
 
+subject /lib o
+	/ h
+	-CAP_ALL
+	connect disabled
+	bind disabled
+
 subject /lib/ld-linux.so.2 o
 	/ h
 	-CAP_ALL
