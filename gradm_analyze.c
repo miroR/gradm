@@ -135,6 +135,10 @@ check_symlinks(void)
 		if (!realpath(sym->obj->filename, buf))
 			continue;
 
+		/* warning exemptions */
+		if (!strcmp(buf, "/proc/self"))
+			continue;
+
 		tmpf = get_exact_matching_object(sym->subj, buf);
 		if (tmpf == NULL) {
 			fprintf(stdout, "Warning: object does not exist in role %s, subject %s for the target of the symlink object %s specified on line %lu of %s.\n",
