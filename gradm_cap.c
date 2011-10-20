@@ -36,6 +36,7 @@ struct capability_set capability_list[] = {
 	{"CAP_MAC_OVERRIDE", 32},
 	{"CAP_MAC_ADMIN", 33},
 	{"CAP_SYSLOG", 34},
+	{"CAP_WAKE_ALARM", 35},
 	{"CAP_ALL", ~0}
 };
 
