@@ -12,9 +12,9 @@ struct file_acl *get_exact_matching_object(struct proc_acl *subject, const char 
 	do {
 		tmpp = subject;
 		do {
-			tmpf = lookup_acl_object_by_name(tmpp, filename);
+			tmpf = lookup_acl_object_by_name(tmpp, tmpname);
 			if (!tmpf)
-				tmpf = lookup_acl_object_by_inodev(tmpp, filename);
+				tmpf = lookup_acl_object_by_inodev(tmpp, tmpname);
 			if (tmpf) {
 				/* check globbed objects */
 				for_each_globbed(tmpg, tmpf) {
@@ -32,7 +32,8 @@ struct file_acl *get_exact_matching_object(struct proc_acl *subject, const char 
 	return NULL;
 }
 
-static struct file_acl *get_a_matching_object(struct proc_acl *subject, const char *filename)
+static struct file_acl *get_a_matching_object(struct proc_acl *subject, 
+				const char *filename, const char *origname)
 {
 	struct file_acl *tmpf, *tmpg;
 	struct proc_acl *tmpp = subject;
@@ -43,7 +44,7 @@ static struct file_acl *get_a_matching_object(struct proc_acl *subject, const ch
 		if (tmpf) {
 			/* check globbed objects */
 			for_each_globbed(tmpg, tmpf) {
-				if (!fnmatch(tmpg->filename, filename, 0))
+				if (!fnmatch(tmpg->filename, origname, 0))
 					return tmpg;
 			}
 			return tmpf;
@@ -62,7 +63,7 @@ struct file_acl *get_matching_object(struct proc_acl *subject, const char *filen
 	strcpy(tmpname, filename);
 
 	do {
-		tmpf = get_a_matching_object(subject, tmpname);
+		tmpf = get_a_matching_object(subject, tmpname, filename);
 		if (tmpf)
 			return tmpf;
 	} while (parent_dir(filename, &tmpname));

@@ -37,8 +37,8 @@
 #define PATH_MAX 		4096
 #define MAX_LINE_LEN 		5000
 
-// CAP_SYSLOG
-#define CAP_MAX			34 
+// CAP_WAKE_ALARM
+#define CAP_MAX			35
 
 #define MAX_INCLUDE_DEPTH	20
 #define MAX_NEST_DEPTH		8
