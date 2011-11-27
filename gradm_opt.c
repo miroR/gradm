@@ -47,8 +47,16 @@ expand_acls(void)
 				add_sock_family(proc, "all");
 			}
 
-			if (!stat(proc->filename, &fstat) && S_ISREG(fstat.st_mode)) {
-				add_proc_object_acl(proc, gr_strdup(proc->filename), proc_object_mode_conv("rx"), GR_FLEARN);
+			if (!lstat(proc->filename, &fstat)) {
+				char buf[PATH_MAX] = {0};
+				if (S_ISLNK(fstat.st_mode)) {
+					readlink(proc->filename, buf, sizeof(buf) - 1);
+					if (!lstat(buf, &fstat) && S_ISREG(fstat.st_mode)) {
+						add_proc_object_acl(proc, gr_strdup(buf), proc_object_mode_conv("rx"), GR_FLEARN);
+					}
+				} else if (S_ISREG(fstat.st_mode)) {
+					add_proc_object_acl(proc, gr_strdup(proc->filename), proc_object_mode_conv("rx"), GR_FLEARN);
+				}
 			}
 			/* if we're not nested and not /, set parent subject */
 			if (!(proc->mode & GR_OVERRIDE) && !(proc->mode & GR_NESTED) && strcmp(proc->filename, "/"))
