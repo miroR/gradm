@@ -275,6 +275,11 @@ subject /sbin/shutdown rvkao
 	/ rwcdmlxi
 	/dev/initctl rwf
 
+# Make sure to unauthenticate with gradm -u from
+# the admin role after restarting a service
+# The service started will run with admin
+# privileges until you run gradm -u or your shell exits
+
 role admin sA
 subject / rvka
 	/ rwcdmlxi
