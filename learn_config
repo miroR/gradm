@@ -4,7 +4,7 @@
 #It accepts lines in the form of <command> <pathname>
 #Where <command> can be inherit-learn, no-learn, inherit-no-learn,
 #high-reduce-path, dont-reduce-path, protected-path, high-protected-path,
-#and always-reduce-path
+#read-protected-path, and always-reduce-path
 #
 #inherit-learn, no-learn, and inherit-no-learn operate only with
 #full learning
