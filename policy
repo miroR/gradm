@@ -271,9 +271,11 @@ subject /sbin/init rvkao
 subject /sbin/halt rvkao
 	/ rwcdmlxi
 	/dev/initctl rwf
+	/run/initctl rwf
 subject /sbin/shutdown rvkao
 	/ rwcdmlxi
 	/dev/initctl rwf
+	/run/initctl rwf
 
 # Make sure to unauthenticate with gradm -u from
 # the admin role after restarting a service
@@ -321,6 +323,7 @@ subject /
 	/proc/sys	r
 	/sys		h
 	/root		r
+	/run		r
 	/tmp		rwcd
 	/var		rwxcd
 	/var/tmp	rwcd

@@ -116,6 +116,7 @@ dont-reduce-path /opt
 protected-path /etc
 protected-path /lib
 protected-path /boot
+protected-path /run
 protected-path /usr
 protected-path /opt
 protected-path /var

@@ -667,6 +667,14 @@ analyze_acls(void)
 			errs_found++;
 		}
 
+		if (!check_permission(role, def_acl, "/run", &chk)) {
+			fprintf(stderr,
+				"Writing access is allowed by role %s to /run, the directory which "
+				"holds information for running services and potentially the initctl device.\n\n",
+				role->rolename);
+			errs_found++;
+		}
+
 		if (!stat("/lib/modules", &fstat) && !check_permission(role, def_acl, "/lib/modules", &chk)) {
 			fprintf(stderr,
 				"Writing access is allowed by role %s to /lib/modules, the directory which "
