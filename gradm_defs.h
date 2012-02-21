@@ -223,11 +223,13 @@ enum {
 	GR_POVERRIDE	= 0x00010000,
 	GR_KERNELAUTH	= 0x00020000,
 	GR_ATSECURE	= 0x00040000,
-	GR_SHMEXEC	= 0x00080000
+	GR_SHMEXEC	= 0x00080000,
+	GR_GLOBANCHOR	= 0x00100000
 };
 
 enum {
-	GR_DONT_LEARN_ALLOWED_IPS = 0x00000001
+	GR_DONT_LEARN_ALLOWED_IPS = 0x00000001,
+	GR_SPLIT_ROLES = 0x00000002
 };
 
 /* internal use only.  not to be modified */
@@ -596,5 +598,7 @@ extern char **high_protected_paths;
 extern u_int32_t grlearn_options;
 
 extern int gr_learn;
+extern int gr_fulllearn;
+extern char *output_log;
 
 #endif

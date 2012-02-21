@@ -63,6 +63,10 @@
 # restricts roles to specific IP ranges:
 # dont-learn-allowed-ips
 #
+# to write out your generated policy such that roles are split into separate
+# files by the name of the role (within user/group directories), uncomment
+# the next line:
+# split-roles
 
 always-reduce-path /dev/pts
 always-reduce-path /var/spool/qmailscan/tmp

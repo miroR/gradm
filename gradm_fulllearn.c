@@ -514,6 +514,34 @@ void generate_full_learned_acls(FILE *learnlog, FILE *stream)
 	struct gr_learn_group_node *group, *tmpgroup;
 	struct gr_learn_user_node *user, *tmpuser;
 	int removed = 0;
+	char *current_output_file;
+	int got_users = 0;
+	int got_groups = 0;
+	FILE *policystream;
+
+	umask(0077);
+
+	if (grlearn_options & GR_SPLIT_ROLES) {
+		if (stream) {
+			fprintf(stderr, "Error: output path must be a directory when \"split-roles\" is used in learn-config.");
+			exit(EXIT_FAILURE);
+		}
+		current_output_file = alloca(strlen(output_log) + 16384);
+		sprintf(current_output_file, "%s/policy", output_log);
+		stream = fopen(current_output_file, "w");
+		if (stream == NULL) {
+			fprintf(stderr, "Unable to open %s for writing.\n"
+					"Error: %s\n", current_output_file, strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+	} else {
+		if (stream == NULL) {
+			fprintf(stderr, "Error: output path must be a file when \"split-roles\" is not used in learn-config.");
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	
 
 	output_learn_header(stream);
 
@@ -525,15 +553,41 @@ void generate_full_learned_acls(FILE *learnlog, FILE *stream)
 
 	for_each_removable_list_entry(group, the_role_list) {
 		if (group->users == NULL) {
+			got_groups = 1;
 			current_learn_rolename = group->rolename;
 			current_learn_rolemode = GR_ROLE_GROUP;
+			if (grlearn_options & GR_SPLIT_ROLES) {
+				fclose(stream);
+				sprintf(current_output_file, "%s/groups", output_log);
+				mkdir(current_output_file, 0700);
+				sprintf(current_output_file, "%s/groups/%s", output_log, group->rolename);
+				stream = fopen(current_output_file, "w");
+				if (stream == NULL) {
+					fprintf(stderr, "Unable to open %s for writing.\n"
+							"Error: %s\n", current_output_file, strerror(errno));
+					exit(EXIT_FAILURE);
+				}
+			}
 			output_role_info(group, NULL, stream);
 			sort_file_node_list(group->subject_list);
 			traverse_file_tree(group->subject_list, &fulllearn_pass3, group->rolename, stream);
 		} else {
 			for_each_removable_list_entry(user, group->users) {
+				got_users = 1;
 				current_learn_rolename = user->rolename;
 				current_learn_rolemode = GR_ROLE_USER;
+				if (grlearn_options & GR_SPLIT_ROLES) {
+					fclose(stream);
+					sprintf(current_output_file, "%s/users", output_log);
+					mkdir(current_output_file, 0700);
+					sprintf(current_output_file, "%s/users/%s", output_log, user->rolename);
+					stream = fopen(current_output_file, "w");
+					if (stream == NULL) {
+						fprintf(stderr, "Unable to open %s for writing.\n"
+								"Error: %s\n", current_output_file, strerror(errno));
+						exit(EXIT_FAILURE);
+					}
+				}
 				output_role_info(NULL, user, stream);
 				sort_file_node_list(user->subject_list);
 				traverse_file_tree(user->subject_list, &fulllearn_pass3, user->rolename, stream);
@@ -549,6 +603,21 @@ void generate_full_learned_acls(FILE *learnlog, FILE *stream)
 		group = tmpgroup;
 		removed = 1;
 		for_each_removable_list_entry_end(group);
+	}
+
+	if (grlearn_options & GR_SPLIT_ROLES) {
+		sprintf(current_output_file, "%s/policy", output_log);
+		policystream = fopen(current_output_file, "a");
+		if (policystream == NULL) {
+			fprintf(stderr, "Unable to open %s for writing.\n"
+					"Error: %s\n", current_output_file, strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+		if (got_users)
+			fprintf(policystream, "include <%s/users>\n", output_log);
+		if (got_groups)
+			fprintf(policystream, "include <%s/groups>\n", output_log);
+		fclose(policystream);
 	}
 
 	fprintf(stdout, "Full learning complete.\n");

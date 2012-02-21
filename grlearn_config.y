@@ -10,7 +10,7 @@ extern int grlearn_configlex(void);
 
 %token <string> FILENAME NOLEARN INHERITLEARN INHERITNOLEARN DONTREDUCE 
 %token <string> PROTECTED HIGHPROTECTED HIGHREDUCE ALWAYSREDUCE NOALLOWEDIPS
-%token <string> READPROTECTED
+%token <string> READPROTECTED SPLITROLES
 %token <num> NUM
 
 %%
@@ -74,6 +74,10 @@ learn_config:
 	|	NOALLOWEDIPS
 		{
 			add_grlearn_option(GR_DONT_LEARN_ALLOWED_IPS);
+		}
+	|	SPLITROLES
+		{
+			add_grlearn_option(GR_SPLIT_ROLES);
 		}
 	;
 %%

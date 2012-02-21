@@ -30,9 +30,10 @@ show_help(void)
 	       "	-R, --reload	Reload the RBAC system while in admin mode\n"
 	       "	-L <filename>, --learn\n"
 	       "			Specify the pathname for learning logs\n"
-	       "	-O <filename>, --output\n"
+	       "	-O <filename|directory>, --output\n"
 	       "			Specify where to place policies generated from\n"
-	       "                        learning mode\n"
+	       "                        learning mode.  Should be a directory only if\n"
+	       "                        \"split-roles\" is specified in learn_config.\n"
 	       "	-M <filename|uid>, --modsegv\n"
 	       "			Remove a ban on a specific file or UID\n"
 	       "	-a <rolename> , --auth\n"
@@ -168,6 +169,7 @@ static FILE *open_learn_log(char *learn_log)
 int gr_learn = 0;
 int gr_enable = 0;
 int gr_check = 0;
+int gr_fulllearn = 0;
 
 void
 parse_args(int argc, char *argv[])
@@ -175,10 +177,8 @@ parse_args(int argc, char *argv[])
 	int next_option = 0;
 	int err;
 	int verbose = 0;
-	char *output_log = NULL;
 	char *learn_log = NULL;
 	int gr_output = 0;
-	int gr_fulllearn = 0;
 	struct gr_pw_entry entry;
 	struct gr_arg_wrapper *grarg;
 	char cwd[PATH_MAX];
@@ -448,13 +448,17 @@ parse_args(int argc, char *argv[])
 		else if (!strcmp(output_log, "stderr"))
 			stream = stderr;
 		else {
-			stream = fopen(output_log, "a");
-			if (!stream) {
-				fprintf(stderr,
-					"Unable to open %s for writing.\n"
-					"Error: %s\n", output_log,
-					strerror(errno));
-				exit(EXIT_FAILURE);
+			struct stat logstat;
+
+			if (!gr_fulllearn || stat(output_log, &logstat) || !S_ISDIR(logstat.st_mode)) {
+				stream = fopen(output_log, "a");
+				if (!stream) {
+					fprintf(stderr,
+						"Unable to open %s for writing.\n"
+						"Error: %s\n", output_log,
+						strerror(errno));
+					exit(EXIT_FAILURE);
+				}
 			}
 		}
 

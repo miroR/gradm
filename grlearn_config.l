@@ -57,6 +57,9 @@ FILENAME [/][^\t\n]*
 "dont-learn-allowed-ips"		{
 					  return NOALLOWEDIPS;
 					}
+"split-roles"				{
+					  return SPLITROLES;
+					}
 {NUM}					{
 					  grlearn_configlval.num = atol(yytext);
 					  return NUM;

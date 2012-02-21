@@ -29,3 +29,5 @@ char **read_protected_paths;
 char **high_reduce_dirs;
 char **high_protected_paths;
 u_int32_t grlearn_options;
+
+char *output_log;
