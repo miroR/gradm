@@ -451,7 +451,12 @@ parse_args(int argc, char *argv[])
 			struct stat logstat;
 
 			if (!gr_fulllearn || stat(output_log, &logstat) || !S_ISDIR(logstat.st_mode)) {
-				stream = fopen(output_log, "a");
+				if (gr_fulllearn) {
+					/* wipe out any existing policy */
+					stream = fopen(output_log, "w");
+				} else {
+					stream = fopen(output_log, "a");
+				}
 				if (!stream) {
 					fprintf(stderr,
 						"Unable to open %s for writing.\n"
