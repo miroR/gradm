@@ -23,8 +23,8 @@ int current_nest_depth = 0;
 %token <string> ID_NAME USER_TRANS_ALLOW GROUP_TRANS_ALLOW 
 %token <string> USER_TRANS_DENY GROUP_TRANS_DENY DOMAIN_TYPE DOMAIN
 %token <string> INTERFACE IPOVERRIDE REPLACE REP_ARG AUDIT
-%token <string> SOCKALLOWFAMILY SOCKFAMILY
-%token <num> OBJ_MODE SUBJ_MODE IPADDR IPNETMASK NOT
+%token <string> SOCKALLOWFAMILY SOCKFAMILY ROLE_UMASK
+%token <num> OBJ_MODE SUBJ_MODE IPADDR IPNETMASK NOT UMASK
 %token <shortnum> IPPORT ROLE_TYPE 
 %type <num> subj_mode obj_mode ip_netmask invert_socket
 %type <shortnum> role_type
@@ -43,6 +43,7 @@ various_acls:			role_label
 	|			replace_rule
 	|			domain_label
 	|			role_allow_ip
+	|			role_umask
 	|			role_transitions
 	|			subject_label
 	|			user_allow_label
@@ -311,6 +312,12 @@ role_names:			ROLE_NAME
 	|			role_names ROLE_NAME
 				{
 					add_role_transition(current_role, $2);
+				}
+	;
+
+role_umask:			ROLE_UMASK UMASK
+				{
+					set_role_umask(current_role, $2);
 				}
 	;
 

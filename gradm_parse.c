@@ -3,6 +3,11 @@
 extern FILE *gradmin;
 extern int gradmparse(void);
 
+void set_role_umask(struct role_acl *role, int umask)
+{
+	role->umask = umask & S_IRWXUGO;
+}
+
 static int get_id_from_role_name(const char *rolename, u_int16_t type)
 {
 	unsigned long the_id = 0;
@@ -317,6 +322,7 @@ add_role_acl(struct role_acl **role, char *rolename, u_int16_t type, int ignore)
 	     (struct role_acl *) calloc(1, sizeof (struct role_acl))) == NULL)
 		failure("calloc");
 
+	rtmp->umask = S_IRWXUGO;
 	rtmp->roletype = type;
 	rtmp->rolename = rolename;
 

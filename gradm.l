@@ -32,7 +32,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 %option nounput
 
 %x ROLE_STATE SUBJECT_STATE IP_STATE RES_STATE COMMENT_STATE ROLETYPE_STATE
-%x INCLUDE_STATE IPNETMASK_STATE IPPORT_STATE ROLETRANS_STATE
+%x INCLUDE_STATE IPNETMASK_STATE IPPORT_STATE ROLETRANS_STATE UMASK_STATE
 %x VAR_STATE VAR_OBJ_STATE IDTRANS_STATE DOMAIN_STATE DOMAINTYPE_STATE
 %x DOMAINLIST_STATE IPIP_STATE IPONLY_STATE REP_STATE CAP_STATE FAMILY_STATE
 
@@ -63,6 +63,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return DOMAIN_TYPE;
 					}
 <DOMAINLIST_STATE>"\\\n"		;
+<UMASK_STATE>[0-7]{3,4}			{
+					  sscanf(yytext, "%o", &gradmlval.num);
+					  return UMASK;
+					}
 <ROLE_STATE>[_a-zA-Z0-9.-]{1,64}	{
 					  BEGIN(ROLETYPE_STATE);
 					  gradmlval.string = gr_strdup(yytext);
@@ -290,6 +294,10 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 "role_allow_ip"				{
 					  BEGIN(IPIP_STATE);
 					  return ROLE_ALLOW_IP;
+					}
+"role_umask"				{
+					  BEGIN(UMASK_STATE);
+					  return ROLE_UMASK;
 					}
 "role_transitions"			{
 					  BEGIN(ROLETRANS_STATE);

@@ -220,6 +220,13 @@
 # log suppression for denial of a capbility can be done by adding "suppress":
 # -CAP_SYS_RAWIO suppress
 #
+# Per-role umask enforcement:
+# If you have a user that you want to be assured cannot accidentally
+# create a file that others can read (a confidentiality issue)
+# add the following under the role declaration:
+# role_umask 077
+# any normal octal umask may be specified
+#
 # Note that the omission of any feature of a role or subject
 # results in a default-allow
 # For instance, if no capability rules are added, an implicit +CAP_ALL is used
