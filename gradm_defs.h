@@ -111,10 +111,6 @@
 #undef AF_MAX
 #define AF_MAX 38
 
-#ifndef S_IRWXUGO
-#define S_IRWXUGO 0777
-#endif
-
 #define GR_NLIMITS	32
 #define GR_CRASH_RES	31
 
