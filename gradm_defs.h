@@ -322,7 +322,6 @@ struct role_transition {
 struct role_acl {
 	char *rolename;
 	uid_t uidgid;
-	int umask;
 	u_int16_t roletype;
 
 	u_int16_t auth_attempts;
@@ -338,6 +337,8 @@ struct role_acl {
 	struct role_allowed_ip *allowed_ips;
 	uid_t *domain_children;
 	u_int16_t domain_child_num;
+
+	u_int16_t  umask;
 
 	struct proc_acl **subj_hash;
 	u_int32_t subj_hash_size;

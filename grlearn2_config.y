@@ -15,7 +15,7 @@ extern void grlearn_configerror(const char *s);
 
 %token <string> FILENAME NOLEARN INHERITLEARN INHERITNOLEARN DONTREDUCE 
 %token <string> PROTECTED HIGHPROTECTED HIGHREDUCE ALWAYSREDUCE NOALLOWEDIPS
-%token <string> READPROTECTED
+%token <string> READPROTECTED SPLITROLES
 %token <num> NUM
 
 %%
@@ -54,6 +54,9 @@ learn_config:
 		{
 		}
 	|	NOALLOWEDIPS
+		{
+		}
+	|	SPLITROLES
 		{
 		}
 	;

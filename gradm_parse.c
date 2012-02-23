@@ -3,7 +3,7 @@
 extern FILE *gradmin;
 extern int gradmparse(void);
 
-void set_role_umask(struct role_acl *role, int umask)
+void set_role_umask(struct role_acl *role, u_int16_t umask)
 {
 	role->umask = umask & S_IRWXUGO;
 }

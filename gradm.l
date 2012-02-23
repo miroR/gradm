@@ -64,7 +64,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 <DOMAINLIST_STATE>"\\\n"		;
 <UMASK_STATE>[0-7]{3,4}			{
-					  sscanf(yytext, "%o", &gradmlval.num);
+					  sscanf(yytext, "%ho", &gradmlval.shortnum);
 					  return UMASK;
 					}
 <ROLE_STATE>[_a-zA-Z0-9.-]{1,64}	{

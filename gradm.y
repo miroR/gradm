@@ -24,8 +24,8 @@ int current_nest_depth = 0;
 %token <string> USER_TRANS_DENY GROUP_TRANS_DENY DOMAIN_TYPE DOMAIN
 %token <string> INTERFACE IPOVERRIDE REPLACE REP_ARG AUDIT
 %token <string> SOCKALLOWFAMILY SOCKFAMILY ROLE_UMASK
-%token <num> OBJ_MODE SUBJ_MODE IPADDR IPNETMASK NOT UMASK
-%token <shortnum> IPPORT ROLE_TYPE 
+%token <num> OBJ_MODE SUBJ_MODE IPADDR IPNETMASK NOT
+%token <shortnum> IPPORT ROLE_TYPE UMASK
 %type <num> subj_mode obj_mode ip_netmask invert_socket
 %type <shortnum> role_type
 %type <var> variable_expression
