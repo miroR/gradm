@@ -226,6 +226,8 @@
 # add the following under the role declaration:
 # role_umask 077
 # any normal octal umask may be specified
+# Note that unlike the normal umask, this umask will also apply
+# to the permissions one can chmod/fchmod a file to
 #
 # Note that the omission of any feature of a role or subject
 # results in a default-allow
