@@ -438,7 +438,7 @@ parse_args(int argc, char *argv[])
 		}
 		transmit_to_kernel(grarg);
 	} else if (gr_learn && gr_output) {
-		FILE *stream;
+		FILE *stream = NULL;
 		FILE *learnfile;
 
 		learnfile = open_learn_log(learn_log);

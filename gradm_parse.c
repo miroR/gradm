@@ -123,7 +123,7 @@ static int
 is_role_dupe(struct role_acl *role, const char *rolename, const u_int16_t type)
 {
 	struct role_acl *tmp;
-	int id;
+	int id = 0;
 	int i;
 
 	if ((type & GR_ROLE_ISID) || ((type & (GR_ROLE_USER | GR_ROLE_GROUP)) && !(type & GR_ROLE_DOMAIN))) {
@@ -564,8 +564,6 @@ parse_homedir(char *filename)
 	return newfilename;
 }
 
-static uid_t symlink_uid;
-
 int
 add_proc_object_acl(struct proc_acl *subject, char *filename,
 		    u_int32_t mode, int type)
@@ -576,7 +574,6 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	struct deleted_file *dfile;
 	unsigned int file_len;
 	char *str;
-	static int link_count = 0;
 
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "

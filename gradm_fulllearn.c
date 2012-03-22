@@ -514,7 +514,7 @@ void generate_full_learned_acls(FILE *learnlog, FILE *stream)
 	struct gr_learn_group_node *group, *tmpgroup;
 	struct gr_learn_user_node *user, *tmpuser;
 	int removed = 0;
-	char *current_output_file;
+	char *current_output_file = NULL;
 	int got_users = 0;
 	int got_groups = 0;
 	FILE *policystream;

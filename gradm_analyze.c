@@ -57,7 +57,6 @@ static struct file_acl *get_a_matching_object(struct proc_acl *subject,
 struct file_acl *get_matching_object(struct proc_acl *subject, const char *filename)
 {
 	struct file_acl *tmpf = NULL;
-	struct file_acl *tmpg = NULL;
 	char *tmpname = alloca(strlen(filename) + 1);
 
 	strcpy(tmpname, filename);

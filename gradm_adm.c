@@ -352,7 +352,6 @@ void start_grlearn(char *logfile)
 		exit(EXIT_FAILURE);
 	} else if (pid > 0) {
 		char b;
-		int read_bytes;
 		int fd;
 
 		fd = open(GR_LEARN_PIPE_PATH, O_RDONLY);
@@ -362,7 +361,7 @@ void start_grlearn(char *logfile)
 			exit(EXIT_FAILURE);
 		}
 
-		read_bytes = read(fd, &b, 1);
+		(void)read(fd, &b, 1);
 		close(fd);
 	} else {
 		fprintf(stderr, "Error starting grlearn.\n");
