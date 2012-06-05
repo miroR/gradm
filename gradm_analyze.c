@@ -241,6 +241,27 @@ check_default_objects(struct role_acl *role)
 }
 
 static void
+check_subject_modes(struct role_acl *role)
+{
+	struct proc_acl *tmp;
+	struct file_acl *tmpf;
+
+	for_each_subject(tmp, role) {
+		if ((tmp->mode & GR_LEARN) && (tmp->mode & GR_INHERITLEARN)) {
+			fprintf(stderr, "Invalid subject mode found for "
+				"role %s subject %s\nBoth \"i\" and \"l\" modes "
+				"cannot be used together.  Please choose either "
+				"normal or inheritance-based learning for the "
+				"subject.\nThe RBAC system will not load until you "
+				"correct this error.\n", role->rolename, tmp->filename);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	return;
+}
+
+static void
 check_socket_policies(struct role_acl *role)
 {
 	struct proc_acl *tmp;
@@ -595,6 +616,7 @@ analyze_acls(void)
 		}
 
 		check_default_objects(role);
+		check_subject_modes(role);
 		check_socket_policies(role);
 
 		/* non-critical warnings aren't issued for special roles */

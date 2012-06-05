@@ -1405,7 +1405,7 @@ int display_leaf(struct gr_learn_file_node *node, void *rolename, FILE *stream)
 		object = node->object_list;
 		connect = node->connect_list;
 		bind = node->bind_list;
-		conv_subj_mode_to_str(node->mode, modes, sizeof(modes));
+		conv_subj_mode_to_str(node->mode &~ (GR_LEARN | GR_INHERITLEARN), modes, sizeof(modes));
 		if (rolename && (!gr_fulllearn || !(grlearn_options & GR_SPLIT_ROLES)))
 			fprintf(stream, "# Role: %s\n", (char *)rolename);
 		fprintf(stream, "subject %s %s {\n", node->filename, modes);
