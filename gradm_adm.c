@@ -116,7 +116,9 @@ add_gradm_acl(struct role_acl *role)
 	ADD_OBJ("/lib", "rx");
 	ADD_OBJ("/usr/lib", "rx");
 	ADD_OBJ("/lib32", "rx");
+	ADD_OBJ("/libx32", "rx");
 	ADD_OBJ("/usr/lib32", "rx");
+	ADD_OBJ("/usr/libx32", "rx");
 	ADD_OBJ("/lib64", "rx");
 	ADD_OBJ("/usr/lib64", "rx");
 	ADD_OBJ(gradm_name, "x");

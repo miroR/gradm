@@ -791,9 +791,24 @@ analyze_acls(void)
 			errs_found++;
 		}
 
+		if (!stat("/libx32", &fstat) && !check_permission(role, def_acl, "/libx32", &chk)) {
+			fprintf(stderr,
+				"Write access is allowed by role %s to /libx32, a directory which "
+				"holds system libraries.\n\n",
+				role->rolename);
+			errs_found++;
+		}
+
 		if (!stat("/usr/lib32", &fstat) && !check_permission(role, def_acl, "/usr/lib32", &chk)) {
 			fprintf(stderr,
 				"Write access is allowed by role %s to /usr/lib32, a directory which "
+				"holds system libraries.\n\n", role->rolename);
+			errs_found++;
+		}
+
+		if (!stat("/usr/libx32", &fstat) && !check_permission(role, def_acl, "/usr/libx32", &chk)) {
+			fprintf(stderr,
+				"Write access is allowed by role %s to /usr/libx32, a directory which "
 				"holds system libraries.\n\n", role->rolename);
 			errs_found++;
 		}
