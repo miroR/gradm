@@ -590,7 +590,7 @@ static void tailor_to_kernel(void)
 
 	uname(&buf);
 
-	if ((strlen(buf.release) < 3) || (buf.release[2] == '4'))
+	if (!strncmp(buf.release, "2.4", 3))
 		is_24_kernel = 1;
 	else
 		is_24_kernel = 0;

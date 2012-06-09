@@ -14,8 +14,8 @@
 #define GR_LEARN_PIPE_PATH	GRSEC_DIR "/.grlearn.pipe"
 #define GR_LEARN_PID_PATH	GRSEC_DIR "/.grlearn.pid"
 
-#define GR_VERSION		"2.9"
-#define GRADM_VERSION		0x2900
+#define GR_VERSION		"2.9.1"
+#define GRADM_VERSION		0x2901
 
 #define GR_PWONLY		0
 #define GR_PWANDSUM		1
