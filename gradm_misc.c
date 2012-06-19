@@ -38,6 +38,8 @@ void check_pam_auth(unsigned char *rolename)
 
 void parse_learn_config(void)
 {
+	struct stat st;
+
 	grlearn_configin = fopen(GR_LEARN_CONFIG_PATH, "r");
 	if (grlearn_configin == NULL) {
 		fprintf(stderr, "Unable to open %s: %s\n", GR_LEARN_CONFIG_PATH, strerror(errno));
@@ -45,6 +47,14 @@ void parse_learn_config(void)
 	}
 	grlearn_configparse();
 	fclose(grlearn_configin);
+
+	if (high_protected_paths == NULL) {
+		fprintf(stderr, "Invalid learn_config detected.  Please use the learn_config "
+			"provided with gradm as a starting point, otherwise learning will not "
+			"produce desired results.\n");
+		exit(EXIT_FAILURE);
+	}
+
 	return;
 }
 
