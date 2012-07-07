@@ -128,7 +128,7 @@ insert_globbed_objects(void)
 				fprintf(stderr, "Error on line %lu of %s: Globbed object %s in subject %s is completely matched by previous "
 						"globbed object %s.  As globbed objects with the same anchor are matched on a "
 						"first-rule-matches-first policy, the ordering present in your policy likely does not reflect "
-						"your intentions.  The RBAC system will not be allowed to be loaded until this error is fixed.\r\n", 
+						"your intentions.\r\n",
 					glob->lineno, glob->policy_file, glob->filename, glob->subj->filename, tmp->filename);
 				num_errors++;
 			}
