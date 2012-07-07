@@ -110,16 +110,33 @@ check_permission(struct role_acl *role, struct proc_acl *def_acl,
 	return 0;
 }
 
-static void
+static unsigned int
 insert_globbed_objects(void)
 {
 	struct glob_file *glob;
+	struct glob_file *tmp;
+	struct glob_file *subj_start = glob_files_head;
+	unsigned int num_errors = 0;
 
 	for (glob = glob_files_head; glob; glob = glob->next) {
+		/* check previous globbed objects for this subject, looking for one that completely matches this later object */
+		if (subj_start->subj != glob->subj)
+			subj_start = glob;
+		for (tmp = subj_start; tmp && tmp != glob; tmp = tmp->next) {
+			/* doesn't cover all cases, but covers enough */
+			if (!fnmatch(tmp->filename, glob->filename, 0)) {
+				fprintf(stderr, "Error on line %lu of %s: Globbed object %s in subject %s is completely matched by previous "
+						"globbed object %s.  As globbed objects with the same anchor are matched on a "
+						"first-rule-matches-first policy, the ordering present in your policy likely does not reflect "
+						"your intentions.  The RBAC system will not be allowed to be loaded until this error is fixed.\r\n", 
+					glob->lineno, glob->policy_file, glob->filename, tmp->filename);
+				num_errors++;
+			}
+		}
 		add_globbed_object_acl(glob->subj, glob->filename, glob->mode, glob->type, glob->policy_file, glob->lineno);
 	}
 
-	return;
+	return num_errors;
 }
 
 static void
@@ -572,9 +589,9 @@ analyze_acls(void)
 	struct stat fstat;
 	gr_cap_t cap_full = {{ ~0, ~0 }};
 
-	insert_globbed_objects();
+	errs_found += insert_globbed_objects();
 
-	errs_found = check_role_transitions();
+	errs_found += check_role_transitions();
 
 	for_each_role(role, current_role)
 		if (role->roletype & GR_ROLE_DEFAULT)
