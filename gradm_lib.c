@@ -5,7 +5,7 @@ char *get_anchor(char *filename)
 	char *basepoint = gr_strdup(filename);
 	char *p, *p2;
 
-	if (*basepoint)
+	if (!basepoint)
 		failure("gr_strdup");
 
 	/* calculates basepoint, eg basepoint of /home/ * /test is /home */
