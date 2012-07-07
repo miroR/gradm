@@ -419,7 +419,7 @@ int
 add_globbed_object_acl(struct proc_acl *subject, char *filename,
 		  u_int32_t mode, int type, char *policy_file, unsigned long line)
 {
-	char *basepoint = gr_strdup(filename);
+	char *basepoint;
 	char *p, *p2;
 	struct file_acl *anchor;
 	struct file_acl *glob, *glob2;
@@ -428,24 +428,7 @@ add_globbed_object_acl(struct proc_acl *subject, char *filename,
 	/* one for the object itself, one for the filename */
 	num_pointers += 2;
 
-	if (!basepoint)
-		failure("gr_strdup");
-
-	/* calculate basepoint, eg basepoint of /home/ * /test is /home */
-	p = p2 = basepoint;
-	while (*p != '\0') {
-		if (*p == '/')
-			p2 = p;
-		if (*p == '?' || *p == '*' || *p == '[')
-			break;
-		p++;
-	}
-	/* if base is / */
-	if (p2 == basepoint)
-		*(p2 + 1) = '\0';
-	else
-		*p2 = '\0';
-
+	basepoint = get_anchor(filename);
 	anchor = lookup_acl_object_by_name(subject, basepoint);
 
 	if (!anchor) {

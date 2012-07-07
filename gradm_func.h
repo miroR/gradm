@@ -179,6 +179,9 @@ void add_sock_family(struct proc_acl *subject, char *family);
 char *get_sock_family_from_val(int val);
 void set_role_umask(struct role_acl *role, u_int16_t umask);
 
+char *get_anchor(char *filename);
+int anchorcmp(char *path1, char *path2);
+
 #ifdef GRADM_DEBUG
 void check_file_node_list_integrity(struct gr_learn_file_node **filelist);
 void check_conformity_with_learned_rules(struct gr_learn_file_node *subject);

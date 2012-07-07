@@ -1,5 +1,44 @@
 #include "gradm.h"
 
+char *get_anchor(char *filename)
+{
+	char *basepoint = gr_strdup(filename);
+	char *p, *p2;
+
+	if (*basepoint)
+		failure("gr_strdup");
+
+	/* calculates basepoint, eg basepoint of /home/ * /test is /home */
+	p = p2 = basepoint;
+	while (*p != '\0') {
+		if (*p == '/')
+			p2 = p;
+		if (*p == '?' || *p == '*' || *p == '[')
+			break;
+		p++;
+	}
+	/* if base is / */
+	if (p2 == basepoint)
+		*(p2 + 1) = '\0';
+	else
+		*p2 = '\0';
+
+	return basepoint;
+}
+
+int anchorcmp(char *path1, char *path2)
+{
+	char *anchor1, *anchor2;
+	int ret;
+
+	anchor1 = get_anchor(path1);
+	anchor2 = get_anchor(path2);
+	ret = strcmp(anchor1, anchor2);
+	free(anchor1);
+	free(anchor2);
+	return ret;
+}	
+
 int is_globbed_file(char *filename)
 {
 	if (strchr(filename, '*') || strchr(filename, '?') || strchr(filename, '['))

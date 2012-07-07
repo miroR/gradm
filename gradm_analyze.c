@@ -124,7 +124,7 @@ insert_globbed_objects(void)
 			subj_start = glob;
 		for (tmp = subj_start; tmp && tmp != glob; tmp = tmp->next) {
 			/* doesn't cover all cases, but covers enough */
-			if (!fnmatch(tmp->filename, glob->filename, 0)) {
+			if (!anchorcmp(tmp->filename, glob->filename) && !fnmatch(tmp->filename, glob->filename, 0)) {
 				fprintf(stderr, "Error on line %lu of %s: Globbed object %s in subject %s is completely matched by previous "
 						"globbed object %s.  As globbed objects with the same anchor are matched on a "
 						"first-rule-matches-first policy, the ordering present in your policy likely does not reflect "
