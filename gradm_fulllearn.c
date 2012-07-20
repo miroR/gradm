@@ -523,7 +523,7 @@ void generate_full_learned_acls(FILE *learnlog, FILE *stream)
 
 	if (grlearn_options & GR_SPLIT_ROLES) {
 		if (stream) {
-			fprintf(stderr, "Error: output path must be a directory when \"split-roles\" is used in learn-config.");
+			fprintf(stderr, "Error: Output path must be a directory when \"split-roles\" is used in learn-config.\n");
 			exit(EXIT_FAILURE);
 		}
 		current_output_file = alloca(strlen(output_log) + 16384);
@@ -536,7 +536,7 @@ void generate_full_learned_acls(FILE *learnlog, FILE *stream)
 		}
 	} else {
 		if (stream == NULL) {
-			fprintf(stderr, "Error: output path must be a file when \"split-roles\" is not used in learn-config.");
+			fprintf(stderr, "Error: Output path must be a file when \"split-roles\" is not used in learn-config.\n");
 			exit(EXIT_FAILURE);
 		}
 	}
