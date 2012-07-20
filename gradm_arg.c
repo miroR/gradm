@@ -163,6 +163,11 @@ static FILE *open_learn_log(char *learn_log)
 		}
 	}
 
+
+	// buffer the learn log if possible
+	setvbuf(learnfile, learn_log_buffer, _IOFBF, LEARN_LOG_BUFFER_SIZE);
+
+
 	return learnfile;
 }
 

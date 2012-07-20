@@ -31,3 +31,5 @@ char **high_protected_paths;
 u_int32_t grlearn_options;
 
 char *output_log;
+
+char *learn_log_buffer;

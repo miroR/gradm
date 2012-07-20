@@ -17,6 +17,9 @@
 #define GR_VERSION		"2.9.1"
 #define GRADM_VERSION		0x2901
 
+
+#define LEARN_LOG_BUFFER_SIZE	(16 * 1024 * 1024)
+
 #define GR_PWONLY		0
 #define GR_PWANDSUM		1
 
@@ -602,5 +605,7 @@ extern u_int32_t grlearn_options;
 extern int gr_learn;
 extern int gr_fulllearn;
 extern char *output_log;
+
+extern char *learn_log_buffer;
 
 #endif
