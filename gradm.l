@@ -268,25 +268,6 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  BEGIN(old_state);
 					  return '}';
 					}
-<VAR_OBJ_STATE>[/][^ \t\n]*		{
-					  gradmlval.string = gr_strdup(yytext);
-					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
-						gradmerror("invalid pathname error");
-					  return OBJ_NAME;
-					}
-<VAR_OBJ_STATE>["][/].*["]		{
-					  gr_line = yytext;
-					  gr_line++;
-					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = gr_strdup(gr_line);
-					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
-						gradmerror("invalid pathname error");
-					  return OBJ_NAME;
-					}
-<VAR_OBJ_STATE>[rwxahitmlLFRWXAIMdDcCspof]+	{
-					  gradmlval.num = proc_object_mode_conv(yytext);
-					  return OBJ_MODE;
-					}
 <IDTRANS_STATE>[_a-zA-Z0-9.-]{1,64}	{
 					  gradmlval.string = gr_strdup(yytext);
 					  return ID_NAME;
