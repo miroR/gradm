@@ -236,6 +236,8 @@
 # Commonly-used objects can be defined and used in multiple subjects
 # As an example, we'll create a variable out of a list of objects
 # and their associated permissions that RBAC enforces
+# files, connect/bind rules, and capabilities can currently be added to a define
+
 define grsec_denied {
 	/boot		h
 	/dev/grsec	h

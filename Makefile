@@ -12,7 +12,7 @@ GRSEC_DIR=/etc/grsec
 LLEX=/usr/bin/lex
 FLEX=/usr/bin/flex
 LEX := $(shell if [ -x $(FLEX) ]; then echo $(FLEX); else echo $(LLEX); fi)
-LEXFLAGS=-B
+LEXFLAGS=-Cfa -B
 #ubuntu broke byacc for who knows why, disable it
 #BYACC=/usr/bin/byacc
 BISON=/usr/bin/bison

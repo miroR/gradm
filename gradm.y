@@ -108,14 +108,78 @@ variable_object:		DEFINE DEFINE_NAME '{' var_object_list '}'
 				}
 	;
 
-var_object_list:		OBJ_NAME obj_mode
+var_object_file:		OBJ_NAME obj_mode
 				{
-				  add_var_object(&var_obj, $1, $2);
+				  add_file_var_object(&var_obj, $1, $2);
 				}
-	|			var_object_list OBJ_NAME obj_mode
+	;
+
+var_object_cap:			CAP_NAME AUDIT
 				{
-				  add_var_object(&var_obj, $2, $3);
+                                add_cap_var_object(&var_obj, $1, $2);
+                                free($1);
+                                free($2);
+                               }
+       |                       CAP_NAME
+                               {
+                                add_cap_var_object(&var_obj, $1, NULL);
+				 free($1);
 				}
+	;
+
+
+var_object_net:			CONNECT invert_socket IPADDR ip_netmask ip_ports ip_typeproto
+				{
+				 ip.addr = $3;
+				 ip.netmask = $4;
+				 add_net_var_object(&var_obj, &ip, GR_IP_CONNECT | $2, NULL);
+				 memset(&ip, 0, sizeof(ip));
+				}
+	|			CONNECT invert_socket HOSTNAME ip_netmask ip_ports ip_typeproto
+				{
+				 ip.netmask = $4;
+				 add_net_var_object(&var_obj, &ip, GR_IP_CONNECT | $2, $3);
+				 memset(&ip, 0, sizeof(ip));
+				 free($3);
+				}
+	|
+				CONNECT DISABLED
+				{
+				 add_net_var_object(&var_obj, &ip, GR_IP_CONNECT, NULL);
+				}
+	|			BIND invert_socket IPADDR ip_netmask ip_ports ip_typeproto
+				{
+				 ip.addr = $3;
+				 ip.netmask = $4;
+				 add_net_var_object(&var_obj, &ip, GR_IP_BIND | $2, NULL);
+				 memset(&ip, 0, sizeof(ip));
+				}
+	|			BIND invert_socket HOSTNAME ip_netmask ip_ports ip_typeproto
+				{
+				 ip.netmask = $4;
+				 add_net_var_object(&var_obj, &ip, GR_IP_BIND | $2, $3);
+				 memset(&ip, 0, sizeof(ip));
+				 free($3);
+				}
+	|			BIND invert_socket INTERFACE ip_ports ip_typeproto
+				{
+				 ip.iface = $3;
+				 add_net_var_object(&var_obj, &ip, GR_IP_BIND | $2, NULL);
+				 memset(&ip, 0, sizeof(ip));
+				}
+	|
+				BIND DISABLED
+				{
+				 add_net_var_object(&var_obj, &ip, GR_IP_BIND, NULL);
+				}
+	;
+
+var_object_list:		var_object_file
+	|			var_object_net
+	|			var_object_cap
+	|			var_object_list var_object_file
+	|			var_object_list var_object_net
+	|			var_object_list var_object_cap
 	;
 
 domain_label:			DOMAIN ROLE_NAME DOMAIN_TYPE 

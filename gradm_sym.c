@@ -15,7 +15,22 @@ void interpret_variable(struct var_object *var)
 		;
 
 	for (; tmp; tmp = tmp->next) {
-		add_proc_object_acl(current_subject, tmp->filename, tmp->mode, GR_FEXIST);
+		switch (tmp->type) {
+		case VAR_FILE_OBJECT:
+			add_proc_object_acl(current_subject, tmp->file_obj.filename, tmp->file_obj.mode, GR_FEXIST);
+			break;
+		case VAR_NET_OBJECT:
+			if (tmp->net_obj.host)
+				add_host_acl(current_subject, tmp->net_obj.mode, tmp->net_obj.host, &tmp->net_obj.ip);
+			else
+				add_ip_acl(current_subject, tmp->net_obj.mode, &tmp->net_obj.ip);
+			break;
+		case VAR_CAP_OBJECT:
+			add_cap_acl(current_subject, tmp->cap_obj.cap, tmp->cap_obj.audit);
+			break;
+		default:
+			break;
+		}
 	}
 
 	return;
@@ -26,11 +41,23 @@ struct var_object * intersect_objects(struct var_object *var1, struct var_object
 	struct var_object *tmpvar1, *tmpvar2, *retvar = NULL;
 
 	for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
-		for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
-			if (!strcmp(tmpvar1->filename, tmpvar2->filename)) {
-				add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode & tmpvar2->mode);
-				break;
+		switch (tmpvar1->type) {
+		case VAR_FILE_OBJECT:
+			for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
+				switch (tmpvar2->type) {
+				case VAR_FILE_OBJECT:
+					if (!strcmp(tmpvar1->file_obj.filename, tmpvar2->file_obj.filename)) {
+						add_file_var_object(&retvar, tmpvar1->file_obj.filename, tmpvar1->file_obj.mode & tmpvar2->file_obj.mode);
+						break;
+					}
+					break;
+				default:
+					break;
+				}
 			}
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -43,28 +70,53 @@ struct var_object * union_objects(struct var_object *var1, struct var_object *va
 	int found_dupe = 0;
 
 	for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
-		found_dupe = 0;
-		for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
-			if (!strcmp(tmpvar1->filename, tmpvar2->filename)) {
-				add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode | tmpvar2->mode);
-				found_dupe = 1;
-				break;
+		switch (tmpvar1->type) {
+		case VAR_FILE_OBJECT:
+			found_dupe = 0;
+			for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
+				switch (tmpvar2->type) {
+				case VAR_FILE_OBJECT:
+					if (!strcmp(tmpvar1->file_obj.filename, tmpvar2->file_obj.filename)) {
+						add_file_var_object(&retvar, tmpvar1->file_obj.filename, tmpvar1->file_obj.mode | tmpvar2->file_obj.mode);
+						found_dupe = 1;
+						break;
+					}
+					break;
+				default:
+					break;
+				}
 			}
+			if (!found_dupe)
+				add_file_var_object(&retvar, tmpvar1->file_obj.filename, tmpvar1->file_obj.mode);
+			break;
+		default:
+			break;
 		}
-		if (!found_dupe)
-			add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode);
 	}
 
 	for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
-		found_dupe = 0;
-		for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
-			if (!strcmp(tmpvar1->filename, tmpvar2->filename)) {
-				found_dupe = 1;
-				break;
+		switch (tmpvar2->type) {
+		case VAR_FILE_OBJECT:
+			found_dupe = 0;
+			for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
+				switch (tmpvar1->type) {
+				case VAR_FILE_OBJECT:
+					if (!strcmp(tmpvar1->file_obj.filename, tmpvar2->file_obj.filename)) {
+						found_dupe = 1;
+						break;
+					}
+					break;
+				default:
+					break;
+				}
 			}
+
+			if (!found_dupe)
+				add_file_var_object(&retvar, tmpvar2->file_obj.filename, tmpvar2->file_obj.mode);
+			break;
+		default:
+			break;
 		}
-		if (!found_dupe)
-			add_var_object(&retvar, tmpvar2->filename, tmpvar2->mode);
 	}
 
 	return retvar;
@@ -77,30 +129,42 @@ struct var_object * differentiate_objects(struct var_object *var1, struct var_ob
 	char *path;
 
 	for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
-		path = calloc(strlen(tmpvar1->filename) + 1, sizeof(char));
-		if (!path)
-			failure("calloc");
-		strcpy(path, tmpvar1->filename);
-		found_dupe = 0;
-		do {
-			for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
-				if (!strcmp(path, tmpvar2->filename)) {
-					found_dupe = 1;
-					add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode &= ~tmpvar2->mode);
-					goto done;
+		switch (tmpvar1->type) {
+		case VAR_FILE_OBJECT:
+			path = calloc(strlen(tmpvar1->file_obj.filename) + 1, sizeof(char));
+			if (!path)
+				failure("calloc");
+			strcpy(path, tmpvar1->file_obj.filename);
+			found_dupe = 0;
+			do {
+				for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
+					switch (tmpvar2->type) {
+					case VAR_FILE_OBJECT:
+						if (!strcmp(path, tmpvar2->file_obj.filename)) {
+							found_dupe = 1;
+							add_file_var_object(&retvar, tmpvar1->file_obj.filename, tmpvar1->file_obj.mode &= ~tmpvar2->file_obj.mode);
+							goto done;
+						}
+						break;
+					default:
+						break;
+					}
 				}
-			}
-		} while(parent_dir(tmpvar1->filename, &path));
+			} while(parent_dir(tmpvar1->file_obj.filename, &path));
 done:
-		if (!found_dupe)
-			add_var_object(&retvar, tmpvar1->filename, tmpvar1->mode);
-		free(path);
+			if (!found_dupe)
+				add_file_var_object(&retvar, tmpvar1->file_obj.filename, tmpvar1->file_obj.mode);
+			free(path);
+			break;
+		default:
+			break;
+		}
 	}
 
 	return retvar;
 }
 
-void add_var_object(struct var_object **object, char *name, u_int32_t mode)
+void add_var_object(struct var_object **object, struct var_object *var)
 {
 	struct var_object *v;
 
@@ -112,14 +176,48 @@ void add_var_object(struct var_object **object, char *name, u_int32_t mode)
 	if (*object)
 		(*object)->next = v;
 
-	v->prev = *object;
+	memcpy(v, var, sizeof(struct var_object));
 
-	v->filename = name;
-	v->mode = mode;
+	v->prev = *object;
+	v->next = NULL;
 
 	*object = v;
 
 	return;
+}
+
+void add_file_var_object(struct var_object **object, char *name, u_int32_t mode)
+{
+	struct var_object var;
+
+	var.type = VAR_FILE_OBJECT;
+	var.file_obj.filename = name;
+	var.file_obj.mode = mode;
+
+	add_var_object(object, &var);
+}
+
+void add_net_var_object(struct var_object **object, struct ip_acl *ip, u_int8_t mode, char *host)
+{
+	struct var_object var;
+
+	var.type = VAR_NET_OBJECT;
+	memcpy(&var.net_obj.ip, ip, sizeof(struct ip_acl));
+	var.net_obj.mode = mode;
+	var.net_obj.host = host ? gr_strdup(host) : NULL;
+
+	add_var_object(object, &var);	
+}
+
+void add_cap_var_object(struct var_object **object, char *name, char *audit)
+{
+	struct var_object var;
+
+	var.type = VAR_CAP_OBJECT;
+	var.cap_obj.cap = name ? gr_strdup(name) : NULL;
+	var.cap_obj.audit = audit ? gr_strdup(audit) : NULL;
+
+	add_var_object(object, &var);
 }
 
 struct var_object * sym_retrieve(char *symname)

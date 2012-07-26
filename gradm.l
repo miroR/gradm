@@ -35,13 +35,16 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 %x INCLUDE_STATE IPNETMASK_STATE IPPORT_STATE ROLETRANS_STATE UMASK_STATE
 %x VAR_STATE VAR_OBJ_STATE IDTRANS_STATE DOMAIN_STATE DOMAINTYPE_STATE
 %x DOMAINLIST_STATE IPIP_STATE IPONLY_STATE REP_STATE CAP_STATE FAMILY_STATE
-
+%x VAR_IPIP_STATE VAR_CAP_STATE VAR_IPNETMASK_STATE VAR_IP_STATE VAR_IPPORT_STATE
 %%
 
 <*>"\n"					{
 					  lineno++;
 					  if (YYSTATE == COMMENT_STATE)
 						  BEGIN(old_state2);
+					  if (YYSTATE == VAR_IPIP_STATE || YYSTATE == VAR_CAP_STATE || YYSTATE == VAR_IPNETMASK_STATE ||
+					      YYSTATE == VAR_IP_STATE || YYSTATE == VAR_IPPORT_STATE)
+						  BEGIN(VAR_OBJ_STATE);
 					  if (YYSTATE != VAR_STATE && YYSTATE != VAR_OBJ_STATE)
 						  BEGIN(INITIAL);
 					}
@@ -133,11 +136,14 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return RES_SOFTHARD;
 					}
 
-<IPIP_STATE>"!"				{
+<VAR_IPIP_STATE,IPIP_STATE>"!"		{
 					  return NOT;
 					}
-<IPIP_STATE>[-a-zA-Z0-9_]{1,7}("#"[0-9]{1,3})?	{
-					  BEGIN(IP_STATE);
+<VAR_IPIP_STATE,IPIP_STATE>[-a-zA-Z0-9_]{1,7}("#"[0-9]{1,3})?	{
+					  if (YYSTATE == IPIP_STATE)
+					    BEGIN(IP_STATE);
+					  else
+					    BEGIN(VAR_IP_STATE);
 					  gr_line = yytext;
 					  gradmlval.string = gr_strdup(gr_line);
 					  gr_line = strchr(gradmlval.string, '#');
@@ -145,11 +151,14 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 						*gr_line = ':';
 					  return INTERFACE;
 					}
-<IPIP_STATE>"disabled"			{
+<VAR_IPIP_STATE,IPIP_STATE>"disabled"			{
 					  return DISABLED;
 					}
-<IPIP_STATE>[-0-9a-zA-Z.]*[a-zA-Z][-0-9a-zA-Z.]*		{
-					  BEGIN(IP_STATE);
+<VAR_IPIP_STATE,IPIP_STATE>[-0-9a-zA-Z.]*[a-zA-Z][-0-9a-zA-Z.]*		{
+					  if (YYSTATE == IPIP_STATE)
+					    BEGIN(IP_STATE);
+					  else
+					    BEGIN(VAR_IP_STATE);
 					  gradmlval.string = gr_strdup(yytext);
 					  return HOSTNAME;
 					}
@@ -157,24 +166,33 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.num = get_ip(yytext);
 					  return IPADDR;
 					}
-<IPIP_STATE>{IP}			{
-					  BEGIN(IP_STATE);
+<VAR_IPIP_STATE,IPIP_STATE>{IP}			{
+					  if (YYSTATE == IPIP_STATE)
+					    BEGIN(IP_STATE);
+					  else
+					    BEGIN(VAR_IP_STATE);
 					  gradmlval.num = get_ip(yytext);
 					  return IPADDR;
 					}
-<IP_STATE>[/]				{
-					  BEGIN(IPNETMASK_STATE);
+<VAR_IP_STATE,IP_STATE>[/]		{
+					  if (YYSTATE == IP_STATE)
+					    BEGIN(IPNETMASK_STATE);
+					  else
+					    BEGIN(VAR_IPNETMASK_STATE);
 					  return *yytext;
 					}
-<IP_STATE>[:-]				{
-					  BEGIN(IPPORT_STATE);
+<VAR_IP_STATE,IP_STATE>[:-]		{
+					  if (YYSTATE == IP_STATE)
+					    BEGIN(IPPORT_STATE);
+					  else
+					    BEGIN(VAR_IPPORT_STATE);
 					  return *yytext;
 					}
-<IP_STATE>"raw_sock"|"dgram"|"rdm"|"stream"|"any_sock" {
+<VAR_IP_STATE,IP_STATE>"raw_sock"|"dgram"|"rdm"|"stream"|"any_sock" {
 					  gradmlval.string = gr_strdup(yytext);
 					  return IPTYPE;
 					}
-<IP_STATE>[a-z_-]+			{
+<VAR_IP_STATE,IP_STATE>[a-z_-]+			{
 					  gradmlval.string = gr_strdup(yytext);
 					  return IPPROTO;
 					}
@@ -183,18 +201,24 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return SOCKFAMILY;
 					}
 
-<IPNETMASK_STATE>[0-9]{1,2}		{
+<VAR_IPNETMASK_STATE,IPNETMASK_STATE>[0-9]{1,2}		{
 					  unsigned int bits = atoi(yytext);
-					  BEGIN(IP_STATE);
+					  if (YYSTATE == IPNETMASK_STATE)
+					    BEGIN(IP_STATE);
+					  else
+					    BEGIN(VAR_IP_STATE);
 					  if (!bits)
 						gradmlval.num = 0;
 					  else
 						gradmlval.num = 0xffffffff << (32 - bits);
 					  return IPNETMASK;
 					}
-<IPPORT_STATE>[0-9]{1,5}		{
+<VAR_IPPORT_STATE,IPPORT_STATE>[0-9]{1,5}		{
 					  unsigned int portcheck = atoi(yytext);
-					  BEGIN(IP_STATE);
+					  if (YYSTATE == IPPORT_STATE)
+					    BEGIN(IP_STATE);
+					  else
+					    BEGIN(VAR_IP_STATE);
 					  if (portcheck > 65535)
 						gradmerror("invalid port number error");
 					  gradmlval.shortnum = portcheck;
@@ -307,12 +331,18 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  BEGIN(SUBJECT_STATE);
 					  return SUBJECT;
 					}
-"connect"				{
-					  BEGIN(IPIP_STATE);
+<INITIAL,VAR_OBJ_STATE>"connect"				{
+					  if (YYSTATE == INITIAL)
+					    BEGIN(IPIP_STATE);
+					  else
+					    BEGIN(VAR_IPIP_STATE);
 					  return CONNECT;
 					}
-"bind"					{
-					  BEGIN(IPIP_STATE);
+<INITIAL,VAR_OBJ_STATE>"bind"					{
+					  if (YYSTATE == INITIAL)
+					    BEGIN(IPIP_STATE);
+					  else
+					    BEGIN(VAR_IPIP_STATE);
 					  return BIND;
 					}
 "ip_override"				{
@@ -328,12 +358,15 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
 					  add_include(gr_line);					  
 					}
-<CAP_STATE>"audit"|"suppress"		{
+<CAP_STATE,VAR_CAP_STATE>"audit"|"suppress"		{
 					  gradmlval.string = gr_strdup(yytext);
 					  return AUDIT;
 					}
-[+-]"CAP_"[_A-Z]+			{
-					  BEGIN(CAP_STATE);
+<INITIAL,VAR_OBJ_STATE>[+-]"CAP_"[_A-Z]+	{
+					  if (YYSTATE == INITIAL)
+					    BEGIN(CAP_STATE);
+					  else
+					    BEGIN(VAR_CAP_STATE);
 					  gradmlval.string = gr_strdup(yytext);
 					  return CAP_NAME;
 					}
@@ -347,13 +380,13 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return RES_NAME;
 					}
 
-([/]|$[(])[^ \t\n]*				{
+<INITIAL,VAR_OBJ_STATE>([/]|$[(])[^ \t\n]*	{
 					  gradmlval.string = process_string_replace(yytext);
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
-["]([/]|$[(]).*["]				{
+<INITIAL,VAR_OBJ_STATE>["]([/]|$[(]).*["]	{
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
@@ -362,13 +395,13 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
-$HOME[/]?[^ \t\n]*			{
+<INITIAL,VAR_OBJ_STATE>$HOME[/]?[^ \t\n]*	{
 					  gradmlval.string = gr_strdup(yytext);
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
-["]$HOME[/]?.*["]			{
+<INITIAL,VAR_OBJ_STATE>["]$HOME[/]?.*["]	{
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
@@ -377,7 +410,7 @@ $HOME[/]?[^ \t\n]*			{
 						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
-[rwxahitmlLFRWXAIMcCdDspof]+		{
+<INITIAL,VAR_OBJ_STATE>[rwxahitmlLFRWXAIMcCdDspof]+	{
 					  gradmlval.num = proc_object_mode_conv(yytext);
 					  return OBJ_MODE;
 					}

@@ -303,9 +303,29 @@ struct file_acl {
 	struct file_acl *next;
 };
 
+enum {
+	VAR_FILE_OBJECT = 0,
+	VAR_NET_OBJECT = 1,
+	VAR_CAP_OBJECT = 2
+};
+
 struct var_object {
-	char *filename;
-	u_int32_t mode;
+	union {
+		struct {
+			char *filename;
+			u_int32_t mode;
+		} file_obj;
+		struct {
+			struct ip_acl ip;
+			u_int8_t mode;
+			char *host;
+		} net_obj;
+		struct {
+			char *cap;
+			char *audit;
+		} cap_obj;
+	};
+	unsigned int type;
 
 	struct var_object *prev;
 	struct var_object *next;
