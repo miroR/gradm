@@ -5,7 +5,7 @@ show_version(void)
 {
 	printf("gradm v%s\n"
 	       "Licensed under the GNU General Public License (GPL) version 2 or higher\n"
-	       "Copyright 2002-2009 - Brad Spengler, Open Source Security, Inc.\n", GR_VERSION);
+	       "Copyright 2002-2012 - Brad Spengler, Open Source Security, Inc.\n", GR_VERSION);
 	exit(EXIT_SUCCESS);
 }
 
