@@ -75,8 +75,8 @@ get_user_passwd(struct gr_pw_entry *entry, int mode)
 			entry = &new;
 		}
 
-		printf("%s", (i ? "Re-enter Password: " : "Password: "));
-		fflush(stdout);
+		fprintf(stderr, "%s", (i ? "Re-enter Password: " : "Password: "));
+		fflush(stderr);
 
 		tcgetattr(STDIN_FILENO, &term);
 
@@ -93,8 +93,8 @@ get_user_passwd(struct gr_pw_entry *entry, int mode)
 			failure("read");
 		}
 
-		printf("\n");
-		fflush(stdout);
+		fprintf(stderr, "\n");
+		fflush(stderr);
 
 		term.c_lflag |= ECHO;
 		tcsetattr(STDIN_FILENO, TCSANOW, &term);
