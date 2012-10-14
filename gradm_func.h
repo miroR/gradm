@@ -142,6 +142,7 @@ int ensure_subject_security(struct gr_learn_file_node *subject,
 void check_acl_status(u_int16_t reqmode);
 struct file_acl *lookup_acl_object_by_name(struct proc_acl *subject, const char *name);
 struct file_acl *lookup_acl_object_by_inodev(struct proc_acl *subject, const char *name);
+struct file_acl *lookup_acl_object_by_inodev_nofollow(struct proc_acl *subject, const char *name);
 struct proc_acl *lookup_acl_subject_by_name(struct role_acl *role, const char *name);
 struct file_acl *lookup_acl_object(struct proc_acl *subject, struct file_acl *object);
 struct proc_acl *lookup_acl_subject(struct role_acl *role, struct proc_acl *subject);

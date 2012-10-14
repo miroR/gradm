@@ -14,7 +14,7 @@ struct file_acl *get_exact_matching_object(struct proc_acl *subject, const char 
 		do {
 			tmpf = lookup_acl_object_by_name(tmpp, tmpname);
 			if (!tmpf)
-				tmpf = lookup_acl_object_by_inodev(tmpp, tmpname);
+				tmpf = lookup_acl_object_by_inodev_nofollow(tmpp, tmpname);
 			if (tmpf) {
 				/* check globbed objects */
 				for_each_globbed(tmpg, tmpf) {
@@ -33,14 +33,18 @@ struct file_acl *get_exact_matching_object(struct proc_acl *subject, const char 
 }
 
 static struct file_acl *get_a_matching_object(struct proc_acl *subject, 
-				const char *filename, const char *origname)
+				const char *filename, const char *origname, int follow)
 {
 	struct file_acl *tmpf, *tmpg;
 	struct proc_acl *tmpp = subject;
 	do {
 		tmpf = lookup_acl_object_by_name(tmpp, filename);
-		if (!tmpf)
-			tmpf = lookup_acl_object_by_inodev(tmpp, filename);
+		if (!tmpf) {
+			if (follow)
+				tmpf = lookup_acl_object_by_inodev(tmpp, filename);
+			else
+				tmpf = lookup_acl_object_by_inodev_nofollow(tmpp, filename);
+		}
 		if (tmpf) {
 			/* check globbed objects */
 			for_each_globbed(tmpg, tmpf) {
@@ -54,7 +58,7 @@ static struct file_acl *get_a_matching_object(struct proc_acl *subject,
 	return NULL;
 }
 
-struct file_acl *get_matching_object(struct proc_acl *subject, const char *filename)
+static struct file_acl *__get_matching_object(struct proc_acl *subject, const char *filename, int follow)
 {
 	struct file_acl *tmpf = NULL;
 	char *tmpname = alloca(strlen(filename) + 1);
@@ -62,13 +66,23 @@ struct file_acl *get_matching_object(struct proc_acl *subject, const char *filen
 	strcpy(tmpname, filename);
 
 	do {
-		tmpf = get_a_matching_object(subject, tmpname, filename);
+		tmpf = get_a_matching_object(subject, tmpname, filename, follow);
 		if (tmpf)
 			return tmpf;
 	} while (parent_dir(filename, &tmpname));
 
 	// won't get here
 	return NULL;
+}
+
+struct file_acl *get_matching_object(struct proc_acl *subject, const char *filename)
+{
+	return __get_matching_object(subject, filename, 1);
+}
+
+struct file_acl *get_matching_object_nofollow(struct proc_acl *subject, const char *filename)
+{
+	return __get_matching_object(subject, filename, 0);
 }
 
 static int
@@ -261,7 +275,6 @@ static void
 check_subject_modes(struct role_acl *role)
 {
 	struct proc_acl *tmp;
-	struct file_acl *tmpf;
 
 	for_each_subject(tmp, role) {
 		if ((tmp->mode & GR_LEARN) && (tmp->mode & GR_INHERITLEARN)) {
@@ -275,6 +288,53 @@ check_subject_modes(struct role_acl *role)
 		}
 	}
 
+	return;
+}
+
+static int get_symlinked_dir(const char *filename, char *out, char *target)
+{
+	char *p = out;
+	struct stat64 st;
+
+	strncpy(out, filename, PATH_MAX);
+	out[PATH_MAX-1] = '\0';
+	p = strchr(p + 1, '/');
+	while (p) {
+		*p = '\0';
+		if (lstat64(out, &st))
+			break;
+		if (S_ISLNK(st.st_mode)) {
+			realpath(out, target);
+			return 1;
+		}
+		*p = '/';
+		p = strchr(p + 1, '/');
+	}
+
+	return 0;
+}
+
+static void
+check_noncanonical_paths(struct role_acl *role)
+{
+	struct proc_acl *subj;
+	struct file_acl *obj;
+	struct file_acl *targobj, *targobj2;
+	struct stat64 st1, st2;
+	char tmp[PATH_MAX];
+	char tmp2[PATH_MAX];
+
+	for_each_subject(subj, role) {
+		for_each_object(obj, subj) {
+			if (get_symlinked_dir(obj->filename, (char *)tmp, (char *)tmp2)) {
+				targobj = get_matching_object_nofollow(subj, tmp);
+				if (targobj->mode & GR_WRITE) {
+					fprintf(stderr, "Warning: In role %s subject %s, pathname \"%s\":\nA writable and symlinked directory \"%s\" points to \"%s\".\n",
+						role->rolename, subj->filename, obj->filename, tmp, tmp2);
+				}
+			}
+		}
+	}
 	return;
 }
 
@@ -635,6 +695,8 @@ analyze_acls(void)
 		check_default_objects(role);
 		check_subject_modes(role);
 		check_socket_policies(role);
+
+		check_noncanonical_paths(role);
 
 		/* non-critical warnings aren't issued for special roles */
 		if (role->roletype & GR_ROLE_SPECIAL)
