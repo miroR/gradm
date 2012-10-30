@@ -63,26 +63,42 @@ $(GRADM_PAM): gradm_pam.c gradm.h gradm_defs.h gradm_func.h
 grlearn: grlearn.c gradm_lib.c gradm_globals.c grlearn2_config.tab.c lex.grlearn_config.c
 	$(CC) $(CFLAGS) -DIS_GRLEARN -o $@ grlearn.c gradm_lib.c gradm_globals.c grlearn2_config.tab.c lex.grlearn_config.c $(LIBS) $(LDFLAGS)
 
-grlearn2_config.tab.c: grlearn2_config.y
+grlearn2_config.tab.c grlearn2_config.tab.h: grlearn2_config_tab_c_h_wrapper
+
+grlearn2_config_tab_c_h_wrapper: grlearn2_config.y
 	$(YACC) -b grlearn2_config -p grlearn2_config -d ./grlearn2_config.y
 
-grlearn_config.tab.c: grlearn_config.y
+grlearn_config.tab.c grlearn_config.tab.h: grlearn_config_tab_c_h_wrapper
+
+grlearn_config_tab_c_h_wrapper: grlearn_config.y
 	$(YACC) -b grlearn_config -p grlearn_config -d ./grlearn_config.y
 
 lex.grlearn_config.c: grlearn_config.l
 	$(LEX) $(LEXFLAGS) -Pgrlearn_config ./grlearn_config.l
 
-gradm.tab.c: gradm.y
+lex.grlearn_config.o: lex.grlearn_config.c grlearn_config.tab.h
+
+gradm.tab.c gradm.tab.h: gradm_tab_c_h_wrapper
+
+gradm_tab_c_h_wrapper: gradm.y
 	$(YACC) -b gradm -p gradm -d ./gradm.y
 
 lex.gradm.c: gradm.l
 	$(LEX) $(LEXFLAGS) -Pgradm ./gradm.l
 
-fulllearn_pass1.tab.c: gradm_fulllearn_pass1.y
+lex.gradm.o: lex.gradm.c gradm.tab.h
+
+fulllearn_pass1.tab.c fulllearn_pass1.tab.h: fulllearn_pass1_tab_c_h_wrapper
+
+fulllearn_pass2.tab.c fulllearn_pass2.tab.h: fulllearn_pass2_tab_c_h_wrapper
+
+fulllearn_pass3.tab.c fulllearn_pass3.tab.h: fulllearn_pass3_tab_c_h_wrapper
+
+fulllearn_pass1_tab_c_h_wrapper: gradm_fulllearn_pass1.y
 	$(YACC) -b fulllearn_pass1 -p fulllearn_pass1 -d ./gradm_fulllearn_pass1.y
-fulllearn_pass2.tab.c: gradm_fulllearn_pass2.y
+fulllearn_pass2_tab_c_h_wrapper: gradm_fulllearn_pass2.y
 	$(YACC) -b fulllearn_pass2 -p fulllearn_pass2 -d ./gradm_fulllearn_pass2.y
-fulllearn_pass3.tab.c: gradm_fulllearn_pass3.y
+fulllearn_pass3_tab_c_h_wrapper: gradm_fulllearn_pass3.y
 	$(YACC) -b fulllearn_pass3 -p fulllearn_pass3 -d ./gradm_fulllearn_pass3.y
 
 lex.fulllearn_pass1.c: gradm_fulllearn_pass1.l
@@ -92,15 +108,30 @@ lex.fulllearn_pass2.c: gradm_fulllearn_pass2.l
 lex.fulllearn_pass3.c: gradm_fulllearn_pass3.l
 	$(LEX) $(LEXFLAGS) -Pfulllearn_pass3 ./gradm_fulllearn_pass3.l
 
-learn_pass1.tab.c: gradm_learn_pass1.y
+lex.fulllearn_pass1.o: lex.fulllearn_pass1.c fulllearn_pass1.tab.h
+
+lex.fulllearn_pass2.o: lex.fulllearn_pass2.c fulllearn_pass2.tab.h
+
+lex.fulllearn_pass3.o: lex.fulllearn_pass3.c fulllearn_pass3.tab.h
+
+learn_pass1.tab.c learn_pass1.tab.h: learn_pass1_tab_c_h_wrapper
+
+learn_pass1_tab_c_h_wrapper: gradm_learn_pass1.y
 	$(YACC) -b learn_pass1 -p learn_pass1 -d ./gradm_learn_pass1.y
-learn_pass2.tab.c: gradm_learn_pass2.y
+
+learn_pass2.tab.c learn_pass2.tab.h: learn_pass2_tab_c_h_wrapper
+
+learn_pass2_tab_c_h_wrapper: gradm_learn_pass2.y
 	$(YACC) -b learn_pass2 -p learn_pass2 -d ./gradm_learn_pass2.y
 
 lex.learn_pass1.c: gradm_learn_pass1.l
 	$(LEX) $(LEXFLAGS) -Plearn_pass1 ./gradm_learn_pass1.l
 lex.learn_pass2.c: gradm_learn_pass2.l
 	$(LEX) $(LEXFLAGS) -Plearn_pass2 ./gradm_learn_pass2.l
+
+lex.learn_pass1.o: lex.learn_pass1.c learn_pass1.tab.h
+
+lex.learn_pass2.o: lex.learn_pass2.c learn_pass2.tab.h
 
 install: $(GRADM_BIN) gradm.8 policy grlearn
 	@mkdir -p $(DESTDIR)/sbin
