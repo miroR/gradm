@@ -3,6 +3,7 @@
 struct glob_file *glob_files_head;
 struct glob_file *glob_files_tail;
 struct symlink *symlinks;
+struct proc_acl *global_nested_subject_list;
 struct deleted_file *deleted_files;
 struct role_acl *current_role;
 struct proc_acl *current_subject;

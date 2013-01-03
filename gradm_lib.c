@@ -592,6 +592,17 @@ void insert_acl_subject(struct role_acl *role, struct proc_acl *subject)
 
 void insert_nested_acl_subject(struct proc_acl *subject)
 {
+	/* we won't iterate over these subjects via for_each_subject, so add them to a special list */
+	if (global_nested_subject_list == NULL) {
+		global_nested_subject_list = subject;
+		subject->next = NULL;
+	} else {
+		subject->next = global_nested_subject_list;
+		global_nested_subject_list = subject;
+	}
+
+	/* force every subject to have a hash table whether or not they
+	   have any objects */
 	subject->hash = create_hash_table(GR_HASH_OBJECT);
 	return;
 }

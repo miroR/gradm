@@ -220,7 +220,7 @@ enum {
 	GR_PROTPROCFD 	= 0x00000400,
 	GR_PROCACCT 	= 0x00000800,
 	GR_RELAXPTRACE  = 0x00001000,
-	GR_NESTED	= 0x00002000,
+	//GR_NESTED	= 0x00002000,
 	GR_INHERITLEARN = 0x00004000,
 	GR_PROCFIND	= 0x00008000,
 	GR_POVERRIDE	= 0x00010000,
@@ -535,6 +535,8 @@ extern struct glob_file *glob_files_head;
 extern struct glob_file *glob_files_tail;
 
 extern struct symlink *symlinks;
+
+extern struct proc_acl *global_nested_subject_list;
 
 extern struct deleted_file *deleted_files;
 

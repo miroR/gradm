@@ -20,6 +20,28 @@ expand_acl(struct proc_acl *proc, struct role_acl *role)
 	return;
 }
 
+static void
+expand_socket_families(struct proc_acl *proc)
+{
+	/* set up the socket families
+	   if proc->ips != NULL, then some connect/bind
+	   rules were specified
+	   we default to allowing unix/ipv4 sockets
+	   if any connect/bind rules are specified
+	*/
+	if (proc->ips != NULL) {
+		add_sock_family(proc, "unix");
+		add_sock_family(proc, "ipv4");
+	} else if (!proc->sock_families[0] &&
+		   !proc->sock_families[1]) {
+	/* there are no connect/bind rules and no
+	   socket_family rules, so we must allow
+	   all families
+	*/
+		add_sock_family(proc, "all");
+	}
+}
+
 void
 expand_acls(void)
 {
@@ -27,26 +49,18 @@ expand_acls(void)
 	struct role_acl *role;
 	struct stat fstat;
 
+	/* handle expansion of nested subjects */
+	for_each_nested_subject(proc) {
+		expand_socket_families(proc);
+	}
+
+	/* handle expansion of all non-nested subjects */
 	for_each_role(role, current_role) {
 		for_each_subject(proc, role) {
-			/* set up the socket families
-			   if proc->ips != NULL, then some connect/bind
-			   rules were specified
-			   we default to allowing unix/ipv4 sockets
-			   if any connect/bind rules are specified
-			*/
-			if (proc->ips != NULL) {
-				add_sock_family(proc, "unix");
-				add_sock_family(proc, "ipv4");
-			} else if (!proc->sock_families[0] &&
-				   !proc->sock_families[1]) {
-			/* there are no connect/bind rules and no
-			   socket_family rules, so we must allow
-			   all families
-			*/
-				add_sock_family(proc, "all");
-			}
+			expand_socket_families(proc);
 
+			/* add an object into each non-dir subject that allows it to read/exec itself
+			   for nested subjects this is handled in gradm_nest.c */
 			if (!lstat(proc->filename, &fstat)) {
 				char buf[PATH_MAX] = {0};
 				if (S_ISLNK(fstat.st_mode)) {
@@ -58,8 +72,11 @@ expand_acls(void)
 					add_proc_object_acl(proc, gr_strdup(proc->filename), proc_object_mode_conv("rx"), GR_FLEARN);
 				}
 			}
-			/* if we're not nested and not /, set parent subject */
-			if (!(proc->mode & GR_OVERRIDE) && !(proc->mode & GR_NESTED) && strcmp(proc->filename, "/"))
+			/* if we're not /, set parent subject
+			   setting the parent subject for nested subjects is handled
+			   in gradm_nest.c when creating the subject
+			 */
+			if (!(proc->mode & GR_OVERRIDE) && strcmp(proc->filename, "/"))
 				expand_acl(proc, role);
 		}
 	}
