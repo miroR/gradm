@@ -436,7 +436,7 @@ int ensure_role_security(struct gr_learn_group_node *group,
 	return 0;
 }
 
-static char *initial_roles_str =
+static const char *initial_roles_str =
 "# policy generated from full system learning\n\n"
 "define grsec_denied {\n"
 "\t/boot\th\n"
@@ -482,7 +482,7 @@ static char *initial_roles_str =
 
 void output_learn_header(FILE *stream)
 {
-	fprintf(stream, initial_roles_str);
+	fprintf(stream, "%s", initial_roles_str);
 	fflush(stream);
 
 	return;
