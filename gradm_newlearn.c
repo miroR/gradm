@@ -1294,6 +1294,10 @@ void check_high_protected_path_enforcement(struct gr_learn_file_node *subject)
 	if (tmp == NULL)
 		return;
 
+	/* don't check if there are no file objects */
+	if (subject->hash == NULL)
+		return;
+
 	tmptable = (struct gr_learn_file_tmp_node **)subject->hash->table;
 
 	while (*tmp) {
@@ -1326,6 +1330,10 @@ void check_conformity_with_learned_rules(struct gr_learn_file_node *subject)
 	struct gr_learn_file_node *tmp;
 	struct gr_learn_file_tmp_node **tmptable;
 	unsigned long i, table_size;
+
+	/* don't check if there are no file objects */
+	if (subject->hash == NULL)
+		return;
 
 	tmptable = (struct gr_learn_file_tmp_node **)subject->hash->table;
 	table_size = subject->hash->table_size;
