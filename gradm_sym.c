@@ -131,10 +131,7 @@ struct var_object * differentiate_objects(struct var_object *var1, struct var_ob
 	for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
 		switch (tmpvar1->type) {
 		case VAR_FILE_OBJECT:
-			path = calloc(strlen(tmpvar1->file_obj.filename) + 1, sizeof(char));
-			if (!path)
-				failure("calloc");
-			strcpy(path, tmpvar1->file_obj.filename);
+			path = gr_strdup(tmpvar1->file_obj.filename);
 			found_dupe = 0;
 			do {
 				for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
@@ -186,7 +183,7 @@ void add_var_object(struct var_object **object, struct var_object *var)
 	return;
 }
 
-void add_file_var_object(struct var_object **object, char *name, u_int32_t mode)
+void add_file_var_object(struct var_object **object, const char *name, u_int32_t mode)
 {
 	struct var_object var;
 
@@ -197,7 +194,7 @@ void add_file_var_object(struct var_object **object, char *name, u_int32_t mode)
 	add_var_object(object, &var);
 }
 
-void add_net_var_object(struct var_object **object, struct ip_acl *ip, u_int8_t mode, char *host)
+void add_net_var_object(struct var_object **object, struct ip_acl *ip, u_int8_t mode, const char *host)
 {
 	struct var_object var;
 
@@ -209,7 +206,7 @@ void add_net_var_object(struct var_object **object, struct ip_acl *ip, u_int8_t 
 	add_var_object(object, &var);	
 }
 
-void add_cap_var_object(struct var_object **object, char *name, char *audit)
+void add_cap_var_object(struct var_object **object, const char *name, const char *audit)
 {
 	struct var_object var;
 
@@ -236,11 +233,7 @@ void sym_store(char *symname, struct var_object *object)
 {
 	symtab_size++;
 
-	symtab = realloc(symtab, symtab_size * sizeof(struct object_variable));
-
-	if (symtab == NULL)
-		failure("realloc");
-
+	symtab = (struct object_variable *)gr_realloc(symtab, symtab_size * sizeof(struct object_variable));
 	symtab[symtab_size - 1].symname = symname;
 	symtab[symtab_size - 1].object = object;
 

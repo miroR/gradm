@@ -10,7 +10,7 @@ void add_grlearn_option(u_int32_t option)
 	return;
 }
 
-int is_protected_path(char *filename, u_int32_t mode)
+int is_protected_path(const char *filename, u_int32_t mode)
 {
 	if (is_read_protected_path(filename, mode) ||
 	    is_write_protected_path(filename, mode))
@@ -18,7 +18,7 @@ int is_protected_path(char *filename, u_int32_t mode)
 	return 0;
 }
 
-int is_read_protected_path(char *filename, u_int32_t mode)
+int is_read_protected_path(const char *filename, u_int32_t mode)
 {
 	char **tmp;
 	unsigned int len;
@@ -43,7 +43,7 @@ int is_read_protected_path(char *filename, u_int32_t mode)
 	return 0;
 }
 
-int is_write_protected_path(char *filename, u_int32_t mode)
+int is_write_protected_path(const char *filename, u_int32_t mode)
 {
 	char **tmp;
 	unsigned int len;
@@ -167,7 +167,7 @@ void sort_file_node_list(struct gr_learn_file_node *root)
 	int num_merges;
 	int left_size, right_size;
 	struct gr_learn_file_node *cur, *left, *right, *end;
-	char *basename;
+	const char *basename;
 	unsigned int baselen;
 
 	if (root == NULL)
@@ -318,11 +318,11 @@ static unsigned long count_users_nomultgroups(struct gr_learn_group_node *group)
 	return ret;
 }
 
-struct gr_learn_user_node * create_new_user(char *username, uid_t uid, struct gr_learn_group_node *group, int multgroups)
+struct gr_learn_user_node * create_new_user(const char *username, uid_t uid, struct gr_learn_group_node *group, int multgroups)
 {
 	struct gr_learn_user_node *user;
 
-	user = (struct gr_learn_user_node *)gr_stat_alloc(sizeof(struct gr_learn_user_node));
+	user = (struct gr_learn_user_node *)gr_alloc(sizeof(struct gr_learn_user_node));
 	user->rolename = gr_strdup(username);
 	user->uid = uid;
 	user->group = group;
@@ -331,18 +331,18 @@ struct gr_learn_user_node * create_new_user(char *username, uid_t uid, struct gr
 	return user;
 }
 
-struct gr_learn_group_node * create_new_group(char *groupname, gid_t gid)
+struct gr_learn_group_node * create_new_group(const char *groupname, gid_t gid)
 {
 	struct gr_learn_group_node *group;
 
-	group = (struct gr_learn_group_node *)gr_stat_alloc(sizeof(struct gr_learn_group_node));
+	group = (struct gr_learn_group_node *)gr_alloc(sizeof(struct gr_learn_group_node));
 	group->rolename = gr_strdup(groupname);
 	group->gid = gid;
 
 	return group;
 }
 
-void insert_user(struct gr_learn_group_node **grouplist, char *username, char *groupname, uid_t uid, gid_t gid)
+void insert_user(struct gr_learn_group_node **grouplist, const char *username, const char *groupname, uid_t uid, gid_t gid)
 {
 	struct gr_learn_group_node *group;
 	struct gr_learn_group_node *tmpgroup;
@@ -387,7 +387,7 @@ void free_entire_user_node_list(struct gr_learn_user_node **userlist)
 		freeuser = tmpuser;
 		tmpuser = tmpuser->next;
 		free(freeuser->rolename);
-		gr_stat_free(freeuser);
+		gr_free(freeuser);
 	}
 		
 	*userlist = NULL;
@@ -407,7 +407,7 @@ void unlink_and_free_user_node_entry(struct gr_learn_user_node *remove)
 			remove->next->prev = remove->prev;
 	}
 	free(remove->rolename);
-	gr_stat_free(remove);
+	gr_free(remove);
 		
 	return;
 }
@@ -428,7 +428,7 @@ struct gr_learn_file_node * unlink_and_free_file_node_entry(struct gr_learn_file
 			remove->next->prev = remove->prev;
 	}
 	free(remove->filename);
-	gr_stat_free(remove);
+	gr_free(remove);
 	
 	/* clear cache when removing a node */
 	cachednode = NULL;
@@ -478,7 +478,7 @@ struct gr_learn_ip_node * unlink_and_free_ip_node_entry(struct gr_learn_ip_node 
 		if (remove->next != NULL)
 			remove->next->prev = remove->prev;
 	}
-	gr_stat_free(remove);
+	gr_free(remove);
 	
 	return ret;
 }
@@ -499,7 +499,7 @@ struct gr_learn_group_node * unlink_and_free_group_node_entry(struct gr_learn_gr
 			remove->next->prev = remove->prev;
 	}
 	free(remove->rolename);
-	gr_stat_free(remove);
+	gr_free(remove);
 		
 	return ret;
 }
@@ -550,8 +550,8 @@ done:
 }
 
 void traverse_file_tree(struct gr_learn_file_node *base,
-		   int (*act)(struct gr_learn_file_node *node, void *optarg, FILE *stream),
-		   void *optarg, FILE *stream)
+		   int (*act)(struct gr_learn_file_node *node, const void *optarg, FILE *stream),
+		   const void *optarg, FILE *stream)
 {
 	struct gr_learn_file_node *node;
 
@@ -977,7 +977,7 @@ final:
    all files within it should be reduced, or if all files and subdirectories in
    it should be reduced
 */
-int second_reduce_node(struct gr_learn_file_node *node, void *unused1, FILE *unused)
+int second_reduce_node(struct gr_learn_file_node *node, const void *unused1, FILE *unused)
 {
 	int (* retval)(struct gr_learn_file_node *node);
 
@@ -994,7 +994,7 @@ void second_stage_reduce_tree(struct gr_learn_file_node *base)
 	return traverse_file_tree(base, &second_reduce_node, NULL, NULL);
 }
 
-int third_reduce_node(struct gr_learn_file_node *node, void *unused1, FILE *unused)
+int third_reduce_node(struct gr_learn_file_node *node, const void *unused1, FILE *unused)
 {
 	struct gr_learn_file_node *tmp;
 	int removed = 0;
@@ -1023,14 +1023,14 @@ void third_stage_reduce_tree(struct gr_learn_file_node *base)
 }
 
 struct gr_learn_file_node *do_find_insert_file(struct gr_learn_file_node **base,
-					char *filename, unsigned int filelen)
+					const char *filename, unsigned int filelen)
 {
 	struct gr_learn_file_node *node, *tmpnode, *ret;
 	unsigned int baselen;
 
 	/* base needs to at least contain a root node for /, if it doesn't then we add it here */
 	if (!*base) {
-		*base = (struct gr_learn_file_node *)gr_stat_alloc(sizeof(struct gr_learn_file_node));
+		*base = (struct gr_learn_file_node *)gr_alloc(sizeof(struct gr_learn_file_node));
 		/* the base has a NULL parent */
 		(*base)->parent = NULL;
 		return *base;
@@ -1048,7 +1048,7 @@ struct gr_learn_file_node *do_find_insert_file(struct gr_learn_file_node **base,
 	*/
 	if (!node && (baselen < filelen) && (baselen == 1 || filename[baselen] == '/') &&
 	    !strncmp((*base)->filename, filename, baselen)) {
-		(*base)->leaves = node = (struct gr_learn_file_node *)gr_stat_alloc(sizeof(struct gr_learn_file_node));
+		(*base)->leaves = node = (struct gr_learn_file_node *)gr_alloc(sizeof(struct gr_learn_file_node));
 		node->parent = *base;
 		cachednode = *base;
 		cachedlen = baselen;
@@ -1071,7 +1071,7 @@ struct gr_learn_file_node *do_find_insert_file(struct gr_learn_file_node **base,
 
 	cachednode = *base;
 	cachedlen = baselen;
-	ret = (struct gr_learn_file_node *)gr_stat_alloc(sizeof(struct gr_learn_file_node));
+	ret = (struct gr_learn_file_node *)gr_alloc(sizeof(struct gr_learn_file_node));
 	ret->parent = *base;
 
 	establish_new_head((*base)->leaves, ret, tmpnode);
@@ -1080,7 +1080,7 @@ struct gr_learn_file_node *do_find_insert_file(struct gr_learn_file_node **base,
 }
 
 #ifdef GRADM_DEBUG
-static struct gr_learn_file_node *find_file(struct gr_learn_file_node *filelist, char *filename)
+static struct gr_learn_file_node *find_file(struct gr_learn_file_node *filelist, const char *filename)
 {
 	struct gr_learn_file_node *tmp, *ret;
 	unsigned int alen, blen;
@@ -1124,7 +1124,7 @@ static struct gr_learn_file_node *find_file(struct gr_learn_file_node *filelist,
 #endif
 
 struct gr_learn_file_node *find_insert_file(struct gr_learn_file_node **base,
-					char *filename, unsigned int filelen)
+					const char *filename, unsigned int filelen)
 {
 	if (cachednode && (cachedlen < filelen) && !strncmp(cachednode->filename, filename, cachedlen)
 	    && filename[cachedlen] == '/') {
@@ -1172,7 +1172,7 @@ void do_replace_file(struct gr_learn_file_node **base, struct gr_learn_file_node
 	return;
 }
 
-void do_insert_file(struct gr_learn_file_node **base, char *filename, u_int32_t mode, u_int8_t subj)
+void do_insert_file(struct gr_learn_file_node **base, const char *filename, u_int32_t mode, u_int8_t subj)
 {
 	struct gr_learn_file_node *node;
 
@@ -1192,7 +1192,7 @@ void do_insert_file(struct gr_learn_file_node **base, char *filename, u_int32_t 
 	return;
 }
 
-void insert_file(struct gr_learn_file_node **base, char *filename, u_int32_t mode, u_int8_t subj)
+void insert_file(struct gr_learn_file_node **base, const char *filename, u_int32_t mode, u_int8_t subj)
 {
 	/* we're inserting a new file, and an entry for / does not exist, add it */
 	if (!(*base)) {
@@ -1217,12 +1217,13 @@ void insert_file(struct gr_learn_file_node **base, char *filename, u_int32_t mod
    this algorithm gets called against every node/leaf in the tree
 */
 
-int first_reduce_node(struct gr_learn_file_node *node, void *unused1, FILE *unused)
+int first_reduce_node(struct gr_learn_file_node *node, const void *unused1, FILE *unused)
 {
 	unsigned long thresh = 5;	
 	unsigned long num = count_nodes(node->leaves);
 	struct gr_learn_file_node *tmp, *tmp2;
-	char *p, *p2;
+	char *p;
+	const char *p2;
 	unsigned int node_len = strlen(node->filename);
 	int removed = 0;
 
@@ -1256,7 +1257,7 @@ int first_reduce_node(struct gr_learn_file_node *node, void *unused1, FILE *unus
 		removed = 1;
 		do_replace_file(&node, tmp2);
 		free(tmp2->filename);
-		gr_stat_free(tmp2);
+		gr_free(tmp2);
 		for_each_removable_list_entry_end(tmp);
 	}
 
@@ -1274,7 +1275,7 @@ void display_tree(struct gr_learn_file_node *base, FILE *stream)
 	return;
 }
 
-void display_tree_with_role(struct gr_learn_file_node *base, char *rolename, FILE *stream)
+void display_tree_with_role(struct gr_learn_file_node *base, const char *rolename, FILE *stream)
 {
 	traverse_file_tree(base, &display_leaf, rolename, stream);
 	return;
@@ -1396,7 +1397,7 @@ ok:
 }
 #endif
 
-int display_leaf(struct gr_learn_file_node *node, void *rolename, FILE *stream)
+int display_leaf(struct gr_learn_file_node *node, const void *rolename, FILE *stream)
 {
 	char modes[33];
 	int i;
@@ -1415,7 +1416,7 @@ int display_leaf(struct gr_learn_file_node *node, void *rolename, FILE *stream)
 		bind = node->bind_list;
 		conv_subj_mode_to_str(node->mode &~ (GR_LEARN | GR_INHERITLEARN), modes, sizeof(modes));
 		if (rolename && (!gr_fulllearn || !(grlearn_options & GR_SPLIT_ROLES)))
-			fprintf(stream, "# Role: %s\n", (char *)rolename);
+			fprintf(stream, "# Role: %s\n", (const char *)rolename);
 		fprintf(stream, "subject %s %s {\n", node->filename, modes);
 
 		if (node->user_trans_list) {
@@ -1486,14 +1487,14 @@ int display_leaf(struct gr_learn_file_node *node, void *rolename, FILE *stream)
 		}
 
 		for (i = 0; i < SIZE(paxflag_list); i++) {
-			if (node->subject->pax_flags & (1 << paxflag_list[i].paxflag_val))
+			if (node->subject->pax_flags & (1U << paxflag_list[i].paxflag_val))
 				fprintf(stream, "\t+%s\n", paxflag_list[i].paxflag_name);
-			else if (node->subject->pax_flags & (0x8000 | (1 << paxflag_list[i].paxflag_val)))
+			else if (node->subject->pax_flags & (0x8000 | (1U << paxflag_list[i].paxflag_val)))
 				fprintf(stream, "\t-%s\n", paxflag_list[i].paxflag_name);
 		}
 
 		for(i = 0; i < SIZE(rlim_table); i++)
-			if (node->subject->resmask & (1 << i))
+			if (node->subject->resmask & (1U << i))
 				fprintf(stream, "\t%s %lu %lu\n", rlim_table[i],
 					node->subject->res[i].rlim_cur,
 					node->subject->res[i].rlim_max);
@@ -1511,13 +1512,13 @@ show_ips:
 		if (node->subject != NULL) {
 			int cnt = 0;
 			for (i = 0; i < (SIZE(node->subject->sock_families) * 32); i++)
-				if (node->subject->sock_families[i / 32] & (1 << (i % 32)))
+				if (node->subject->sock_families[i / 32] & (1U << (i % 32)))
 					cnt++;
 			/* if we have bind/connect rules and no extra family allowance outside of
 			   the default, then don't add a sock_family rule
 			*/
 			if ((bind || connect) &&
-				!(node->subject->sock_families[0] & ~((1 << AF_UNIX) | (1 << AF_INET))) &&
+				!(node->subject->sock_families[0] & ~((1U << AF_UNIX) | (1U << AF_INET))) &&
 				node->subject->sock_families[1] == 0)
 				;
 			else if (cnt > 10)
@@ -1527,7 +1528,7 @@ show_ips:
 				for (i = 0; i < AF_MAX; i++) {
 					if ((bind || connect) && (i == AF_UNIX || i == AF_INET))
 						continue;
-					if (node->subject->sock_families[i / 32] & (1 << (i % 32)))
+					if (node->subject->sock_families[i / 32] & (1U << (i % 32)))
 						fprintf(stream, " %s", get_sock_family_from_val(i));
 				}
 				fprintf(stream, "\n");
@@ -1649,7 +1650,7 @@ print_ip:
 		sprintf(ipandtype, "\tbind %u.%u.%u.%u/%u", ip[0], ip[1], ip[2], ip[3], netmask);
 
 	for (i = 1; i < 5; i++) {
-		if (node->ip_type & (1 << i)) {
+		if (node->ip_type & (1U << i)) {
 			switch (i) {
 			case SOCK_RAW:
 				strcat(socktypeandprotos, " raw_sock");
@@ -1668,13 +1669,16 @@ print_ip:
 	}
 
 	for (i = 0; i < 256; i++) {
-		if (node->ip_proto[i / 32] & (1 << (i % 32))) {
+		if (node->ip_proto[i / 32] & (1U << (i % 32))) {
 			if (i == IPPROTO_RAW) {
 				strcat(socktypeandprotos, " raw_proto");
 			} else {
 				proto = getprotobynumber(i);
 				strcat(socktypeandprotos, " ");
-				strcat(socktypeandprotos, proto->p_name);
+				if (proto)
+					strcat(socktypeandprotos, proto->p_name);
+				else
+					sprintf(socktypeandprotos+strlen(socktypeandprotos), "proto:%d", i);
 			}
 		}
 	}
@@ -1793,13 +1797,13 @@ void insert_port(struct gr_learn_ip_node *node, u_int16_t port)
 	}
 
 	if (!num) {
-		node->ports = (u_int16_t **)gr_dyn_alloc(2 * sizeof(u_int16_t *));
-		*(node->ports) = (u_int16_t *)gr_stat_alloc(sizeof(u_int16_t));
+		node->ports = (u_int16_t **)gr_alloc(2 * sizeof(u_int16_t *));
+		*(node->ports) = (u_int16_t *)gr_alloc(sizeof(u_int16_t));
 		**(node->ports) = port;
 	} else {
-		node->ports = (u_int16_t **)gr_dyn_realloc(node->ports, (num + 2) * sizeof(u_int16_t *));
+		node->ports = (u_int16_t **)gr_realloc(node->ports, (num + 2) * sizeof(u_int16_t *));
 		memset(node->ports + num, 0, 2 * sizeof(u_int16_t *));
-		*(node->ports + num) = (u_int16_t *)gr_stat_alloc(sizeof(u_int16_t));
+		*(node->ports + num) = (u_int16_t *)gr_alloc(sizeof(u_int16_t));
 		**(node->ports + num) = port;
 	}
 
@@ -1814,7 +1818,7 @@ void remove_port(struct gr_learn_ip_node *node, u_int16_t port)
 
 	for(i = 0; i < num; i++) {
 		if (**(ports + i) == port) {
-			gr_stat_free(*(ports + i));
+			gr_free(*(ports + i));
 			while (i < num) {
 				**(ports + i) = **(ports + i + 1);
 				i++;
@@ -1834,12 +1838,12 @@ void do_reduce_ip_node(struct gr_learn_ip_node *node, struct gr_learn_ip_node *a
 
 	while (tmpport && *tmpport) {
 		insert_port(actor, **tmpport);
-		gr_stat_free(*tmpport);
+		gr_free(*tmpport);
 		*tmpport = NULL;
 		tmpport++;
 	}
 	if (node->ports) {
-		gr_dyn_free(node->ports);
+		gr_free(node->ports);
 		node->ports = NULL;
 	}
 
@@ -1951,7 +1955,7 @@ struct gr_learn_ip_node * find_insert_ip(struct gr_learn_ip_node **base, u_int32
 	int match = 0;
 
 	if (!(*base)) {
-		(*base) = (struct gr_learn_ip_node *)gr_stat_alloc(sizeof(struct gr_learn_ip_node));
+		(*base) = (struct gr_learn_ip_node *)gr_alloc(sizeof(struct gr_learn_ip_node));
 		(*base)->root_node = 1;
 	}
 
@@ -1973,7 +1977,7 @@ struct gr_learn_ip_node * find_insert_ip(struct gr_learn_ip_node **base, u_int32
 		return tmpip;
 	} else {
 		/* no match, need to allocate a new node */
-		newip = (struct gr_learn_ip_node *)gr_stat_alloc(sizeof(struct gr_learn_ip_node));
+		newip = (struct gr_learn_ip_node *)gr_alloc(sizeof(struct gr_learn_ip_node));
 		newip->parent = *base;
 		newip->ip_node = extract_ip_field(ip, depth);
 
@@ -1996,8 +2000,8 @@ void insert_ip(struct gr_learn_ip_node **base, u_int32_t ip, u_int16_t port, u_i
 	/* the IP has already been added to the tree,
 	   so just OR in the information we've filled out in the
 	   insert structure */
-	node->ip_proto[proto / 32] |= (1 << (proto % 32));
-	node->ip_type |= (1 << socktype);
+	node->ip_proto[proto / 32] |= (1U << (proto % 32));
+	node->ip_type |= (1U << socktype);
 	insert_port(node, port);
 
 	return;
@@ -2031,11 +2035,11 @@ void sort_file_list(struct gr_hash_struct *hash)
 	return qsort(hash->table, hash->table_size, sizeof (struct gr_learn_file_tmp_node *), strcompare);
 }
 
-struct gr_learn_file_tmp_node *conv_filename_to_struct(char *filename, u_int32_t mode)
+struct gr_learn_file_tmp_node *conv_filename_to_struct(const char *filename, u_int32_t mode)
 {
 	struct gr_learn_file_tmp_node *node;
 
-	node = (struct gr_learn_file_tmp_node *)gr_stat_alloc(sizeof(struct gr_learn_file_tmp_node));
+	node = (struct gr_learn_file_tmp_node *)gr_alloc(sizeof(struct gr_learn_file_tmp_node));
 	node->filename = gr_strdup(filename);
 	node->mode = mode;
 
@@ -2043,7 +2047,7 @@ struct gr_learn_file_tmp_node *conv_filename_to_struct(char *filename, u_int32_t
 }
 
 struct gr_learn_role_entry *
-insert_learn_role(struct gr_learn_role_entry **role_list, char *rolename, u_int16_t rolemode)
+insert_learn_role(struct gr_learn_role_entry **role_list, const char *rolename, u_int16_t rolemode)
 {
 	struct gr_learn_role_entry *tmp;
 	struct gr_learn_role_entry *newrole;
@@ -2055,7 +2059,7 @@ insert_learn_role(struct gr_learn_role_entry **role_list, char *rolename, u_int1
 		}
 	}
 
-	newrole = (struct gr_learn_role_entry *)gr_stat_alloc(sizeof(struct gr_learn_role_entry));
+	newrole = (struct gr_learn_role_entry *)gr_alloc(sizeof(struct gr_learn_role_entry));
 	newrole->rolename = gr_strdup(rolename);
 	newrole->rolemode = rolemode;
 
@@ -2068,7 +2072,7 @@ insert_learn_role(struct gr_learn_role_entry **role_list, char *rolename, u_int1
 }
 
 struct gr_learn_role_entry *
-find_learn_role(struct gr_learn_role_entry *role_list, char *rolename)
+find_learn_role(struct gr_learn_role_entry *role_list, const char *rolename)
 {
 	struct gr_learn_role_entry *tmp;
 
@@ -2087,7 +2091,7 @@ void insert_learn_id_transition(unsigned int ***list, int real, int eff, int fs)
 	unsigned int **p;
 
 	if (*list == NULL)
-		*list = (unsigned int **)gr_dyn_alloc(2 * sizeof(unsigned int *));
+		*list = (unsigned int **)gr_alloc(2 * sizeof(unsigned int *));
 
 
 	for (x = 0; x < sizeof(ids)/sizeof(ids[0]); x++) {
@@ -2105,9 +2109,9 @@ void insert_learn_id_transition(unsigned int ***list, int real, int eff, int fs)
 				p++;
 				num++;
 			}
-			*list = (unsigned int **)gr_dyn_realloc(*list, (num + 2) * sizeof(unsigned int *));
+			*list = (unsigned int **)gr_realloc(*list, (num + 2) * sizeof(unsigned int *));
 			memset(*list + num, 0, 2 * sizeof(unsigned int *));
-			*(*list + num) = (unsigned int *)gr_stat_alloc(sizeof(unsigned int));
+			*(*list + num) = (unsigned int *)gr_alloc(sizeof(unsigned int));
 			**(*list + num) = ids[x];
 		}
 	}

@@ -77,7 +77,7 @@ learn_log:
 			else if ((strlen($9) > 1) && !res1 && !res2) {
 				// capability
 				if (subject->subject == NULL) {
-					subject->subject = calloc(1, sizeof(struct gr_learn_subject_node));
+					subject->subject = (struct gr_learn_subject_node *)calloc(1, sizeof(struct gr_learn_subject_node));
 					if (subject->subject == NULL)
 						failure("calloc");
 				}
@@ -85,12 +85,12 @@ learn_log:
 			} else if (strlen($9) > 1) {
 				// resource
 				if (subject->subject == NULL) {
-					subject->subject = calloc(1, sizeof(struct gr_learn_subject_node));
+					subject->subject = (struct gr_learn_subject_node *)calloc(1, sizeof(struct gr_learn_subject_node));
 					if (subject->subject == NULL)
 						failure("calloc");
 				}
 				if (mode < GR_NLIMITS) {
-					subject->subject->resmask |= (1 << mode);
+					subject->subject->resmask |= (1U << mode);
 					subject->subject->res[mode].rlim_cur = res1;
 					subject->subject->res[mode].rlim_max = res2;
 				}
@@ -141,11 +141,11 @@ learn_log:
 				insert_ip(&(subject->bind_list), addr, port, proto, socktype);
 			else if (mode == GR_SOCK_FAMILY) {
 				if (subject->subject == NULL) {
-					subject->subject = calloc(1, sizeof(struct gr_learn_subject_node));
+					subject->subject = (struct gr_learn_subject_node *)calloc(1, sizeof(struct gr_learn_subject_node));
 					if (subject->subject == NULL)
 						failure("calloc");
 				}
-				subject->subject->sock_families[port / 32] |= (1 << (port % 32));
+				subject->subject->sock_families[port / 32] |= (1U << (port % 32));
 			}
 
 			free($9);

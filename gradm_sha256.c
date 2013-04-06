@@ -275,7 +275,7 @@ generate_hash(struct gr_pw_entry *entry)
 	sha256_ctx_t context;
 	char *pos;
 
-	pos = memchr(entry->passwd, '\n', strlen((char *)entry->passwd));
+	pos = (char *)memchr(entry->passwd, '\n', strlen((char *)entry->passwd));
 	if (pos)
 		*pos = '\0';
 

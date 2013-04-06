@@ -5,7 +5,7 @@ struct file_acl *get_exact_matching_object(struct proc_acl *subject, const char 
 	struct file_acl *tmpf = NULL;
 	struct proc_acl *tmpp = subject;
 	struct file_acl *tmpg = NULL;
-	char *tmpname = alloca(strlen(filename) + 1);
+	char *tmpname = (char *)alloca(strlen(filename) + 1);
 	int reduced_dir = 0;
 	strcpy(tmpname, filename);
 
@@ -61,7 +61,7 @@ static struct file_acl *get_a_matching_object(struct proc_acl *subject,
 static struct file_acl *__get_matching_object(struct proc_acl *subject, const char *filename, int follow)
 {
 	struct file_acl *tmpf = NULL;
-	char *tmpname = alloca(strlen(filename) + 1);
+	char *tmpname = (char *)alloca(strlen(filename) + 1);
 
 	strcpy(tmpname, filename);
 
@@ -325,7 +325,7 @@ check_noncanonical_paths(struct role_acl *role)
 	char tmp2[PATH_MAX];
 
 	for_each_subject(subj, role) {
-		for_each_object(obj, subj) {
+		for_each_file_object(obj, subj) {
 			if (get_symlinked_dir(obj->filename, (char *)tmp, (char *)tmp2)) {
 				targobj = get_matching_object_nofollow(subj, tmp);
 				if (targobj->mode & GR_WRITE) {
@@ -515,7 +515,7 @@ handle_notrojan_mode(void)
 		for_each_subject(subj, role) {
 			if (!(subj->mode & GR_NOTROJAN))
 				continue;
-			for_each_object(obj, subj) {
+			for_each_file_object(obj, subj) {
 				if (!(obj->mode & GR_EXEC))
 					continue;
 				for_each_role(role2, current_role) {

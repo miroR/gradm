@@ -4,7 +4,9 @@
 
 void fulllearn_pass1error(const char *s);
 int fulllearn_pass1wrap(void);
+
 static struct in_addr ip;
+
 %}
 
 ROLENAME ^[_a-zA-Z0-9.-]{1,64}

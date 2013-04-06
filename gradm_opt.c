@@ -6,7 +6,7 @@ expand_acl(struct proc_acl *proc, struct role_acl *role)
 	char *tmpproc;
 	struct proc_acl *tmpp;
 
-	tmpproc = alloca(strlen(proc->filename) + 1);
+	tmpproc = (char *)alloca(strlen(proc->filename) + 1);
 	strcpy(tmpproc, proc->filename);
 
 	while (parent_dir(proc->filename, &tmpproc)) {

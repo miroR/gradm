@@ -43,7 +43,7 @@ struct family_set sock_families[] = {
 	{ "all", -1 }
 };
 
-char *
+const char *
 get_sock_family_from_val(int val)
 {
 	int i;
@@ -60,7 +60,7 @@ get_sock_family_from_val(int val)
 }
 
 void
-add_sock_family(struct proc_acl *subject, char *family)
+add_sock_family(struct proc_acl *subject, const char *family)
 {
 	int i;
 
@@ -85,13 +85,13 @@ add_sock_family(struct proc_acl *subject, char *family)
 	}
 
 	subject->sock_families[sock_families[i].family_val / 32] |=
-				(1 << (sock_families[i].family_val % 32));
+				(1U << (sock_families[i].family_val % 32));
 
 	return;
 }
 
 void
-add_role_allowed_host(struct role_acl *role, char *host, u_int32_t netmask)
+add_role_allowed_host(struct role_acl *role, const char *host, u_int32_t netmask)
 {
 	struct hostent *he;
 	char **p;
@@ -143,7 +143,7 @@ add_role_allowed_ip(struct role_acl *role, u_int32_t addr, u_int32_t netmask)
 	return;
 }
 
-void add_host_acl(struct proc_acl *subject, u_int8_t mode, char *host, struct ip_acl *acl_tmp)
+void add_host_acl(struct proc_acl *subject, u_int8_t mode, const char *host, struct ip_acl *acl_tmp)
 {
 	struct hostent *he;
 	char **p;
@@ -190,14 +190,11 @@ add_ip_acl(struct proc_acl *subject, u_int8_t mode, struct ip_acl *acl_tmp)
 
 	subject->ip_num++;
 	if (subject->ips == NULL)
-		subject->ips = gr_dyn_alloc(subject->ip_num * sizeof(struct ip_acl *));
+		subject->ips = (struct ip_acl **)gr_alloc(subject->ip_num * sizeof(struct ip_acl *));
 	else
-		subject->ips = gr_dyn_realloc(subject->ips, subject->ip_num * sizeof(struct ip_acl *));
+		subject->ips = (struct ip_acl **)gr_realloc(subject->ips, subject->ip_num * sizeof(struct ip_acl *));
 
-	p = (struct ip_acl *) calloc(1, sizeof (struct ip_acl));
-	if (!p)
-		failure("calloc");
-
+	p = (struct ip_acl *)gr_alloc(sizeof (struct ip_acl));
 	*(subject->ips + subject->ip_num - 1) = p;
 
 	p->mode = mode;
@@ -233,35 +230,38 @@ get_ip(char *ip)
 }
 
 void
-conv_name_to_type(struct ip_acl *ip, char *name)
+conv_name_to_type(struct ip_acl *ip, const char *name)
 {
 	struct protoent *proto;
 	unsigned short i;
 
 	if (!strcmp(name, "raw_proto"))
-		ip->proto[IPPROTO_RAW / 32] |= (1 << (IPPROTO_RAW % 32));
+		ip->proto[IPPROTO_RAW / 32] |= (1U << (IPPROTO_RAW % 32));
 	else if (!strcmp(name, "raw_sock"))
-		ip->type |= (1 << SOCK_RAW);
+		ip->type |= (1U << SOCK_RAW);
 	else if (!strcmp(name, "any_sock")) {
 		ip->type = ~0;
-		ip->type &= ~(1 << 0);	// there is no sock type 0
+		ip->type &= ~(1U << 0);	// there is no sock type 0
 	} else if (!strcmp(name, "any_proto")) {
 		for (i = 0; i < 8; i++)
 			ip->proto[i] = ~0;
 	} else if (!strcmp(name, "stream"))
-		ip->type |= (1 << SOCK_STREAM);
+		ip->type |= (1U << SOCK_STREAM);
 	else if (!strcmp(name, "dgram"))
-		ip->type |= (1 << SOCK_DGRAM);
+		ip->type |= (1U << SOCK_DGRAM);
 	else if (!strcmp(name, "rdm"))
-		ip->type |= (1 << SOCK_RDM);
+		ip->type |= (1U << SOCK_RDM);
 	else if (!strcmp(name, "tcp")) {	// silly protocol 0
-		ip->proto[IPPROTO_IP / 32] |= (1 << (IPPROTO_IP % 32));
-		ip->proto[IPPROTO_TCP / 32] |= (1 << (IPPROTO_TCP % 32));
+		ip->proto[IPPROTO_IP / 32] |= (1U << (IPPROTO_IP % 32));
+		ip->proto[IPPROTO_TCP / 32] |= (1U << (IPPROTO_TCP % 32));
 	} else if (!strcmp(name, "udp")) {	// silly protocol 0
-		ip->proto[IPPROTO_IP / 32] |= (1 << (IPPROTO_IP % 32));
-		ip->proto[IPPROTO_UDP / 32] |= (1 << (IPPROTO_UDP % 32));
+		ip->proto[IPPROTO_IP / 32] |= (1U << (IPPROTO_IP % 32));
+		ip->proto[IPPROTO_UDP / 32] |= (1U << (IPPROTO_UDP % 32));
+	} else if (!strncmp(name, "proto:", strlen("proto:"))) {
+		int pro = atoi(name+strlen("proto:"));
+		ip->proto[pro / 32] |= 1U << (pro % 32);
 	} else if ((proto = getprotobyname(name)))
-		ip->proto[proto->p_proto / 32] |= (1 << (proto->p_proto % 32));
+		ip->proto[proto->p_proto / 32] |= (1U << (proto->p_proto % 32));
 	else {
 		fprintf(stderr, "Invalid type/protocol: %s\n", name);
 		exit(EXIT_FAILURE);

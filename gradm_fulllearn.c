@@ -102,7 +102,7 @@ void fulllearn_pass2(FILE *stream)
 }
 
 int full_reduce_object_node(struct gr_learn_file_node *subject,
-			    void *unused1, FILE *unused2)
+			    const void *unused1, FILE *unused2)
 {
 	struct gr_learn_file_tmp_node **tmptable;
 	unsigned long i;
@@ -148,7 +148,7 @@ int full_reduce_object_node(struct gr_learn_file_node *subject,
 }
 
 int full_reduce_ip_node(struct gr_learn_file_node *subject,
-			void *unused1, FILE *unused2)
+			const void *unused1, FILE *unused2)
 {
 	struct gr_learn_ip_node *tmp = subject->connect_list;
 
@@ -193,7 +193,7 @@ void free_subject_ids(unsigned int ***list, int thresh)
 }
 
 int full_reduce_id_node(struct gr_learn_file_node *subject,
-			void *unused1, FILE *unused2)
+			const void *unused1, FILE *unused2)
 {
 	if (subject->subject == NULL ||
 	    !cap_raised(subject->subject->cap_raise, CAP_SETUID))
@@ -247,16 +247,16 @@ void free_ip_ports(struct gr_learn_ip_node *node)
 
 	tmp2 = node->ports;
 	while (tmp2 && *tmp2) {
-		gr_stat_free(*tmp2);
+		gr_free(*tmp2);
 		tmp2++;
 	}
 
 	if (node->ports)
-		gr_dyn_free(node->ports);
+		gr_free(node->ports);
 
 	node->ports = NULL;
 
-	gr_stat_free(node);
+	gr_free(node);
 
 	return;
 }
@@ -288,7 +288,7 @@ void free_subject_objects(struct gr_learn_file_node *node)
 	}
 
 	free(node->filename);
-	gr_stat_free(node);
+	gr_free(node);
 
 	return;
 }
@@ -370,7 +370,7 @@ void free_role_group_full(struct gr_learn_group_node *group)
 	return;
 }
 
-int fulllearn_pass3(struct gr_learn_file_node *subject, void *rolename, FILE *stream)
+int fulllearn_pass3(struct gr_learn_file_node *subject, const void *rolename, FILE *stream)
 {
 	fseek(fulllearn_pass3in, 0, SEEK_SET);
 	current_learn_subject = subject->filename;
@@ -389,7 +389,7 @@ int fulllearn_pass3(struct gr_learn_file_node *subject, void *rolename, FILE *st
 	return 0;
 }
 
-void enforce_hidden_file(struct gr_learn_file_node *subject, char *filename)
+void enforce_hidden_file(struct gr_learn_file_node *subject, const char *filename)
 {
 	struct gr_learn_file_node *objects = subject->object_list;
 	struct gr_learn_file_node *retobj;
@@ -404,7 +404,7 @@ void enforce_hidden_file(struct gr_learn_file_node *subject, char *filename)
 }
 
 int ensure_subject_security(struct gr_learn_file_node *subject,
-			void *unused1, FILE *unused2)
+			const void *unused1, FILE *unused2)
 {
 	if (strcmp(subject->filename, "/"))
 		return 0;
@@ -526,7 +526,7 @@ void generate_full_learned_acls(FILE *learnlog, FILE *stream)
 			fprintf(stderr, "Error: Output path must be a directory when \"split-roles\" is used in learn-config.\n");
 			exit(EXIT_FAILURE);
 		}
-		current_output_file = alloca(strlen(output_log) + 16384);
+		current_output_file = (char *)alloca(strlen(output_log) + 16384);
 		sprintf(current_output_file, "%s/policy", output_log);
 		stream = fopen(current_output_file, "w");
 		if (stream == NULL) {

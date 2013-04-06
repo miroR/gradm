@@ -4,6 +4,7 @@
 
 void learn_pass1error(const char *s);
 int learn_pass1wrap(void);
+
 static struct in_addr ip;
 %}
 

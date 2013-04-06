@@ -125,7 +125,7 @@ void merge_acl_rules(void)
 				matchsubj = match_file_node(matchrole->subject_list, subject->filename);
 			if (matchrole && matchsubj) {
 				if (matchsubj->subject == NULL) {
-					matchsubj->subject = calloc(1, sizeof(struct gr_learn_subject_node));
+					matchsubj->subject = (struct gr_learn_subject_node *)calloc(1, sizeof(struct gr_learn_subject_node));
 					if (matchsubj->subject == NULL)
 						failure("calloc");
 				}
@@ -155,7 +155,7 @@ void merge_acl_rules(void)
 					if (subject->res[i].rlim_max > matchsubj->subject->res[i].rlim_max)
 						matchsubj->subject->res[i].rlim_max = subject->res[i].rlim_max;
 				}
-				for_each_object(object, subject) {
+				for_each_file_object(object, subject) {
 					insert_learn_object(matchsubj, conv_filename_to_struct(object->filename, object->mode));
 				}
 				for (i = 0; i < subject->ip_num; i++) {
@@ -164,13 +164,13 @@ void merge_acl_rules(void)
 						for (port = ipp->low; port <= ipp->high; port++)
 						for (x = 0; x < 5; x++)
 						for (y = 0; y < 256; y++)
-						if ((ipp->type & (1 << x)) && (ipp->proto[y / 32] & (1 << y % 32)))
+						if ((ipp->type & (1U << x)) && (ipp->proto[y / 32] & (1U << y % 32)))
 							insert_ip(&(matchsubj->connect_list), ipp->addr, port, x, y);
 					} else if (ipp->mode == GR_IP_BIND) {
 						for (port = ipp->low; port <= ipp->high; port++)
 						for (x = 0; x < 5; x++)
 						for (y = 0; y < 256; y++)
-						if ((ipp->type & (1 << x)) && (ipp->proto[y / 32] & (1 << y % 32)))
+						if ((ipp->type & (1U << x)) && (ipp->proto[y / 32] & (1U << y % 32)))
 							insert_ip(&(matchsubj->bind_list), ipp->addr, port, x, y);
 					}
 				}

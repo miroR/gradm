@@ -1,12 +1,9 @@
 #include "gradm.h"
 
-char *get_anchor(char *filename)
+char *get_anchor(const char *filename)
 {
 	char *basepoint = gr_strdup(filename);
 	char *p, *p2;
-
-	if (!basepoint)
-		failure("gr_strdup");
 
 	/* calculates basepoint, eg basepoint of /home/ * /test is /home */
 	p = p2 = basepoint;
@@ -26,7 +23,7 @@ char *get_anchor(char *filename)
 	return basepoint;
 }
 
-int anchorcmp(char *path1, char *path2)
+int anchorcmp(const char *path1, const char *path2)
 {
 	char *anchor1, *anchor2;
 	int ret;
@@ -39,7 +36,7 @@ int anchorcmp(char *path1, char *path2)
 	return ret;
 }	
 
-int is_globbed_file(char *filename)
+int is_globbed_file(const char *filename)
 {
 	if (strchr(filename, '*') || strchr(filename, '?') || strchr(filename, '['))
 		return 1;
@@ -47,7 +44,7 @@ int is_globbed_file(char *filename)
 		return 0;
 }
 
-int match_filename(char *filename, char *pattern, unsigned int len, int is_glob)
+int match_filename(const char *filename, const char *pattern, unsigned int len, int is_glob)
 {
 	if (is_glob)
 		return fnmatch(pattern, filename, 0);
@@ -58,22 +55,23 @@ int match_filename(char *filename, char *pattern, unsigned int len, int is_glob)
 	return 1;
 }
 
-void add_to_string_array(char ***array, char *str)
+void add_to_string_array(char *** array, const char *str)
 {
 	unsigned int size = 0;
 	if (*array == NULL)
-		*array = gr_dyn_alloc(2 * sizeof(char *));
+		*array = (char **)gr_alloc(2 * sizeof(char *));
 	while (*(*array + size))
 		size++;
 
-	*array = gr_dyn_realloc(*array, (size + 2) * sizeof(char *));
+	*array = (char **)gr_realloc(*array, (size + 2) * sizeof(char *));
 	memset(*array + size, 0, 2 * sizeof(char *));
-	*(*array + size) = str;
+	// fix the warning for this
+	*(const char **)(*array + size) = str;
 
 	return;
 }
 
-char * gr_strdup(char *p)
+char * gr_strdup(const char *p)
 {
 	char *ret;
 
@@ -83,7 +81,7 @@ char * gr_strdup(char *p)
 	return ret;
 }
 
-void * gr_stat_alloc(unsigned long len)
+void * gr_alloc(size_t len)
 {
 	void *ptr;
 
@@ -94,23 +92,12 @@ void * gr_stat_alloc(unsigned long len)
 	return ptr;
 }
 
-void * gr_dyn_alloc(unsigned long len)
-{
-	void *ptr;
-
-	ptr = calloc(1, len);
-	if (ptr == NULL)
-		failure("calloc");
-
-	return ptr;
-}
-
-void * gr_dyn_realloc(void *addr, unsigned long len)
+void * gr_realloc(void *addr, size_t len)
 {
 	void *ptr;
 
 	if (addr == NULL)
-		return gr_dyn_alloc(len);
+		return gr_alloc(len);
 
 	ptr = realloc(addr, len);
 	if (ptr == NULL)
@@ -119,15 +106,7 @@ void * gr_dyn_realloc(void *addr, unsigned long len)
 	return ptr;
 }
 
-void gr_dyn_free(void *addr)
-{
-	free(addr);
-
-	return;
-}
-
-
-void gr_stat_free(void *addr)
+void gr_free(void *addr)
 {
 	free(addr);
 
@@ -187,9 +166,7 @@ void resize_hash_table(struct gr_hash_struct *hash)
 	unsigned long i;
 	struct gr_hash_struct *newhash;
 
-	newhash = calloc(1, sizeof(struct gr_hash_struct));
-	if (newhash == NULL)
-		failure("calloc");
+	newhash = (struct gr_hash_struct *)gr_alloc(sizeof(struct gr_hash_struct));
 
 	for (i = 0; i < sizeof(table_sizes)/sizeof(table_sizes[0]); i++) {
 		if (table_sizes[i] > hash->table_size) {
@@ -203,15 +180,10 @@ void resize_hash_table(struct gr_hash_struct *hash)
 		exit(EXIT_FAILURE);
 	}
 
-	newhash->table = calloc(newhash->table_size, sizeof(void *));
-	if (newhash->table == NULL)
-		failure("calloc");
-
+	newhash->table = (void **)gr_alloc(newhash->table_size * sizeof(void *));
 	newhash->nametable = NULL;
 	if (hash->type != GR_HASH_FILENAME) {
-		newhash->nametable = calloc(newhash->table_size, sizeof(void *));
-		if (newhash->nametable == NULL)
-			failure("calloc");
+		newhash->nametable = (void **)gr_alloc(newhash->table_size * sizeof(void *));
 	}
 
 	newhash->used_size = 0;
@@ -244,7 +216,7 @@ void *lookup_name_entry(struct gr_hash_struct *hash, const char *name)
 		match = (struct file_acl *)hash->nametable[index];
 
 		while (match && strcmp(match->filename, name)) {
-			index = (index + (1 << i)) % hash->table_size;
+			index = (index + (1U << i)) % hash->table_size;
 			match = (struct file_acl *)hash->nametable[index];
 			i = (i + 1) % 32;
 		}
@@ -258,7 +230,7 @@ void *lookup_name_entry(struct gr_hash_struct *hash, const char *name)
 		match = (struct proc_acl *)hash->nametable[index];
 
 		while (match && strcmp(match->filename, name)) {
-			index = (index + (1 << i)) % hash->table_size;
+			index = (index + (1U << i)) % hash->table_size;
 			match = (struct proc_acl *)hash->nametable[index];
 			i = (i + 1) % 32;
 		}
@@ -293,7 +265,7 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 
 		while (match && (match->inode != object->inode ||
 		       match->dev != object->dev)) {
-			index = (index + (1 << i)) % hash->table_size;
+			index = (index + (1U << i)) % hash->table_size;
 			match = (struct file_acl *)hash->table[index];
 			i = (i + 1) % 32;
 		}
@@ -309,7 +281,7 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 
 		while (match && (match->inode != subject->inode ||
 		       match->dev != subject->dev)) {
-			index = (index + (1 << i)) % hash->table_size;
+			index = (index + (1U << i)) % hash->table_size;
 			match = (struct proc_acl *)hash->table[index];
 			i = (i + 1) % 32;
 		}
@@ -325,7 +297,7 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 		match = (struct gr_learn_file_tmp_node *)hash->table[index];
 
 		while (match && (match->key != key || strcmp(match->filename, filename))) {
-			index = (index + (1 << i)) % hash->table_size;
+			index = (index + (1U << i)) % hash->table_size;
 			match = (struct gr_learn_file_tmp_node *)hash->table[index];
 			i = (i + 1) % 32;
 		}
@@ -416,7 +388,7 @@ void insert_name_entry(struct gr_hash_struct *hash, void *entry)
 		curr = (struct file_acl **)&hash->nametable[index];
 
 		while (*curr) {
-			index = (index + (1 << i)) % hash->table_size;
+			index = (index + (1U << i)) % hash->table_size;
 			curr = (struct file_acl **)&hash->nametable[index];
 			i = (i + 1) % 32;
 		}
@@ -431,7 +403,7 @@ void insert_name_entry(struct gr_hash_struct *hash, void *entry)
 		curr = (struct proc_acl **)&hash->nametable[index];
 
 		while (*curr) {
-			index = (index + (1 << i)) % hash->table_size;
+			index = (index + (1U << i)) % hash->table_size;
 			curr = (struct proc_acl **)&hash->nametable[index];
 			i = (i + 1) % 32;
 		}
@@ -455,7 +427,7 @@ void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
 		curr = (struct file_acl **)&hash->table[index];
 
 		while (*curr) {
-			index = (index + (1 << i)) % hash->table_size;
+			index = (index + (1U << i)) % hash->table_size;
 			curr = (struct file_acl **)&hash->table[index];
 			i = (i + 1) % 32;
 		}
@@ -472,7 +444,7 @@ void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
 		curr = (struct proc_acl **)&hash->table[index];
 
 		while (*curr) {
-			index = (index + (1 << i)) % hash->table_size;
+			index = (index + (1U << i)) % hash->table_size;
 			curr = (struct proc_acl **)&hash->table[index];
 			i = (i + 1) % 32;
 		}
@@ -490,7 +462,7 @@ void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
 		curr = (struct gr_learn_file_tmp_node **)&hash->table[index];
 
 		while (*curr && ((*curr)->key != key || strcmp(node->filename, (*curr)->filename))) {
-			index = (index + (1 << i)) % hash->table_size;
+			index = (index + (1U << i)) % hash->table_size;
 			curr = (struct gr_learn_file_tmp_node **)&hash->table[index];
 			i = (i + 1) % 32;
 		}
@@ -498,7 +470,7 @@ void insert_hash_entry(struct gr_hash_struct *hash, void *entry)
 		if (*curr) {
 			(*curr)->mode |= node->mode;
 			free(node->filename);
-			gr_stat_free(node);
+			gr_free(node);
 		} else {
 			*curr = (struct gr_learn_file_tmp_node *)entry;
 			(*curr)->key = key;
@@ -511,16 +483,10 @@ struct gr_hash_struct *create_hash_table(int type)
 {
 	struct gr_hash_struct *hash;
 
-	hash = calloc(1, sizeof(struct gr_hash_struct));
-	if (hash == NULL)
-		failure("calloc");
-	hash->table = calloc(table_sizes[0], sizeof(void *));
-	if (hash->table == NULL)
-		failure("calloc");
+	hash = (struct gr_hash_struct *)gr_alloc(sizeof(struct gr_hash_struct));
+	hash->table = (void **)gr_alloc(table_sizes[0] * sizeof(void *));
 	if (type != GR_HASH_FILENAME) {
-		hash->nametable = calloc(table_sizes[0], sizeof(void *));
-		if (hash->nametable == NULL)
-			failure("calloc");
+		hash->nametable = (void **)gr_alloc(table_sizes[0] * sizeof(void *));
 	}
 	hash->table_size = table_sizes[0];
 	hash->type = type;
@@ -562,7 +528,7 @@ void insert_acl_object(struct proc_acl *subject, struct file_acl *object)
 		subject->hash->first = object;
 	} else {
 		((struct file_acl *)subject->hash->first)->next = object;
-		object->prev = subject->hash->first;
+		object->prev = (struct file_acl *)subject->hash->first;
 		subject->hash->first = object;
 	}
 
@@ -579,7 +545,7 @@ void insert_acl_subject(struct role_acl *role, struct proc_acl *subject)
 		role->hash->first = subject;
 	} else {
 		((struct proc_acl *)role->hash->first)->next = subject;
-		subject->prev = role->hash->first;
+		subject->prev = (struct proc_acl *)role->hash->first;
 		role->hash->first = subject;
 	}
 	/* force every subject to have a hash table whether or not they
@@ -622,7 +588,7 @@ struct gr_group_map {
 static struct gr_user_map *user_list;
 static struct gr_group_map *group_list;
 
-char *gr_get_user_name(uid_t uid)
+const char *gr_get_user_name(uid_t uid)
 {
 	struct gr_user_map *tmpuser = user_list;
 	struct passwd *pwd;
@@ -635,7 +601,7 @@ char *gr_get_user_name(uid_t uid)
 	pwd = getpwuid(uid);
 
 	if (pwd) {
-		tmpuser = gr_stat_alloc(sizeof(struct gr_user_map));
+		tmpuser = (struct gr_user_map *)gr_alloc(sizeof(struct gr_user_map));
 		tmpuser->uid = uid;
 		tmpuser->user = gr_strdup(pwd->pw_name);
 		tmpuser->next = user_list;
@@ -645,7 +611,7 @@ char *gr_get_user_name(uid_t uid)
 		return NULL;
 }
 
-char *gr_get_group_name(gid_t gid)
+const char *gr_get_group_name(gid_t gid)
 {
 	struct gr_group_map *tmpgroup;
 	struct group *grp;
@@ -658,7 +624,7 @@ char *gr_get_group_name(gid_t gid)
 	grp = getgrgid(gid);
 
 	if (grp) {
-		tmpgroup = gr_stat_alloc(sizeof(struct gr_group_map));
+		tmpgroup = (struct gr_group_map *)gr_alloc(sizeof(struct gr_group_map));
 		tmpgroup->gid = gid;
 		tmpgroup->group = gr_strdup(grp->gr_name);
 		tmpgroup->next = group_list;

@@ -7,7 +7,7 @@ char *gr_line;
 unsigned int old_state;
 unsigned int old_state2;
 
-int gradmerror(char *s);
+int gradmerror(const char *s);
 int gradmwrap(void);
 int is_eof(void);
 void add_include(char *includename);
@@ -93,7 +93,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  return ':';
 					}
 <SUBJECT_STATE>([/]|$[(])[^ :\t\n]*	{
-					  gradmlval.string = process_string_replace(yytext);
+					  gradmlval.string = strip_trailing_slash(process_string_replace(yytext));
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
@@ -102,13 +102,13 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = process_string_replace(gr_line);
+					  gradmlval.string = strip_trailing_slash(process_string_replace(gr_line));
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
 					}
 <SUBJECT_STATE>$HOME[/]?[^ :\t\n]*	{ 
-					  gradmlval.string = process_string_replace(yytext);
+					  gradmlval.string = strip_trailing_slash(process_string_replace(yytext));
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
@@ -117,7 +117,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = process_string_replace(gr_line);
+					  gradmlval.string = strip_trailing_slash(process_string_replace(gr_line));
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
@@ -192,7 +192,11 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gradmlval.string = gr_strdup(yytext);
 					  return IPTYPE;
 					}
-<VAR_IP_STATE,IP_STATE>[a-z_-]+			{
+<VAR_IP_STATE,IP_STATE>[a-z_-]+		{
+					  gradmlval.string = gr_strdup(yytext);
+					  return IPPROTO;
+					}
+<VAR_IP_STATE,IP_STATE>"proto:"[0-9]{1,3}	{
 					  gradmlval.string = gr_strdup(yytext);
 					  return IPPROTO;
 					}
@@ -362,7 +366,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 
 <INITIAL,VAR_OBJ_STATE>([/]|$[(])[^ \t\n]*	{
-					  gradmlval.string = process_string_replace(yytext);
+					  gradmlval.string = strip_trailing_slash(process_string_replace(yytext));
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
@@ -371,13 +375,13 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = process_string_replace(gr_line);
+					  gradmlval.string = strip_trailing_slash(process_string_replace(gr_line));
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
 <INITIAL,VAR_OBJ_STATE>$HOME[/]?[^ \t\n]*	{
-					  gradmlval.string = gr_strdup(yytext);
+					  gradmlval.string = strip_trailing_slash(gr_strdup(yytext));
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
@@ -386,7 +390,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					  gr_line = yytext;
 					  gr_line++;
 					  *(gr_line + strlen(gr_line) - 1) = '\0';
-					  gradmlval.string = gr_strdup(gr_line);
+					  gradmlval.string = strip_trailing_slash(gr_strdup(gr_line));
 					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
 						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
@@ -412,10 +416,10 @@ void push_include(unsigned long linenum, YY_BUFFER_STATE buffer,
 {
 	int sp = main_stack->sp;
 
-	main_stack->stack = realloc(main_stack->stack, (1 + main_stack->sp) * sizeof(struct include_entry *));
+	main_stack->stack = (struct include_entry **) realloc(main_stack->stack,(1 + main_stack->sp) * sizeof(struct include_entry *));
 	if (main_stack->stack == NULL)
 		failure("realloc");
-	main_stack->stack[sp] = calloc(1, sizeof(struct include_entry));
+	main_stack->stack[sp] = (struct include_entry *)calloc(1, sizeof(struct include_entry));
 	if (main_stack->stack[sp] == NULL)
 		failure("calloc");
 	main_stack->stack[sp]->sp = -1;
@@ -467,11 +471,11 @@ void add_include(char *includename)
 		if (!strcmp(namelist[i]->d_name, ".") || !strcmp(namelist[i]->d_name, "..") ||
 		    !strcmp(namelist[i]->d_name+strlen(namelist[i]->d_name)-1, "~"))
 			continue;
-		tmp = calloc(1, sizeof(struct include_entry));
+		tmp = (struct include_entry *)calloc(1, sizeof(struct include_entry));
 		if (tmp == NULL)
 			failure("calloc");
 		
-		path = calloc(1, strlen(includename) + strlen(namelist[i]->d_name) + 2);
+		path = (char *)calloc(1, strlen(includename) + strlen(namelist[i]->d_name) + 2);
 		if (path == NULL)
 			failure("calloc");
 
@@ -578,7 +582,7 @@ int gradmwrap(void)
 	return 1;
 }
 
-int gradmerror(char *s)
+int gradmerror(const char *s)
 {
 	fflush(stderr);  
 	fprintf(stderr, "\"%s\" caused a %s on line %lu of %s\n", yytext, s,
@@ -664,7 +668,7 @@ void show_policy(void) {
 			ipp = *(proc->ips + i);
 			memcpy(&ipaddr, &(ipp->addr), sizeof(ipaddr));
 			for (c = 0; c < 32; c++)
-				if (ipp->addr & (1 << c))
+				if (ipp->addr & (1U << c))
 					netmask++;
 			if (ipp->mode &= GR_IP_CONNECT)
 				printf("\t\tCONNECT %s %u.%u.%u.%u/%u:%d-%d", ipp->mode & GR_IP_INVERT ? "!" : "", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], netmask, ipp->low, ipp->high);
@@ -672,7 +676,7 @@ void show_policy(void) {
 				printf("\t\tBIND %s %u.%u.%u.%u/%u:%d-%d", ipp->mode & GR_IP_INVERT ? "!" : "", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], netmask, ipp->low, ipp->high);
 
 			for (c = 1; c < 5; c++) {
-				if (ipp->type & (1 << c)) {
+				if (ipp->type & (1U << c)) {
 					switch (c) {
 					case SOCK_RAW:
 						printf(" raw_sock");
@@ -690,7 +694,7 @@ void show_policy(void) {
 				}
 			}
 			for (c = 0; c < 256; c++) {
-				if (ipp->proto[c / 32] & (1 << (c % 32))) {
+				if (ipp->proto[c / 32] & (1U << (c % 32))) {
 					if (c == IPPROTO_RAW)
 						printf(" raw_proto");
 					else {
@@ -699,7 +703,7 @@ void show_policy(void) {
 					if(proto)
 						printf(" %s", proto->p_name);
 					else
-						printf(" %d", c);
+						printf(" proto:%d", c);
 					}
 				}
 			}
@@ -708,7 +712,7 @@ void show_policy(void) {
 		for (filp = proc->hash->first;filp;filp=filp->prev)
                         printf("\t\tOBJECT: %s dev:%lu inode:%lu mode:%lu\n", filp->filename, filp->dev, filp->inode, filp->mode);
 		for (i=0;i<GR_NLIMITS;i++)
-			if (proc->resmask & (1 << i))
+			if (proc->resmask & (1U << i))
 				printf("\t\t%s: soft: %lu hard: %lu\n", rlim_table[i], proc->res[i].rlim_cur, proc->res[i].rlim_max);
 	}
 	}
@@ -721,6 +725,8 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "gradm is not meant to run suid root.\n");
 		exit(EXIT_FAILURE);
 	}
+
+	init_res_table();
 
 	special_role_uid = 0;
 	

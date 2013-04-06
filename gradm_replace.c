@@ -3,13 +3,13 @@
 typedef struct _replace_string_entry
 {
 	struct _replace_string_entry *next;
-	char *name;
+	const char *name;
 	char *replacewith;
 } replace_string_entry;
 
 static replace_string_entry *replace_list;
 
-char *lookup_replace_string(char *name)
+char *lookup_replace_string(const char *name)
 {
 	replace_string_entry *tmp;
 
@@ -22,7 +22,7 @@ char *lookup_replace_string(char *name)
 }
 
 /* called with already strdup'd strings */
-void add_replace_string(char *name, char *replacewith)
+void add_replace_string(const char *name, char *replacewith)
 {
 	replace_string_entry *entry;
 	replace_string_entry *tmp;
@@ -38,10 +38,7 @@ void add_replace_string(char *name, char *replacewith)
 			break;
 	}
 
-	tmp = malloc(sizeof(replace_string_entry));
-	if (tmp == NULL)
-		failure("malloc");
-
+	tmp = (replace_string_entry *)gr_alloc(sizeof(replace_string_entry));
 	tmp->next = NULL;
 	tmp->name = name;
 	tmp->replacewith = replacewith;
@@ -55,7 +52,7 @@ void add_replace_string(char *name, char *replacewith)
 }
 
 /* returns newly allocated string */
-char *process_string_replace(char *str)
+char *process_string_replace(const char *str)
 {
 	char *p, *p2;
 	char *replacewith;
@@ -83,7 +80,7 @@ char *process_string_replace(char *str)
 	*p = '\0';
 
 	newlen = strlen(str) + strlen(p2 + 1) + strlen(replacewith);
-	newstr = malloc(newlen + 1);
+	newstr = (char *)gr_alloc(newlen + 1);
 	strcpy(newstr, str);
 	strcat(newstr, replacewith);
 	strcat(newstr, p2 + 1);

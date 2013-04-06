@@ -8,6 +8,21 @@ void set_role_umask(struct role_acl *role, u_int16_t umask)
 	role->umask = umask;
 }
 
+char *strip_trailing_slash(char *filename)
+{
+	unsigned int file_len = strlen(filename);
+	if (file_len > 1 && filename[file_len - 1] == '/')
+		filename[file_len - 1] = '\0';
+
+	if (file_len >= PATH_MAX) {
+		fprintf(stderr, "Filename too long on line %lu of file %s.\n",
+			lineno, current_acl_file);
+		exit(EXIT_FAILURE);
+	}
+
+	return filename;
+}
+
 static int get_id_from_role_name(const char *rolename, u_int16_t type)
 {
 	unsigned long the_id = 0;
@@ -61,7 +76,7 @@ static int get_id_from_role_name(const char *rolename, u_int16_t type)
 }
 
 void
-add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int allowdeny)
+add_id_transition(struct proc_acl *subject, const char *idname, int usergroup, int allowdeny)
 {
 	int i;
 	int id;
@@ -88,7 +103,7 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 			num_pointers++;
 
 		subject->user_trans_num++;
-		subject->user_transitions = gr_dyn_realloc(subject->user_transitions, subject->user_trans_num * sizeof(uid_t));
+		subject->user_transitions = (uid_t *)gr_realloc(subject->user_transitions, subject->user_trans_num * sizeof(uid_t));
 		subject->user_transitions[subject->user_trans_num - 1] = id;
 	} else if (usergroup == GR_ID_GROUP) {
 		if ((subject->group_trans_type | allowdeny) == (GR_ID_ALLOW | GR_ID_DENY)) {
@@ -112,7 +127,7 @@ add_id_transition(struct proc_acl *subject, char *idname, int usergroup, int all
 			num_pointers++;
 
 		subject->group_trans_num++;
-		subject->group_transitions = gr_dyn_realloc(subject->group_transitions, subject->group_trans_num * sizeof(gid_t));
+		subject->group_transitions = (gid_t *)gr_realloc(subject->group_transitions, subject->group_trans_num * sizeof(gid_t));
 		subject->group_transitions[subject->group_trans_num - 1] = id;
 	}
 
@@ -145,7 +160,7 @@ is_role_dupe(struct role_acl *role, const char *rolename, const u_int16_t type)
 }
 
 void
-add_domain_child(struct role_acl *role, char *idname)
+add_domain_child(struct role_acl *role, const char *idname)
 {
 	if (!(role->roletype & (GR_ROLE_USER | GR_ROLE_GROUP))) {
 		// should never get here
@@ -173,14 +188,14 @@ add_domain_child(struct role_acl *role, char *idname)
 		num_pointers++;
 
 	role->domain_child_num++;
-	role->domain_children = gr_dyn_realloc(role->domain_children, role->domain_child_num * sizeof(gid_t));
+	role->domain_children = (gid_t *)gr_realloc(role->domain_children, role->domain_child_num * sizeof(gid_t));
 	*(role->domain_children + role->domain_child_num - 1) = get_id_from_role_name(idname, role->roletype);
 
 	return;
 }
 
 void
-add_role_transition(struct role_acl *role, char *rolename)
+add_role_transition(struct role_acl *role, const char *rolename)
 {
 	struct role_transition **roletpp;
 	struct role_transition *roletp;
@@ -188,11 +203,7 @@ add_role_transition(struct role_acl *role, char *rolename)
 	/* one for transition, one for name */
 	num_pointers += 2;
 
-	roletp =
-	    (struct role_transition *) calloc(1,
-					      sizeof (struct role_transition));
-	if (!roletp)
-		failure("calloc");
+	roletp = (struct role_transition *) gr_alloc(sizeof (struct role_transition));
 
 	roletpp = &(role->transitions);
 
@@ -210,9 +221,7 @@ add_role_transition(struct role_acl *role, char *rolename)
 
 void add_symlink(struct proc_acl *subj, struct file_acl *obj)
 {
-	struct symlink *sym = malloc(sizeof (struct symlink));
-	if (!sym)
-		failure("malloc");
+	struct symlink *sym = (struct symlink *)gr_alloc(sizeof (struct symlink));
 
 	sym->role = current_role;
 	sym->subj = subj;
@@ -240,7 +249,7 @@ is_deleted_file_dupe(const char *filename)
 }
 
 static struct deleted_file *
-add_deleted_file(char *filename)
+add_deleted_file(const char *filename)
 {
 	struct deleted_file *dfile;
 	struct deleted_file *retfile;
@@ -251,9 +260,7 @@ add_deleted_file(char *filename)
 	retfile = is_deleted_file_dupe(filename);
 	if (retfile)
 		return retfile;
-	dfile = malloc(sizeof (struct deleted_file));
-	if (!dfile)
-		failure("malloc");
+	dfile = (struct deleted_file *)gr_alloc(sizeof (struct deleted_file));
 	dfile->filename = filename;
 	dfile->ino = ++ino;
 	dfile->next = deleted_files;
@@ -293,7 +300,7 @@ is_proc_subject_dupe(struct role_acl *role, struct proc_acl *subject)
 }
 
 int
-add_role_acl(struct role_acl **role, char *rolename, u_int16_t type, int ignore)
+add_role_acl(struct role_acl **role, const char *rolename, u_int16_t type, int ignore)
 {
 	struct role_acl *rtmp;
 
@@ -318,9 +325,7 @@ add_role_acl(struct role_acl **role, char *rolename, u_int16_t type, int ignore)
 		exit(EXIT_FAILURE);
 	}
 
-	if ((rtmp =
-	     (struct role_acl *) calloc(1, sizeof (struct role_acl))) == NULL)
-		failure("calloc");
+	rtmp = (struct role_acl *) gr_alloc(sizeof (struct role_acl));
 
 	rtmp->umask = 0;
 	rtmp->roletype = type;
@@ -374,7 +379,7 @@ add_role_acl(struct role_acl **role, char *rolename, u_int16_t type, int ignore)
 	return 1;
 }
 
-int count_slashes(char *str)
+int count_slashes(const char *str)
 {
 	int i = 0;
 	while (*str) {
@@ -387,12 +392,10 @@ int count_slashes(char *str)
 }
 
 static int
-add_globbing_file(struct proc_acl *subject, char *filename,
+add_globbing_file(struct proc_acl *subject, const char *filename,
 		  u_int32_t mode, int type)
 {
-	struct glob_file *glob = malloc(sizeof (struct glob_file));
-	if (!glob)
-		failure("malloc");
+	struct glob_file *glob = (struct glob_file *)gr_alloc(sizeof (struct glob_file));
 
 	glob->role = current_role;
 	glob->subj = subject;
@@ -416,8 +419,8 @@ add_globbing_file(struct proc_acl *subject, char *filename,
 }
 
 int
-add_globbed_object_acl(struct proc_acl *subject, char *filename,
-		  u_int32_t mode, int type, char *policy_file, unsigned long line)
+add_globbed_object_acl(struct proc_acl *subject, const char *filename,
+		  u_int32_t mode, int type, const char *policy_file, unsigned long line)
 {
 	char *basepoint;
 	char *p, *p2;
@@ -443,9 +446,7 @@ add_globbed_object_acl(struct proc_acl *subject, char *filename,
 
 	if (anchor->globbed) {
 		glob = anchor->globbed;
-		glob2 = calloc(1, sizeof(struct file_acl));
-		if (!glob2)
-			failure("calloc");
+		glob2 = (struct file_acl *)gr_alloc(sizeof(struct file_acl));
 		onum = count_slashes(filename);
 		lnum = count_slashes(glob->filename);
 		if (onum > lnum) {
@@ -474,9 +475,7 @@ add_globbed_object_acl(struct proc_acl *subject, char *filename,
 		glob2->prev = glob;
 		glob->next = glob2;
 	} else {
-		glob2 = calloc(1, sizeof(struct file_acl));
-		if (!glob2)
-			failure("calloc");
+		glob2 = (struct file_acl *)gr_alloc(sizeof(struct file_acl));
 		glob2->filename = filename;
 		glob2->mode = mode;
 		anchor->globbed = glob2;
@@ -492,7 +491,7 @@ display_all_dupes(struct proc_acl *subject, struct file_acl *filp2)
 	struct stat64 fstat;
 	struct file_acl ftmp;
 
-	for_each_object(tmp, subject) {
+	for_each_file_object(tmp, subject) {
 	    if (!stat64(tmp->filename, &fstat)) {
 		ftmp.inode = fstat.st_ino;
 		if (is_24_kernel)
@@ -509,7 +508,7 @@ display_all_dupes(struct proc_acl *subject, struct file_acl *filp2)
 }
 
 static char *
-parse_homedir(char *filename)
+parse_homedir(const char *filename)
 {
 	struct passwd *pwd;
 	unsigned int newlen;
@@ -534,7 +533,7 @@ parse_homedir(char *filename)
 
 	newlen = strlen(pwd->pw_dir) + strlen(filename) - 5 + 1;
 		
-	newfilename = calloc(1, newlen);
+	newfilename = (char *)gr_alloc( newlen);
 
 	if (!newfilename) {
 		fprintf(stderr, "Out of memory.\n");
@@ -548,15 +547,14 @@ parse_homedir(char *filename)
 }
 
 int
-add_proc_object_acl(struct proc_acl *subject, char *filename,
+add_proc_object_acl(struct proc_acl *subject, const char *filename,
 		    u_int32_t mode, int type)
 {
 	struct file_acl *p;
 	struct file_acl *p2;
 	struct stat64 fstat;
 	struct deleted_file *dfile;
-	unsigned int file_len;
-	char *str;
+	const char *str;
 
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "
@@ -585,15 +583,13 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	}
 
 	str = filename;
-	file_len = 0;
 	if (!strncmp(filename, "/SYSV", 5))
 		return add_globbing_file(subject, filename, mode, type);
 	while (*str) {
-		file_len++;
 		if (*str == '?' || *str == '*')
 			return add_globbing_file(subject, filename, mode, type);
 		if (*str == '[') {
-			char *str2 = str;
+			const char *str2 = str;
 			while (*str2) {
 				if (*str2 == ']')	
 					return add_globbing_file(subject, filename, mode, type);
@@ -602,8 +598,6 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 		}
 		str++;
 	}
-
-	file_len++;
 
 	memset(&fstat, 0, sizeof(fstat));
 
@@ -618,18 +612,7 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 	/* one for the object, one for the filename, one for the name entry struct, and one for the inodev_entry struct in the kernel*/
 	num_pointers += 4;
 
-	if ((p =
-	     (struct file_acl *) calloc(1, sizeof (struct file_acl))) == NULL)
-		failure("calloc");
-
-	if ((filename[file_len - 2] == '/') && file_len != 2)
-		filename[file_len - 2] = '\0';
-
-	if (file_len > PATH_MAX) {
-		fprintf(stderr, "Filename too long on line %lu of file %s.\n",
-			lineno, current_acl_file);
-		exit(EXIT_FAILURE);
-	}
+	p = (struct file_acl *) gr_alloc(sizeof (struct file_acl));
 
 	p->filename = filename;
 	p->mode = mode;
@@ -677,13 +660,12 @@ add_proc_object_acl(struct proc_acl *subject, char *filename,
 }
 
 int
-add_proc_subject_acl(struct role_acl *role, char *filename, u_int32_t mode, int flag)
+add_proc_subject_acl(struct role_acl *role, const char *filename, u_int32_t mode, int flag)
 {
 	struct proc_acl *p;
 	struct proc_acl *p2;
 	struct deleted_file *dfile;
 	struct stat fstat;
-	unsigned int file_len;
 
 	num_subjects++;
 	/* one for the subject, one for the filename */
@@ -713,8 +695,6 @@ add_proc_subject_acl(struct role_acl *role, char *filename, u_int32_t mode, int 
 	if (!strncmp(filename, "$HOME", 5))
 		filename = parse_homedir(filename);
 
-	file_len = strlen(filename) + 1;
-
 	// FIXME: for subjects we currently follow symlinks
 	if (stat(filename, &fstat)) {
 		dfile = add_deleted_file(filename);
@@ -723,21 +703,10 @@ add_proc_subject_acl(struct role_acl *role, char *filename, u_int32_t mode, int 
 		mode |= GR_DELETED;
 	}
 
-	if ((p =
-	     (struct proc_acl *) calloc(1, sizeof (struct proc_acl))) == NULL)
-		failure("calloc");
+	p = (struct proc_acl *) gr_alloc(sizeof (struct proc_acl));
 
 	if (!strcmp(filename, "/") && !(flag & GR_FFAKE))
 		role->root_label = p;
-
-	if ((filename[file_len - 2] == '/') && file_len != 2)
-		filename[file_len - 2] = '\0';
-
-	if (file_len > PATH_MAX) {
-		fprintf(stderr, "Filename too long on line %lu of file %s.\n",
-			lineno, current_acl_file);
-		exit(EXIT_FAILURE);
-	}
 
 	p->filename = filename;
 	p->mode = mode;
@@ -1090,7 +1059,7 @@ setup_special_roles(struct gr_arg *grarg)
 				exit(EXIT_FAILURE);
 			}
 			grarg->sprole_pws[i].rolename =
-			    (unsigned char *) rtmp->rolename;
+			    (const unsigned char *) rtmp->rolename;
 			memcpy(grarg->sprole_pws[i].salt, entry.salt,
 			       GR_SALT_SIZE);
 			memcpy(grarg->sprole_pws[i].sum, entry.sum,
@@ -1122,13 +1091,8 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 			sproles++;
 	}
 
-	if ((retarg =
-	     (struct gr_arg *) calloc(1, sizeof (struct gr_arg))) == NULL)
-		failure("calloc");
-
-	if ((wrapper =
-	     (struct gr_arg_wrapper *) calloc(1, sizeof (struct gr_arg_wrapper))) == NULL)
-		failure("calloc");
+	retarg = (struct gr_arg *) gr_alloc(sizeof (struct gr_arg));
+	wrapper = (struct gr_arg_wrapper *) gr_alloc(sizeof (struct gr_arg_wrapper));
 
 	wrapper->version = GRADM_VERSION;
 	wrapper->size = sizeof(struct gr_arg);
@@ -1142,10 +1106,7 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 	if (!racls)	// we are disabling, don't want to calloc 0
 		goto set_pw;
 
-	if ((retarg->sprole_pws =
-	     (struct sprole_pw *) calloc(sproles,
-					 sizeof (struct sprole_pw))) == NULL)
-		failure("calloc");
+	retarg->sprole_pws = (struct sprole_pw *) gr_alloc(sproles * sizeof (struct sprole_pw));
 
 	err = mlock(retarg->sprole_pws, sproles * sizeof (struct sprole_pw));
 	if (err && !getuid())
@@ -1156,9 +1117,7 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 
 	retarg->num_sprole_pws = sproles;
 
-	role_db = (struct user_acl_role_db *) calloc(1, sizeof (struct user_acl_role_db));
-	if (role_db == NULL)
-		failure("calloc");
+	role_db = (struct user_acl_role_db *) gr_alloc(sizeof (struct user_acl_role_db));
 
 	role_db->num_pointers = num_pointers;
 	role_db->num_roles = num_roles;
@@ -1166,10 +1125,12 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 	role_db->num_subjects = num_subjects;
 	role_db->num_objects = num_objects;
 
-	if ((r_tmp = role_db->r_table =
-	     (struct role_acl **) calloc(racls,
-					 sizeof (struct role_acl *))) == NULL)
-		failure("calloc");
+	if (racls >= ULONG_MAX/sizeof(struct role_acl *)) {
+		fprintf(stderr, "Too many roles.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	r_tmp = role_db->r_table = (struct role_acl **) gr_alloc(racls * sizeof (struct role_acl *));
 
 	for_each_role(rtmp, current_role) {
 		*r_tmp = rtmp;

@@ -31,8 +31,8 @@ learn_log:
 		error
 	|	ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' NUM ':' NUM ':' filename ':' NUM ':' IPADDR
 		{
-			char *user;
-			char *group;
+			const char *user;
+			const char *group;
 			uid_t uid;
 			gid_t gid;
 
@@ -47,8 +47,8 @@ learn_log:
 		}		
 	|	ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' IPADDR ':' NUM ':' NUM ':' NUM ':' NUM ':' IPADDR
 		{
-			char *user;
-			char *group;
+			const char *user;
+			const char *group;
 			uid_t uid;
 			gid_t gid;
 
@@ -63,8 +63,8 @@ learn_log:
 		}
 	|	ROLENAME ':' NUM ':' NUM ':' NUM ':' filename ':' filename ':' id_type ':' NUM ':' NUM ':' NUM ':' IPADDR
 		{
-			char *user;
-			char *group;
+			const char *user;
+			const char *group;
 			uid_t uid;
 			gid_t gid;
 

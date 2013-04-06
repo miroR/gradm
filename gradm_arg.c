@@ -118,7 +118,7 @@ static void verbose_stats(void)
 			if (stmp->ips == NULL)
 				ussubjs++;
 
-			for_each_object(otmp, stmp) {
+			for_each_file_object(otmp, stmp) {
 				tobjs++;
 				if (otmp->mode & GR_SETID &&
 				    ((rtmp->roletype & GR_ROLE_GOD) == 0))
@@ -164,11 +164,9 @@ static FILE *open_learn_log(char *learn_log)
 		}
 	}
 
-	learn_log_buffer = malloc(LEARN_LOG_BUFFER_SIZE);
-	if (learn_log_buffer) {
-		// buffer the learn log if possible
-		setvbuf(learnfile, learn_log_buffer, _IOFBF, LEARN_LOG_BUFFER_SIZE);
-	}
+	learn_log_buffer = (char *)gr_alloc(LEARN_LOG_BUFFER_SIZE);
+	// buffer the learn log if possible
+	setvbuf(learnfile, learn_log_buffer, _IOFBF, LEARN_LOG_BUFFER_SIZE);
 
 	return learnfile;
 }

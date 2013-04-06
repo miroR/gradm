@@ -15,7 +15,7 @@ paxflag_conv(const char *paxflag)
 
 	for (i = 0; i < sizeof (paxflag_list) / sizeof (struct paxflag_set); i++)
 		if (!strcmp(paxflag, paxflag_list[i].paxflag_name))
-			return (1 << (paxflag_list[i].paxflag_val));
+			return (1U << (paxflag_list[i].paxflag_val));
 
 	fprintf(stderr, "Invalid PaX flag name \"%s\" on line %lu of %s.\n"
 		"The RBAC system will not load until this"

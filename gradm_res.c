@@ -5,25 +5,28 @@
 #define NR_OPEN 1024
 #endif
 
-char *rlim_table[] = {
-	[RLIMIT_CPU] = "RES_CPU",
-	[RLIMIT_FSIZE] = "RES_FSIZE",
-	[RLIMIT_DATA] = "RES_DATA",
-	[RLIMIT_STACK] = "RES_STACK",
-	[RLIMIT_CORE] = "RES_CORE",
-	[RLIMIT_RSS] = "RES_RSS",
-	[RLIMIT_NPROC] = "RES_NPROC",
-	[RLIMIT_NOFILE] = "RES_NOFILE",
-	[RLIMIT_MEMLOCK] = "RES_MEMLOCK",
-	[RLIMIT_AS] = "RES_AS",
-	[RLIMIT_LOCKS] = "RES_LOCKS",
-	[RLIMIT_SIGPENDING] = "RES_SIGPENDING",
-	[RLIMIT_MSGQUEUE] = "RES_MSGQUEUE",
-	[RLIMIT_NICE] = "RES_NICE",
-	[RLIMIT_RTPRIO] = "RES_RTPRIO",
-	[RLIMIT_RTTIME] = "RES_RTTIME",
-	[GR_CRASH_RES] = "RES_CRASH"
-};
+const char *rlim_table[GR_NLIMITS];
+
+void init_res_table(void)
+{
+	rlim_table[RLIMIT_CPU] = "RES_CPU";
+	rlim_table[RLIMIT_FSIZE] = "RES_FSIZE";
+	rlim_table[RLIMIT_DATA] = "RES_DATA";
+	rlim_table[RLIMIT_STACK] = "RES_STACK";
+	rlim_table[RLIMIT_CORE] = "RES_CORE";
+	rlim_table[RLIMIT_RSS] = "RES_RSS";
+	rlim_table[RLIMIT_NPROC] = "RES_NPROC";
+	rlim_table[RLIMIT_NOFILE] = "RES_NOFILE";
+	rlim_table[RLIMIT_MEMLOCK] = "RES_MEMLOCK";
+	rlim_table[RLIMIT_AS] = "RES_AS";
+	rlim_table[RLIMIT_LOCKS] = "RES_LOCKS";
+	rlim_table[RLIMIT_SIGPENDING] = "RES_SIGPENDING";
+	rlim_table[RLIMIT_MSGQUEUE] = "RES_MSGQUEUE";
+	rlim_table[RLIMIT_NICE] = "RES_NICE";
+	rlim_table[RLIMIT_RTPRIO] = "RES_RTPRIO";
+	rlim_table[RLIMIT_RTTIME] = "RES_RTTIME";
+	rlim_table[GR_CRASH_RES] = "RES_CRASH";
+}
 
 static unsigned short
 name_to_res(const char *name)
@@ -47,7 +50,7 @@ name_to_res(const char *name)
 static unsigned int
 res_to_mask(unsigned short res)
 {
-	return (1 << res);
+	return (1U << res);
 }
 
 static unsigned long
@@ -93,7 +96,7 @@ conv_res(const char *lim)
 		res = res * 60 * 60 * 24;
 		break;
 	case 's':
-		res = res;
+		//res = res;
 		break;
 	case 'K':
 		res = res << 10;

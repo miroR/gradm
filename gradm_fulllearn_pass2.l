@@ -4,6 +4,7 @@
 
 void fulllearn_pass2error(const char *s);
 int fulllearn_pass2wrap(void);
+
 static struct in_addr ip;
 %}
 

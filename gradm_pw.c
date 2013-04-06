@@ -59,20 +59,20 @@ get_user_passwd(struct gr_pw_entry *entry, int mode)
 {
 	struct termios term;
 	struct gr_pw_entry *old = NULL;
-	struct gr_pw_entry new;
+	struct gr_pw_entry newpw;
 	int i, err;
 
-	err = mlock(&new, sizeof (new));
+	err = mlock(&newpw, sizeof (newpw));
 	if (err && !getuid())
 		fprintf(stderr, "Warning: Unable to lock password "
 			"into physical memory.\n");
       start_pw:
-	memset(&new, 0, sizeof (struct gr_pw_entry));
+	memset(&newpw, 0, sizeof (struct gr_pw_entry));
 
 	for (i = 0; i <= mode; i++) {
 		if (i == GR_PWANDSUM) {
 			old = entry;
-			entry = &new;
+			entry = &newpw;
 		}
 
 		fprintf(stderr, "%s", (i ? "Re-enter Password: " : "Password: "));
@@ -113,7 +113,7 @@ get_user_passwd(struct gr_pw_entry *entry, int mode)
 				exit(EXIT_FAILURE);
 			}
 			entry = old;
-			memset(&new, 0, sizeof (struct gr_pw_entry));
+			memset(&newpw, 0, sizeof (struct gr_pw_entry));
 			printf("Password written to %s.\n", GR_PW_PATH);
 		}
 	}
@@ -140,7 +140,7 @@ generate_salt(struct gr_pw_entry *entry)
 }
 
 int
-read_saltandpass(unsigned char *rolename, unsigned char *salt, unsigned char *pass)
+read_saltandpass(const unsigned char *rolename, unsigned char *salt, unsigned char *pass)
 {
 	int fd;
 	int len;

@@ -42,7 +42,7 @@
 	for(x = y; x; x = (x)->prev)
 
 #define for_each_subject(x, y) \
-	for(x = (y)->hash->first; x; x = (x)->prev)
+	for(x = (struct proc_acl *)(y)->hash->first; x; x = (x)->prev)
 
 #define for_each_nested_subject(x) \
 	for (x = global_nested_subject_list; x; x = (x)->next)
@@ -50,8 +50,8 @@
 #define for_each_include(x) \
 	for(x = includes; x; x = (x)->prev)
 
-#define for_each_object(x, y) \
-	for(x = (y)->hash->first; x; x = (x)->prev)
+#define for_each_file_object(x, y) \
+	for(x = (struct file_acl *)(y)->hash->first; x; x = (x)->prev)
 
 #define for_each_allowed_ip(x, y) \
 	for(x = y; x; x = (x)->prev)

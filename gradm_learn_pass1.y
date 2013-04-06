@@ -60,7 +60,7 @@ learn_log:
 				role = insert_learn_role(&special_role_list, $1, rolemode);
 			else {
 				if (default_role_entry == NULL) {
-					default_role_entry = calloc(1, sizeof(struct gr_learn_role_entry));
+					default_role_entry = (struct gr_learn_role_entry *)calloc(1, sizeof(struct gr_learn_role_entry));
 					if (!default_role_entry)
 						failure("calloc");
 				}
@@ -99,7 +99,7 @@ learn_log:
 				role = insert_learn_role(&special_role_list, $1, rolemode);
 			else {
 				if (default_role_entry == NULL) {
-					default_role_entry = calloc(1, sizeof(struct gr_learn_role_entry));
+					default_role_entry = (struct gr_learn_role_entry *)calloc(1, sizeof(struct gr_learn_role_entry));
 					if (!default_role_entry)
 						failure("calloc");
 				}
@@ -136,7 +136,7 @@ learn_log:
 				role = insert_learn_role(&special_role_list, $1, rolemode);
 			else {
 				if (default_role_entry == NULL) {
-					default_role_entry = calloc(1, sizeof(struct gr_learn_role_entry));
+					default_role_entry = (struct gr_learn_role_entry *)calloc(1, sizeof(struct gr_learn_role_entry));
 					if (!default_role_entry)
 						failure("calloc");
 				}

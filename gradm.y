@@ -228,7 +228,7 @@ subject_label:			SUBJECT SUBJ_NAME subj_mode
 
 nested_label:			SUBJECT SUBJ_NAME nested_subjs subj_mode
 				{
-					add_proc_nested_acl(current_role, $2, nested, current_nest_depth, $4);
+					add_proc_nested_acl(current_role, $2, (const char * const *)nested, current_nest_depth, $4);
 					current_nest_depth = 0;
 				}
 	;

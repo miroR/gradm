@@ -1,8 +1,8 @@
 #include "gradm.h"
 
 void
-add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
-		    char **nestednames, int nestlen, u_int32_t nestmode)
+add_proc_nested_acl(struct role_acl *role, const char *mainsubjname,
+		    const char * const *nestednames, int nestlen, u_int32_t nestmode)
 {
 	int i;
 	char *nestname;
@@ -23,13 +23,7 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 	for (i = 0; i < nestlen; i++)
 		namelen += strlen(nestednames[i]) + 1;
 
-	nestname = malloc(namelen + 1);
-
-	if (!nestname) {
-		fprintf(stderr, "Out of memory.\n");
-		exit(EXIT_FAILURE);
-	}
-
+	nestname = (char *)gr_alloc(namelen + 1);
 	strcpy(nestname, mainsubjname);
 	for (i = 0; i < nestlen; i++)
 		sprintf(nestname + strlen(nestname), ":%s", nestednames[i]);
@@ -72,13 +66,12 @@ add_proc_nested_acl(struct role_acl *role, char *mainsubjname,
 	add_proc_subject_acl(role, nestednames[i - 1], nestmode, GR_FFAKE);
 
 	namelen = strlen(nestednames[i-1]);
-	for_each_object(otmp, stmp) {
+	for_each_file_object(otmp, stmp) {
 		if (!strncmp(nestednames[i-1], otmp->filename, namelen) && (otmp->filename[namelen] == '/' || otmp->filename[namelen] == '\0'))
 			if (otmp->mode & GR_EXEC)
 				otmp->nested = current_subject;
 	}
 	current_subject->parent_subject = stmp;
-	//current_subject->mode |= GR_NESTED;
 
 	if (!stat(nestednames[i - 1], &fstat) && S_ISREG(fstat.st_mode))
 		add_proc_object_acl(current_subject, nestednames[i - 1], proc_object_mode_conv("rx"), GR_FLEARN);

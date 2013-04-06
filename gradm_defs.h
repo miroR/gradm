@@ -123,7 +123,7 @@
 #undef cap_lower
 #undef cap_raised
 #define CAP_TO_INDEX(x)     ((x) >> 5)        /* 1 << 5 == bits in __u32 */
-#define CAP_TO_MASK(x)      (1 << ((x) & 31)) /* mask for indexed __u32 */
+#define CAP_TO_MASK(x)      (1U << ((x) & 31)) /* mask for indexed __u32 */
 #define cap_raise(c, flag)  ((c).cap[CAP_TO_INDEX(flag)] |= CAP_TO_MASK(flag))
 #define cap_lower(c, flag)  ((c).cap[CAP_TO_INDEX(flag)] &= ~CAP_TO_MASK(flag))
 #define cap_raised(c, flag) ((c).cap[CAP_TO_INDEX(flag)] & CAP_TO_MASK(flag))
@@ -220,7 +220,6 @@ enum {
 	GR_PROTPROCFD 	= 0x00000400,
 	GR_PROCACCT 	= 0x00000800,
 	GR_RELAXPTRACE  = 0x00001000,
-	//GR_NESTED	= 0x00002000,
 	GR_INHERITLEARN = 0x00004000,
 	GR_PROCFIND	= 0x00008000,
 	GR_POVERRIDE	= 0x00010000,
@@ -242,17 +241,17 @@ typedef struct _gr_cap_t {
 } gr_cap_t;
 
 struct capability_set {
-	char *cap_name;
+	const char *cap_name;
 	int cap_val;
 };
 
 struct family_set {
-	char *family_name;
+	const char *family_name;
 	int family_val;
 };
 
 struct paxflag_set {
-	char *paxflag_name;
+	const char *paxflag_name;
 	u_int16_t paxflag_val;
 };
 
@@ -291,7 +290,7 @@ struct ip_acl {
 };
 
 struct file_acl {
-	char *filename;
+	const char *filename;
 	ino_t inode;
 	u_int32_t dev;
 	u_int32_t mode;
@@ -312,17 +311,17 @@ enum {
 struct var_object {
 	union {
 		struct {
-			char *filename;
+			const char *filename;
 			u_int32_t mode;
 		} file_obj;
 		struct {
 			struct ip_acl ip;
 			u_int8_t mode;
-			char *host;
+			const char *host;
 		} net_obj;
 		struct {
-			char *cap;
-			char *audit;
+			const char *cap;
+			const char *audit;
 		} cap_obj;
 	};
 	unsigned int type;
@@ -332,14 +331,14 @@ struct var_object {
 };
 
 struct role_transition {
-	char *rolename;
+	const char *rolename;
 
 	struct role_transition *prev;
 	struct role_transition *next;
 };
 
 struct role_acl {
-	char *rolename;
+	const char *rolename;
 	uid_t uidgid;
 	u_int16_t roletype;
 
@@ -364,7 +363,7 @@ struct role_acl {
 };
 
 struct proc_acl {
-	char *filename;
+	const char *filename;
 	ino_t inode;
 	u_int32_t dev;
 	u_int32_t mode;
@@ -419,7 +418,7 @@ struct gr_learn_ip_node {
 struct gr_learn_role_entry {
 	struct gr_learn_role_entry *prev;
 	struct gr_learn_role_entry *next;
-	char *rolename;
+	const char *rolename;
 	u_int16_t rolemode;
 	unsigned int id;
 	struct gr_hash_struct *hash;
@@ -498,7 +497,7 @@ struct gr_pw_entry {
 */
 
 struct deleted_file {
-	char *filename;
+	const char *filename;
 	ino_t ino;
 	struct deleted_file *next;
 };
@@ -511,7 +510,7 @@ struct symlink {
 	struct role_acl *role;
 	struct file_acl *obj;
 	struct proc_acl *subj;
-	char *policy_file;
+	const char *policy_file;
 	unsigned long lineno;
 	struct symlink *next;
 };
@@ -523,10 +522,10 @@ struct symlink {
 struct glob_file {
 	struct role_acl *role;
 	struct proc_acl *subj;
-	char *filename;
+	const char *filename;
 	u_int32_t mode;
 	int type;
-	char *policy_file;
+	const char *policy_file;
 	unsigned long lineno;
 	struct glob_file *next;
 };
@@ -572,7 +571,7 @@ struct user_acl_role_db {
 };
 
 struct sprole_pw {
-	unsigned char *rolename;
+	const unsigned char *rolename;
 	unsigned char salt[GR_SALT_SIZE];
 	unsigned char sum[GR_SHA_SUM_SIZE];
 };
@@ -597,7 +596,7 @@ struct gr_arg_wrapper {
 	u_int32_t size;
 };
 
-extern char *rlim_table[GR_NLIMITS];
+extern const char *rlim_table[GR_NLIMITS];
 extern struct capability_set capability_list[CAP_MAX+2];
 extern struct paxflag_set paxflag_list[5];
 extern struct family_set sock_families[AF_MAX+2];
@@ -616,12 +615,12 @@ extern char *current_learn_rolename;
 extern char *current_learn_subject;
 extern u_int16_t current_learn_rolemode;
 
-extern char **dont_reduce_dirs;
-extern char **always_reduce_dirs;
-extern char **protected_paths;
-extern char **read_protected_paths;
-extern char **high_reduce_dirs;
-extern char **high_protected_paths;
+extern char ** dont_reduce_dirs;
+extern char ** always_reduce_dirs;
+extern char ** protected_paths;
+extern char ** read_protected_paths;
+extern char ** high_reduce_dirs;
+extern char ** high_protected_paths;
 extern u_int32_t grlearn_options;
 
 extern int gr_learn;
