@@ -23,13 +23,13 @@ char *strip_trailing_slash(char *filename)
 	return filename;
 }
 
-static int get_id_from_role_name(const char *rolename, u_int16_t type)
+static int get_id_from_role_name(const char *rolename, u_int16_t type, int *retid)
 {
 	unsigned long the_id = 0;
 	struct passwd *pwd;
 	struct group *grp;
 	char *endptr;
-	
+
 	if (type & GR_ROLE_USER) {
 		pwd = getpwnam(rolename);
 
@@ -39,12 +39,10 @@ static int get_id_from_role_name(const char *rolename, u_int16_t type)
 			if (*endptr == '\0')
 				pwd = getpwuid((int)the_id);
 			if (the_id > INT_MAX || *endptr != '\0') {
-				fprintf(stderr, "User %s on line %lu of %s "
-					"is invalid.\nThe RBAC system will "
-					"not be allowed to be enabled until "
-					"this error is fixed.\n", rolename,
+				fprintf(stderr, "Warning: User %s on line %lu of %s "
+					"is invalid.\n", rolename,
 					lineno, current_acl_file);
-				exit(EXIT_FAILURE);
+				return 1;
 			}
 		}
 		if (pwd)
@@ -59,12 +57,10 @@ static int get_id_from_role_name(const char *rolename, u_int16_t type)
 			if (*endptr == '\0')
 				grp = getgrgid((int)the_id);
 			if (the_id > INT_MAX || *endptr != '\0') {
-				fprintf(stderr, "Group %s on line %lu of %s "
-					"is invalid.\nThe RBAC system will "
-					"not be allowed to be enabled until "
-					"this error is fixed.\n", rolename,
+				fprintf(stderr, "Warning: Group %s on line %lu of %s "
+					"is invalid.\n", rolename,
 					lineno, current_acl_file);
-				exit(EXIT_FAILURE);
+				return 1;
 			}
 		}
 		if (grp)
@@ -72,7 +68,8 @@ static int get_id_from_role_name(const char *rolename, u_int16_t type)
 		/* else, the_id obtained above via strtoul is valid */
 	}
 
-	return (int)the_id;
+	*retid = (int)the_id;
+	return 0;
 }
 
 void
@@ -80,6 +77,7 @@ add_id_transition(struct proc_acl *subject, const char *idname, int usergroup, i
 {
 	int i;
 	int id;
+	int ret;
 
 	if (usergroup == GR_ID_USER) {
 		if ((subject->user_trans_type | allowdeny) == (GR_ID_ALLOW | GR_ID_DENY)) {
@@ -91,7 +89,9 @@ add_id_transition(struct proc_acl *subject, const char *idname, int usergroup, i
 		}
 		subject->user_trans_type |= allowdeny;
 
-		id = get_id_from_role_name(idname, GR_ROLE_USER);
+		ret = get_id_from_role_name(idname, GR_ROLE_USER, &id);
+		if (ret)
+			return;
 
 		/* dupecheck */
 		for (i = 0; i < subject->user_trans_num; i++)
@@ -115,7 +115,9 @@ add_id_transition(struct proc_acl *subject, const char *idname, int usergroup, i
 		}
 		subject->group_trans_type |= allowdeny;
 
-		id = get_id_from_role_name(idname, GR_ROLE_GROUP);
+		ret = get_id_from_role_name(idname, GR_ROLE_GROUP, &id);
+		if (ret)
+			return;
 
 		/* dupecheck */
 		for (i = 0; i < subject->group_trans_num; i++)
@@ -139,10 +141,13 @@ is_role_dupe(struct role_acl *role, const char *rolename, const u_int16_t type)
 {
 	struct role_acl *tmp;
 	int id = 0;
+	int ret;
 	int i;
 
 	if ((type & GR_ROLE_ISID) || ((type & (GR_ROLE_USER | GR_ROLE_GROUP)) && !(type & GR_ROLE_DOMAIN))) {
-		id = get_id_from_role_name(rolename, type);
+		ret = get_id_from_role_name(rolename, type, &id);
+		if (ret)
+			return 0;
 	}
 
 	for_each_role(tmp, role) {
@@ -162,6 +167,8 @@ is_role_dupe(struct role_acl *role, const char *rolename, const u_int16_t type)
 void
 add_domain_child(struct role_acl *role, const char *idname)
 {
+	int ret, id;
+
 	if (!(role->roletype & (GR_ROLE_USER | GR_ROLE_GROUP))) {
 		// should never get here
 		fprintf(stderr, "Unhandled exception 1.\n");
@@ -176,6 +183,10 @@ add_domain_child(struct role_acl *role, const char *idname)
 		exit(EXIT_FAILURE);
 	}
 
+	ret = get_id_from_role_name(idname, role->roletype, &id);
+	if (ret)
+		return;
+
 	/* reason for this is that in the kernel, the hash table which is keyed by UID/GID
 	   has a size dependent on the number of roles.  Since we want to fake a domain
 	   as being a real role for each of those users/groups by providing a pointer
@@ -189,7 +200,7 @@ add_domain_child(struct role_acl *role, const char *idname)
 
 	role->domain_child_num++;
 	role->domain_children = (gid_t *)gr_realloc(role->domain_children, role->domain_child_num * sizeof(gid_t));
-	*(role->domain_children + role->domain_child_num - 1) = get_id_from_role_name(idname, role->roletype);
+	*(role->domain_children + role->domain_child_num - 1) = id;
 
 	return;
 }
@@ -303,6 +314,7 @@ int
 add_role_acl(struct role_acl **role, const char *rolename, u_int16_t type, int ignore)
 {
 	struct role_acl *rtmp;
+	int id, ret;
 
 	if (current_role && current_role->hash == NULL) {
 		fprintf(stderr, "Error on line %lu of %s: "
@@ -351,7 +363,15 @@ add_role_acl(struct role_acl **role, const char *rolename, u_int16_t type, int i
 		rtmp->uidgid = special_role_uid++;
 	else if (strcmp(rolename, "default") || !(type & GR_ROLE_DEFAULT)) {
 		if (type & (GR_ROLE_USER | GR_ROLE_GROUP)) {
-			rtmp->uidgid = get_id_from_role_name(rolename, type);
+			ret = get_id_from_role_name(rolename, type, &id);
+			if (ret) {
+				/* ignore roles for nonexistent users/groups */
+				rtmp->roletype |= GR_ROLE_IGNORENOEXIST;
+				num_roles--;
+				num_pointers -= 2;
+				id = -1;
+			}
+			rtmp->uidgid = id;
 		} else if (type & GR_ROLE_SPECIAL) {
 			rtmp->uidgid = special_role_uid++;
 		}
@@ -365,14 +385,14 @@ add_role_acl(struct role_acl **role, const char *rolename, u_int16_t type, int i
 	*role = rtmp;
 
 	if (type & GR_ROLE_SPECIAL)
-		add_role_transition(*role,rolename);
+		add_role_transition(rtmp,rolename);
 
 	if (type & GR_ROLE_AUTH) {
-		add_gradm_acl(*role);
-		add_gradm_pam_acl(*role);
+		add_gradm_acl(rtmp);
+		add_gradm_pam_acl(rtmp);
 	}
 	if (!(type & GR_ROLE_SPECIAL))
-		add_grlearn_acl(*role);
+		add_grlearn_acl(rtmp);
 	if (type & GR_ROLE_LEARN)
 		add_rolelearn_acl();
 
@@ -1133,8 +1153,10 @@ conv_user_to_kernel(struct gr_pw_entry *entry)
 	r_tmp = role_db->r_table = (struct role_acl **) gr_alloc(racls * sizeof (struct role_acl *));
 
 	for_each_role(rtmp, current_role) {
-		*r_tmp = rtmp;
-		r_tmp++;
+		if (!(rtmp->roletype & GR_ROLE_IGNORENOEXIST)) {
+			*r_tmp = rtmp;
+			r_tmp++;
+		}
 	}
 
 	memcpy(&retarg->role_db, role_db, sizeof (struct user_acl_role_db));
