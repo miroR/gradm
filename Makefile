@@ -25,7 +25,9 @@ CC=/usr/bin/gcc
 FIND=/usr/bin/find
 STRIP=/usr/bin/strip
 LIBS := $(shell if [ "`uname -m`" != "sparc64" -a "`uname -m`" != "x86_64" ]; then echo "-lfl" ; else echo "" ; fi)
-OPT_FLAGS := $(shell if [ "`uname -m`" != "sparc64" ] && [ "`uname -m`" != "x86_64" ]; then echo "-O2" ; else echo "-O2 -m64" ; fi)
+OPT_FLAGS := -O2
+# for older versions of grsecurity, comment the above line and uncomment the below:
+#OPT_FLAGS := $(shell if [ "`uname -m`" != "sparc64" ] && [ "`uname -m`" != "x86_64" ]; then echo "-O2" ; else echo "-O2 -m64" ; fi)
 CFLAGS := $(OPT_FLAGS) -Wcast-qual -DGRSEC_DIR=\"$(GRSEC_DIR)\" -D_LARGEFILE64_SOURCE
 LDFLAGS=
 INSTALL = /usr/bin/install -c
