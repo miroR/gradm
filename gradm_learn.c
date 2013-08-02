@@ -317,14 +317,21 @@ void display_learn_logs(FILE *stream)
 	}
 
 	return;
-}	
+}
 
 
 void
 handle_learn_logs(FILE *learnlog, FILE * stream)
 {
+	struct glob_file *glob;
+
 	parse_acls();
 	expand_acls();
+
+	/* since we don't call analyze_acls(), we'll defer the errors till they load the policy */
+	for (glob = glob_files_head; glob; glob = glob->next)
+		add_globbed_object_acl(glob->subj, glob->filename, glob->mode, glob->type, glob->policy_file, glob->lineno);
+
 	perform_parse_and_reduce(learnlog);
 	display_learn_logs(stream);
 
