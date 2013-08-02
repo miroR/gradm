@@ -119,21 +119,28 @@ void merge_acl_rules(void)
 			matchrole = default_role_entry;
 
 		for_each_subject(subject, role) {
-			if (!(subject->mode & GR_LEARN))
-				continue;
 			if (matchrole)
 				matchsubj = match_file_node(matchrole->subject_list, subject->filename);
 			if (matchrole && matchsubj) {
+				if (!(subject->mode & (GR_LEARN | GR_INHERITLEARN))) {
+					matchsubj->dont_display = 1;
+					continue;
+				}
 				if (matchsubj->subject == NULL) {
 					matchsubj->subject = (struct gr_learn_subject_node *)calloc(1, sizeof(struct gr_learn_subject_node));
 					if (matchsubj->subject == NULL)
 						failure("calloc");
 				}
 
+				matchsubj->mode |= subject->mode;
+				/* learned subject was using policy inheritance */
+				if (subject->parent_subject)
+					matchsubj->mode &= ~GR_OVERRIDE;
+
 				matchsubj->subject->pax_flags = subject->pax_flags;
 
 				matchsubj->subject->cap_raise = cap_combine(matchsubj->subject->cap_raise,
-									    cap_invert(subject->cap_drop));
+									    cap_intersect(cap_invert(subject->cap_drop), subject->cap_mask));
 				matchsubj->subject->resmask |= subject->resmask;
 
 				matchsubj->subject->inaddr_any_override = subject->inaddr_any_override;

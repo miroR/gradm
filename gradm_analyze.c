@@ -368,6 +368,9 @@ check_socket_policies(struct role_acl *role)
 				role->rolename, tmp->filename);
 			exit(EXIT_FAILURE);
 		}
+		if (tmp->parent_subject && tmp->parent_subject->ips && !tmp->ips)
+			fprintf(stderr, "Warning: Network policies do not support policy inheritance.  Please inspect policy for subject %s in role %s to make sure you intended to allow all network activity.\n", tmp->filename, role->rolename);
+
 	}
 
 	return;

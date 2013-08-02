@@ -231,7 +231,11 @@
 #
 # Note that the omission of any feature of a role or subject
 # results in a default-allow
-# For instance, if no capability rules are added, an implicit +CAP_ALL is used
+# For instance, if no capability rules are added in a subject without
+# policy inheritance ("o" in subject mode), an implicit +CAP_ALL is used
+#
+# Also note that policy inheritance does not exist for network policies, only
+# file objects and capabilities inherit policy
 #
 # Commonly-used objects can be defined and used in multiple subjects
 # As an example, we'll create a variable out of a list of objects
