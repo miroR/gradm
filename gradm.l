@@ -668,7 +668,7 @@ void show_policy(void) {
 			ipp = *(proc->ips + i);
 			memcpy(&ipaddr, &(ipp->addr), sizeof(ipaddr));
 			for (c = 0; c < 32; c++)
-				if (ipp->addr & (1U << c))
+				if (ipp->netmask & (1U << c))
 					netmask++;
 			if (ipp->mode &= GR_IP_CONNECT)
 				printf("\t\tCONNECT %s %u.%u.%u.%u/%u:%d-%d", ipp->mode & GR_IP_INVERT ? "!" : "", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], netmask, ipp->low, ipp->high);
