@@ -558,6 +558,7 @@ int is_eof(void)
 			fprintf(stderr, "Unable to open included file: %s\n", tmp->name);
 			exit(EXIT_FAILURE);
 		}
+		lineno = tmp->lineno;
 		yy_switch_to_buffer(yy_create_buffer(gradmin, YY_BUF_SIZE));
 		return 0;
 	} else if (!strcmp(main_stack->stack[main_stack->sp]->name, current_acl_file))
