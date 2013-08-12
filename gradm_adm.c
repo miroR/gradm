@@ -350,7 +350,7 @@ void start_grlearn(char *logfile)
 	pid = fork();
 
 	if (!pid) {
-		execl(GRLEARN_PATH, GRLEARN_PATH, logfile, NULL);
+		execl(GRLEARN_PATH, GRLEARN_PATH, logfile, (char *)NULL);
 		exit(EXIT_FAILURE);
 	} else if (pid > 0) {
 		char b;
@@ -380,7 +380,7 @@ void stop_grlearn(void)
 	pid = fork();
 
 	if (!pid) {
-		execl(GRLEARN_PATH, GRLEARN_PATH, "-stop", NULL);
+		execl(GRLEARN_PATH, GRLEARN_PATH, "-stop", (char *)NULL);
 	}
 
 	return;

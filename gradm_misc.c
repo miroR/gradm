@@ -18,7 +18,7 @@ void check_pam_auth(const unsigned char *rolename)
 	pid = fork();
 
 	if (pid == 0) {
-		execl(GRPAM_PATH, GRPAM_PATH, rolename, NULL);
+		execl(GRPAM_PATH, GRPAM_PATH, rolename, (char *)NULL);
 		exit(EXIT_FAILURE);
 	} else if (pid > 0) {
 		int status = 0;
