@@ -135,6 +135,7 @@ protected-path /opt
 protected-path /var
 protected-path /dev/log
 protected-path /root
+protected-path /sys
 
 read-protected-path /etc/ssh
 read-protected-path /proc/kallsyms
