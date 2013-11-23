@@ -5,7 +5,7 @@ show_version(void)
 {
 	printf("gradm v%s\n"
 	       "Licensed under the GNU General Public License (GPL) version 2 or higher\n"
-	       "Copyright 2002-2012 - Brad Spengler, Open Source Security, Inc.\n", GR_VERSION);
+	       "Copyright 2002-2013 - Brad Spengler, Open Source Security, Inc.\n", GR_VERSION);
 	exit(EXIT_SUCCESS);
 }
 
@@ -28,6 +28,10 @@ show_help(void)
 	       "			Create password for RBAC administration\n"
 	       "			or a special role\n"
 	       "	-R, --reload	Reload the RBAC system while in admin mode\n"
+	       "                        Reloading will happen atomically, preserving\n"
+	       "                        special roles and inherited subjects\n"
+	       "	-r, --oldreload Reload the RBAC system using the old method that\n"
+	       "                        drops existing special roles and inherited subjects\n"
 	       "	-L <filename>, --learn\n"
 	       "			Specify the pathname for learning logs\n"
 	       "	-O <filename|directory>, --output\n"
@@ -107,7 +111,7 @@ static void verbose_stats(void)
 			/* default role */
 			;
 		}
-		
+
 		for_each_subject(stmp, rtmp) {
 			tsubjs++;
 
@@ -125,7 +129,7 @@ static void verbose_stats(void)
 					chsobjs++;
 			}
 		}
-	}				
+	}
 
 	printf("Policy statistics:\n");
 	printf("-------------------------------------------------------\n");
@@ -187,7 +191,7 @@ parse_args(int argc, char *argv[])
 	struct gr_pw_entry entry;
 	struct gr_arg_wrapper *grarg;
 	char cwd[PATH_MAX];
-	const char *const short_opts = "SVECFuDP::RL:O:M:a:p:n:hv";
+	const char *const short_opts = "SVECFuDP::RrL:O:M:a:p:n:hv";
 	const struct option long_opts[] = {
 		{"help", 0, NULL, 'h'},
 		{"version", 0, NULL, 'v'},
@@ -199,6 +203,7 @@ parse_args(int argc, char *argv[])
 		{"auth", 1, NULL, 'a'},
 		{"noauth", 1, NULL, 'n'},
 		{"reload", 0, NULL, 'R'},
+		{"oldreload", 0, NULL, 'r'},
 		{"modsegv", 1, NULL, 'M'},
 		{"verbose", 0, NULL, 'V'},
 		{"learn", 1, NULL, 'L'},
@@ -269,9 +274,13 @@ parse_args(int argc, char *argv[])
 			transmit_to_kernel(grarg);
 			break;
 		case 'R':
+		case 'r':
 			if (argc > 3)
 				show_help();
-			entry.mode = GRADM_RELOAD;
+			if (next_option == 'R')
+				entry.mode = GRADM_RELOAD;
+			else
+				entry.mode = GRADM_OLDRELOAD;
 			check_acl_status(entry.mode);
 			get_user_passwd(&entry, GR_PWONLY);
 			parse_acls();
