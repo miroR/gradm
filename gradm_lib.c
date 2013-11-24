@@ -34,7 +34,7 @@ int anchorcmp(const char *path1, const char *path2)
 	free(anchor1);
 	free(anchor2);
 	return ret;
-}	
+}
 
 int is_globbed_file(const char *filename)
 {
@@ -189,7 +189,7 @@ void resize_hash_table(struct gr_hash_struct *hash)
 	newhash->used_size = 0;
 	newhash->type = hash->type;
 	newhash->first = hash->first;
-	
+
 	for (i = 0; i < hash->table_size; i++)
 		if (hash->table[i]) {
 			insert_hash_entry(newhash, hash->table[i]);
@@ -324,19 +324,72 @@ struct file_acl *lookup_acl_object_by_inodev(struct proc_acl *subject, const cha
 	return (struct file_acl *)lookup_hash_entry(subject->hash, (void *)&obj);
 }
 
+int get_canonical_inodev(const char *name, ino_t *ino, u_int32_t *dev, int *is_symlink)
+{
+	struct stat64 st;
+	char *dirname;
+	char *parentdir;
+	DIR *dir;
+	struct dirent *dirent;
+
+	if (lstat64(name, &st))
+		return 0;
+
+	if (is_symlink)
+		*is_symlink = S_ISLNK(st.st_mode);
+
+	*ino = st.st_ino;
+	if (*ino != 1)
+		goto normal;
+
+	// if this is a mount root , obtain the inode of the mountpoint
+	// instead so that we can hide mountpoints from readdir at least
+	dirname = strrchr(name, '/');
+	if (dirname == NULL)
+		goto normal;
+	parentdir = gr_alloc(strlen(name) + 4);
+
+	/* skip past / */
+	dirname++;
+
+	strcpy(parentdir, name);
+	strcat(parentdir, "/..");
+	dir = opendir(parentdir);
+	if (dir == NULL) {
+		gr_free(parentdir);
+		goto normal;
+	}
+
+	while ((dirent = readdir(dir))) {
+		if (strcmp(dirent->d_name, dirname))
+			continue;
+		if (lstat64(parentdir, &st)) {
+			closedir(dir);
+			free(parentdir);
+			goto normal;
+		}
+		*ino = dirent->d_ino;
+		break;
+	}
+	closedir(dir);
+
+normal:
+	if (is_24_kernel)
+		*dev = MKDEV_24(MAJOR_24(st.st_dev), MINOR_24(st.st_dev));
+	else
+		*dev = MKDEV_26(MAJOR_26(st.st_dev), MINOR_26(st.st_dev));
+
+	return 1;
+}
+
 struct file_acl *lookup_acl_object_by_inodev_nofollow(struct proc_acl *subject, const char *name)
 {
 	struct stat64 st;
 	struct file_acl obj;
 	int ret;
-	ret = lstat64(name, &st);
-	if (ret)
+
+	if (!get_canonical_inodev(name, &obj.inode, &obj.dev, NULL))
 		return NULL;
-	obj.inode = st.st_ino;
-	if (is_24_kernel)
-		obj.dev = MKDEV_24(MAJOR_24(st.st_dev), MINOR_24(st.st_dev));
-	else
-		obj.dev = MKDEV_26(MAJOR_26(st.st_dev), MINOR_26(st.st_dev));
 
 	return (struct file_acl *)lookup_hash_entry(subject->hash, (void *)&obj);
 }

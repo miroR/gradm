@@ -572,9 +572,11 @@ add_proc_object_acl(struct proc_acl *subject, const char *filename,
 {
 	struct file_acl *p;
 	struct file_acl *p2;
-	struct stat64 fstat;
 	struct deleted_file *dfile;
 	const char *str;
+	ino_t inode;
+	u_int32_t dev;
+	int is_symlink;
 
 	if (!subject) {
 		fprintf(stderr, "Error on line %lu of %s.  Attempt to "
@@ -611,7 +613,7 @@ add_proc_object_acl(struct proc_acl *subject, const char *filename,
 		if (*str == '[') {
 			const char *str2 = str;
 			while (*str2) {
-				if (*str2 == ']')	
+				if (*str2 == ']')
 					return add_globbing_file(subject, filename, mode, type);
 				str2++;
 			}
@@ -619,12 +621,10 @@ add_proc_object_acl(struct proc_acl *subject, const char *filename,
 		str++;
 	}
 
-	memset(&fstat, 0, sizeof(fstat));
-
-	if (lstat64(filename, &fstat)) {
+	if (!get_canonical_inodev(filename, &inode, &dev, &is_symlink)) {
 		dfile = add_deleted_file(filename);
-		fstat.st_ino = dfile->ino;
-		fstat.st_dev = 0;
+		inode = dfile->ino;
+		dev = 0;
 		mode |= GR_DELETED;
 	}
 
@@ -636,11 +636,8 @@ add_proc_object_acl(struct proc_acl *subject, const char *filename,
 
 	p->filename = filename;
 	p->mode = mode;
-	p->inode = fstat.st_ino;
-	if (is_24_kernel)
-		p->dev = MKDEV_24(MAJOR_24(fstat.st_dev), MINOR_24(fstat.st_dev));
-	else
-		p->dev = MKDEV_26(MAJOR_26(fstat.st_dev), MINOR_26(fstat.st_dev));
+	p->inode = inode;
+	p->dev = dev;
 
 	if (type & GR_FLEARN) {
 		struct file_acl *tmp;
@@ -672,9 +669,8 @@ add_proc_object_acl(struct proc_acl *subject, const char *filename,
 
 	insert_acl_object(subject, p);
 
-	if (S_ISLNK(fstat.st_mode)) {
+	if (is_symlink)
 		add_symlink(subject, p);
-	}
 
 	return 1;
 }
