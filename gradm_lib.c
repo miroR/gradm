@@ -250,13 +250,13 @@ struct proc_acl *lookup_acl_subject_by_name(struct role_acl *role, const char *n
 	return (struct proc_acl *)lookup_name_entry(role->hash, name);
 }
 
-void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
+void *lookup_hash_entry(struct gr_hash_struct *hash, const void *entry)
 {
 	if (hash == NULL)
 		return NULL;
 
 	if (hash->type == GR_HASH_OBJECT) {
-		struct file_acl *object = (struct file_acl *)entry;
+		const struct file_acl *object = (const struct file_acl *)entry;
 		unsigned long index = fhash(object->inode, object->dev, hash->table_size);
 		struct file_acl *match;
 		unsigned char i = 0;
@@ -272,7 +272,7 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 
 		return match;
 	} else if (hash->type == GR_HASH_SUBJECT) {
-		struct proc_acl *subject = (struct proc_acl *)entry;
+		const struct proc_acl *subject = (const struct proc_acl *)entry;
 		unsigned long index = fhash(subject->inode, subject->dev, hash->table_size);
 		struct proc_acl *match;
 		unsigned char i = 0;
@@ -288,8 +288,8 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 
 		return match;
 	} else if (hash->type == GR_HASH_FILENAME) {
-		char *filename = (char *)entry;
-		u_int32_t key = full_name_hash((unsigned char *)filename);
+		const char *filename = (const char *)entry;
+		u_int32_t key = full_name_hash((const unsigned char *)filename);
 		u_int32_t index = key % hash->table_size;
 		struct gr_learn_file_tmp_node *match;
 		unsigned char i = 0;
@@ -307,21 +307,46 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, void *entry)
 	return NULL;
 }
 
-struct file_acl *lookup_acl_object_by_inodev(struct proc_acl *subject, const char *name)
-{
-	struct stat64 st;
-	struct file_acl obj;
-	int ret;
-	ret = stat64(name, &st);
-	if (ret)
-		return NULL;
-	obj.inode = st.st_ino;
-	if (is_24_kernel)
-		obj.dev = MKDEV_24(MAJOR_24(st.st_dev), MINOR_24(st.st_dev));
-	else
-		obj.dev = MKDEV_26(MAJOR_26(st.st_dev), MINOR_26(st.st_dev));
+struct gr_hash_struct *create_hash_table(int type);
 
-	return (struct file_acl *)lookup_hash_entry(subject->hash, (void *)&obj);
+static struct gr_hash_struct *mount_hash;
+
+struct gr_learn_file_tmp_node *conv_filename_to_struct(const char *filename, u_int32_t mode)
+{
+	struct gr_learn_file_tmp_node *node;
+
+	node = (struct gr_learn_file_tmp_node *)gr_alloc(sizeof(struct gr_learn_file_tmp_node));
+	node->filename = gr_strdup(filename);
+	node->mode = mode;
+
+	return node;
+}
+
+void create_mount_hash(void)
+{
+	FILE *f = fopen("/proc/mounts", "r");
+	char buf[4096] = { };
+	char *p, *p2;
+	struct gr_learn_file_tmp_node *node;
+
+	mount_hash = create_hash_table(GR_HASH_FILENAME);
+
+	if (f == NULL)
+		return;
+
+	while(fgets(buf, sizeof(buf)-1, f)) {
+		p = strchr(buf, ' ');
+		if (!p)
+			continue;
+		p2 = strchr(p+1, ' ');
+		if (!p2)
+			continue;
+		*p2 = '\0';
+		node = conv_filename_to_struct((const char *)p+1, 0);
+		insert_hash_entry(mount_hash, node);
+	}
+
+	fclose(f);
 }
 
 int get_canonical_inodev(const char *name, ino_t *ino, u_int32_t *dev, int *is_symlink)
@@ -332,14 +357,21 @@ int get_canonical_inodev(const char *name, ino_t *ino, u_int32_t *dev, int *is_s
 	DIR *dir;
 	struct dirent *dirent;
 
-	if (lstat64(name, &st))
-		return 0;
+	if (is_symlink) {
+		if (lstat64(name, &st))
+			return 0;
 
-	if (is_symlink)
 		*is_symlink = S_ISLNK(st.st_mode);
+	} else {
+		if (stat64(name, &st))
+			return 0;
+	}
 
 	*ino = st.st_ino;
-	if (*ino != 1)
+
+	if (mount_hash == NULL)
+		create_mount_hash();
+	if (mount_hash == NULL || !lookup_hash_entry(mount_hash, name))
 		goto normal;
 
 	// if this is a mount root , obtain the inode of the mountpoint
@@ -382,22 +414,31 @@ normal:
 	return 1;
 }
 
-struct file_acl *lookup_acl_object_by_inodev_nofollow(struct proc_acl *subject, const char *name)
+struct file_acl *lookup_acl_object_by_inodev(struct proc_acl *subject, const char *name)
 {
-	struct stat64 st;
 	struct file_acl obj;
-	int ret;
 
 	if (!get_canonical_inodev(name, &obj.inode, &obj.dev, NULL))
 		return NULL;
 
-	return (struct file_acl *)lookup_hash_entry(subject->hash, (void *)&obj);
+	return (struct file_acl *)lookup_hash_entry(subject->hash, (const void *)&obj);
+}
+
+struct file_acl *lookup_acl_object_by_inodev_nofollow(struct proc_acl *subject, const char *name)
+{
+	struct file_acl obj;
+	int is_symlink;
+
+	if (!get_canonical_inodev(name, &obj.inode, &obj.dev, &is_symlink))
+		return NULL;
+
+	return (struct file_acl *)lookup_hash_entry(subject->hash, (const void *)&obj);
 }
 
 struct file_acl *lookup_acl_object(struct proc_acl *subject, struct file_acl *object)
 {
 	struct file_acl *obj;
-	obj = (struct file_acl *)lookup_hash_entry(subject->hash, object);
+	obj = (struct file_acl *)lookup_hash_entry(subject->hash, (const struct file_acl *)object);
 	if (obj && !(obj->mode & GR_DELETED) && !(object->mode & GR_DELETED))
 		return obj;
 	else
@@ -406,27 +447,27 @@ struct file_acl *lookup_acl_object(struct proc_acl *subject, struct file_acl *ob
 
 struct gr_learn_file_tmp_node *lookup_learn_object(struct gr_learn_file_node *subject, char *filename)
 {
-	return (struct gr_learn_file_tmp_node *)lookup_hash_entry(subject->hash, filename);
+	return (struct gr_learn_file_tmp_node *)lookup_hash_entry(subject->hash, (const char *)filename);
 }
 
 struct gr_learn_file_tmp_node *lookup_learn_role_subject(struct gr_learn_role_entry *role, char *filename)
 {
-	return (struct gr_learn_file_tmp_node *)lookup_hash_entry(role->hash, filename);
+	return (struct gr_learn_file_tmp_node *)lookup_hash_entry(role->hash, (const char *)filename);
 }
 
 struct gr_learn_file_tmp_node *lookup_learn_group_subject(struct gr_learn_group_node *role, char *filename)
 {
-	return (struct gr_learn_file_tmp_node *)lookup_hash_entry(role->hash, filename);
+	return (struct gr_learn_file_tmp_node *)lookup_hash_entry(role->hash, (const char *)filename);
 }
 
 struct gr_learn_file_tmp_node *lookup_learn_user_subject(struct gr_learn_user_node *role, char *filename)
 {
-	return (struct gr_learn_file_tmp_node *)lookup_hash_entry(role->hash, filename);
+	return (struct gr_learn_file_tmp_node *)lookup_hash_entry(role->hash, (const char *)filename);
 }
 
 struct proc_acl *lookup_acl_subject(struct role_acl *role, struct proc_acl *subject)
 {
-	return (struct proc_acl *)lookup_hash_entry(role->hash, subject);
+	return (struct proc_acl *)lookup_hash_entry(role->hash, (const struct proc_acl *)subject);
 }
 
 
@@ -462,7 +503,7 @@ void insert_name_entry(struct gr_hash_struct *hash, void *entry)
 		}
 
 		*curr = (struct proc_acl *)entry;
-	}		
+	}
 }
 
 void insert_hash_entry(struct gr_hash_struct *hash, void *entry)

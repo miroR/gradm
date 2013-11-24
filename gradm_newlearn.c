@@ -2035,23 +2035,12 @@ void sort_file_list(struct gr_hash_struct *hash)
 	return qsort(hash->table, hash->table_size, sizeof (struct gr_learn_file_tmp_node *), strcompare);
 }
 
-struct gr_learn_file_tmp_node *conv_filename_to_struct(const char *filename, u_int32_t mode)
-{
-	struct gr_learn_file_tmp_node *node;
-
-	node = (struct gr_learn_file_tmp_node *)gr_alloc(sizeof(struct gr_learn_file_tmp_node));
-	node->filename = gr_strdup(filename);
-	node->mode = mode;
-
-	return node;
-}
-
 struct gr_learn_role_entry *
 insert_learn_role(struct gr_learn_role_entry **role_list, const char *rolename, u_int16_t rolemode)
 {
 	struct gr_learn_role_entry *tmp;
 	struct gr_learn_role_entry *newrole;
-	
+
 	for_each_list_entry(tmp, *role_list) {
 		if (!strcmp(tmp->rolename, rolename)) {
 			tmp->rolemode |= rolemode;

@@ -75,7 +75,7 @@
 		if (removed)			\
 			removed = 0;		\
 		else				\
-			x = (x)->next;		
+			x = (x)->next;
 
 #define for_each_parent_entry(x, y) \
 	for (x = (y); x; x = (x)->parent)
