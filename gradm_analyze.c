@@ -173,7 +173,7 @@ check_symlinks(void)
 
 		tmpf = get_matching_object(sym->subj, buf);
 		if (tmpf->mode != sym->obj->mode) {
-			fprintf(stdout, "Warning: permission for symlink %s in role %s, subject %s does not match that of its matching target object %s.  Symlink is specified on line %lu of %s.\n"
+			fprintf(stdout, "Warning: permission for symlink %s in role %s, subject %s does not match that of its matching target object %s.  Symlink is specified on line %lu of %s.\n",
 				sym->obj->filename, sym->role->rolename, sym->subj->filename, tmpf->filename, sym->lineno, sym->policy_file);
 		}
 		else if (!lstat64(buf, &dst_st) && !lstat64(sym->obj->filename, &src_st) && src_st.st_uid != dst_st.st_uid) {
