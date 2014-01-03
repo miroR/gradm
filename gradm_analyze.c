@@ -161,6 +161,7 @@ check_symlinks(void)
 
 	for (sym = symlinks; sym; sym = sym->next) {
 		char buf[PATH_MAX];
+		struct stat64 src_st, dst_st;
 		memset(&buf, 0, sizeof (buf));
 
 		if (!realpath(sym->obj->filename, buf))
@@ -170,10 +171,14 @@ check_symlinks(void)
 		if (!strcmp(buf, "/proc/self"))
 			continue;
 
-		tmpf = get_exact_matching_object(sym->subj, buf);
-		if (tmpf == NULL) {
-			fprintf(stdout, "Warning: object does not exist in role %s, subject %s for the target of the symlink object %s specified on line %lu of %s.\n",
-				sym->role->rolename, sym->subj->filename, sym->obj->filename, sym->lineno, sym->policy_file);
+		tmpf = get_matching_object(sym->subj, buf);
+		if (tmpf->mode != sym->obj->mode) {
+			fprintf(stdout, "Warning: permission for symlink %s in role %s, subject %s does not match that of its matching target object %s.  Symlink is specified on line %lu of %s.\n"
+				sym->obj->filename, sym->role->rolename, sym->subj->filename, tmpf->filename, sym->lineno, sym->policy_file);
+		}
+		else if (!lstat64(buf, &dst_st) && !lstat64(sym->obj->filename, &src_st) && src_st.st_uid != dst_st.st_uid) {
+			fprintf(stdout, "Warning: owner of symlink %s in role %s, subject %s does not match that of its target %s.  Symlink is specified on line %lu of %s.\n",
+				sym->obj->filename, sym->role->rolename, sym->subj->filename, buf, sym->lineno, sym->policy_file);
 		}
 	}
 
