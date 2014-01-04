@@ -187,6 +187,8 @@ char *strip_trailing_slash(char *filename);
 int get_canonical_inodev(const char *name, ino_t *ino, u_int32_t *dev, int *is_symlink);
 
 void init_res_table(void);
+int bikeshedding_detected(void);
+char *get_bikeshedded_path(const char *path);
 
 #ifdef GRADM_DEBUG
 void check_file_node_list_integrity(struct gr_learn_file_node **filelist);

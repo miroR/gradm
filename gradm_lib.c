@@ -1,5 +1,23 @@
 #include "gradm.h"
 
+int bikeshedding_detected(void)
+{
+	struct stat64 st;
+
+	if (!lstat64("/sbin", &st) && S_ISLNK(st.st_mode))
+		return 1;
+	return 0;
+}
+
+char *get_bikeshedded_path(const char *path)
+{
+	unsigned int len = strlen(path);
+	char *buf = gr_alloc(len + strlen("/usr") + 1);
+	strcpy(buf, "/usr");
+	strcat(buf, path);
+	return buf;
+}
+
 char *get_anchor(const char *filename)
 {
 	char *basepoint = gr_strdup(filename);

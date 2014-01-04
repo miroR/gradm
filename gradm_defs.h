@@ -426,7 +426,7 @@ struct gr_learn_role_entry {
 	struct gr_hash_struct *hash;
 	struct gr_learn_file_node *subject_list;
 	struct gr_learn_ip_node *allowed_ips;
-};	
+};
 
 struct gr_learn_group_node {
 	struct gr_learn_group_node *prev;

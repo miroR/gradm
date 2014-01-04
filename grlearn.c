@@ -57,7 +57,7 @@ void term_handler(int sig)
 	signal(sig, SIG_IGN);
 	if (fd2 >= 0)
 		ignore_ret = write(fd2, writebuf, writep - writebuf);
-	exit(0);	
+	exit(0);
 }
 
 int stop_daemon(void)
@@ -82,7 +82,6 @@ int stop_daemon(void)
 
 	return 0;
 }
-		
 
 int write_pid_log(pid_t pid)
 {
@@ -92,6 +91,12 @@ int write_pid_log(pid_t pid)
 	char pathname[PATH_MAX] = {0};
 	char procname[64] = {0};
 	int ignore_ret;
+	char *grlearn_path;
+
+	if (bikeshedding_detected())
+		grlearn_path = get_bikeshedded_path(GRLEARN_PATH);
+	else
+		grlearn_path = GRLEARN_PATH;
 
 	if (!stat(GR_LEARN_PID_PATH, &fstat)) {
 		fd = open(GR_LEARN_PID_PATH, O_RDONLY);
@@ -110,13 +115,13 @@ int write_pid_log(pid_t pid)
 		snprintf(procname, sizeof(procname) - 1, "/proc/%d/exe", learn_pid);
 		if (readlink(procname, pathname, PATH_MAX - 1) < 0)
 			goto start;
-		if (strcmp(pathname, GRLEARN_PATH))
+		if (strcmp(pathname, grlearn_path))
 			goto start;
 		fprintf(stdout, "Learning daemon possibly running already...killing process.\n");
 
 		kill(learn_pid, 15);
 	}
-start:		
+start:
 	fd = open(GR_LEARN_PID_PATH, O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
 
 	if (fd < 0) {
@@ -183,7 +188,7 @@ void insert_into_cache(char *str, unsigned int len)
 
 	return;
 }
-		
+
 char * rewrite_learn_entry(char *p)
 {
 	int i;
@@ -252,10 +257,10 @@ int main(int argc, char *argv[])
 
 	if (argc != 2)
 		return 1;
-	
+
 	if (!strcmp(argv[1], "-stop"))
 		return stop_daemon();
-		
+
 	signal(SIGTERM, term_handler);
 
 	parse_learn2_config();

@@ -67,11 +67,22 @@ add_gradm_acl(struct role_acl *role)
 	char *gradm_name;
 	struct ip_acl ip;
 	struct protoent *proto;
+	char *gradm_path;
+	char *grpam_path;
 
 	find_gradm_path(gradm_realpath);
 
 	gradm_name = gr_strdup(gradm_realpath);
-	if (gr_enable && strcmp(gradm_name, GRADM_PATH)) {
+
+	if (bikeshedding_detected()) {
+		gradm_path = get_bikeshedded_path(GRADM_PATH);
+		grpam_path = get_bikeshedded_path(GRPAM_PATH);
+	} else {
+		gradm_path = GRADM_PATH;
+		grpam_path = GRPAM_PATH;
+	}
+
+	if (gr_enable && strcmp(gradm_name, gradm_path)) {
 		printf("You are attempting to use a gradm binary other "
 		       "than the installed version.  Depending on your "
 		       "policy, you could be locking yourself out of "
@@ -122,7 +133,7 @@ add_gradm_acl(struct role_acl *role)
 	ADD_OBJ("/lib64", "rx");
 	ADD_OBJ("/usr/lib64", "rx");
 	ADD_OBJ(gradm_name, "x");
-	ADD_OBJ(GRPAM_PATH, "x");
+	ADD_OBJ(grpam_path, "x");
 
 	add_cap_acl(current_subject, "-CAP_ALL", NULL);
 	add_cap_acl(current_subject, "+CAP_IPC_LOCK", NULL);
@@ -135,8 +146,14 @@ add_gradm_pam_acl(struct role_acl *role)
 {
 	struct ip_acl ip;
 	struct protoent *proto;
+	char *grpam_path;
 
-	add_proc_subject_acl(role, GRPAM_PATH, proc_subject_mode_conv("ado"), 0);
+	if (bikeshedding_detected())
+		grpam_path = get_bikeshedded_path(GRPAM_PATH);
+	else
+		grpam_path = GRPAM_PATH;
+
+	add_proc_subject_acl(role, grpam_path, proc_subject_mode_conv("ado"), 0);
 
 	ADD_OBJ(GRDEV_PATH, "w");
 
@@ -189,7 +206,7 @@ add_gradm_pam_acl(struct role_acl *role)
 	ADD_OBJ("/usr/lib32", "rx");
 	ADD_OBJ("/lib64", "rx");
 	ADD_OBJ("/usr/lib64", "rx");
-	ADD_OBJ(GRPAM_PATH, "x");
+	ADD_OBJ(grpam_path, "x");
 
 	add_cap_acl(current_subject, "-CAP_ALL", NULL);
 	add_cap_acl(current_subject, "+CAP_IPC_LOCK", NULL);
@@ -218,20 +235,26 @@ add_grlearn_acl(struct role_acl *role)
 {
 	struct stat fstat;
 	struct ip_acl ip;
+	char *grlearn_path;
 
-	if (stat(GRLEARN_PATH, &fstat)) {
-		fprintf(stderr, "%s does not exist.  Please reinstall gradm.\n", GRLEARN_PATH);
+	if (bikeshedding_detected())
+		grlearn_path = get_bikeshedded_path(GRLEARN_PATH);
+	else
+		grlearn_path = GRLEARN_PATH;
+
+	if (stat(grlearn_path, &fstat)) {
+		fprintf(stderr, "%s does not exist.  Please reinstall gradm.\n", grlearn_path);
 		exit(EXIT_FAILURE);
 	}
 
-	add_proc_subject_acl(role, GRLEARN_PATH, proc_subject_mode_conv("hpado"), 0);
+	add_proc_subject_acl(role, grlearn_path, proc_subject_mode_conv("hpado"), 0);
 
 	memset(&ip, 0, sizeof (ip));
 	add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
 	add_ip_acl(current_subject, GR_IP_BIND, &ip);
 
 	ADD_OBJ("/", "h");
-	ADD_OBJ(GRLEARN_PATH, "x");
+	ADD_OBJ(grlearn_path, "x");
 
 	add_cap_acl(current_subject, "-CAP_ALL", NULL);
 
