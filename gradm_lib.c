@@ -325,8 +325,6 @@ void *lookup_hash_entry(struct gr_hash_struct *hash, const void *entry)
 	return NULL;
 }
 
-struct gr_hash_struct *create_hash_table(int type);
-
 static struct gr_hash_struct *mount_hash;
 
 struct gr_learn_file_tmp_node *conv_filename_to_struct(const char *filename, u_int32_t mode)

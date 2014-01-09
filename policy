@@ -90,6 +90,8 @@
 #      to transfer the privilege of the persistent role; only valid
 #      within a persistent role.  Transfer only occurs when the file is 
 #      opened for writing
+# Z -> tells gradm to ignore earlier object of the same name and use this
+#      one instead
 #
 # new subject modes:
 # O -> disable "writable library" restrictions for this task
@@ -105,7 +107,9 @@
 #      (enables the same environment sanitization that occurs in glibc
 #	upon execution of a suid binary)
 # x -> allows executable anonymous shared memory for this subject
-#
+# Z -> tells gradm to ignore earlier subject of the same path and use this
+#      one instead
+
 # user/group transitions:
 # You may now specify what users and groups a given subject can
 # transition to.  This can be done on an inclusive or exclusive basis.

@@ -78,6 +78,7 @@ struct var_object *differentiate_objects(struct var_object *var1, struct var_obj
 void sort_file_list(struct gr_hash_struct *hash);
 struct gr_learn_file_node *match_file_node(struct gr_learn_file_node *base, const char *filename);
 struct gr_learn_file_tmp_node *conv_filename_to_struct(const char *filename, u_int32_t mode);
+struct gr_hash_struct *create_hash_table(int type);
 void match_role(struct gr_learn_group_node *grouplist, uid_t uid, gid_t gid, struct gr_learn_group_node **group, struct gr_learn_user_node **user);
 struct gr_learn_ip_node * find_insert_ip(struct gr_learn_ip_node **base, u_int32_t ip);
 void conv_mode_to_str(u_int32_t mode, char *modestr, unsigned short len);

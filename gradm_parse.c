@@ -283,31 +283,40 @@ add_deleted_file(const char *filename)
 static struct file_acl *
 is_proc_object_dupe(struct proc_acl *subject, struct file_acl *object)
 {
-	struct file_acl *tmp;
+	struct file_acl *tmp = NULL;
 
 	tmp = lookup_acl_object_by_name(subject, object->filename);
-	if (tmp)
-		return tmp;
-	tmp = lookup_acl_object(subject, object);
-	if (tmp)
-		return tmp;
+	if (tmp == NULL)
+		tmp = lookup_acl_object(subject, object);
+	else {
+		/* found a match by filename, handle 'Z' flag here */
+		if (object->mode & GR_OBJ_REPLACE)
+			tmp->mode = object->mode &~ GR_OBJ_REPLACE;
+	}
 
-	return NULL;
+	return tmp;
 }
 
 static struct proc_acl *
 is_proc_subject_dupe(struct role_acl *role, struct proc_acl *subject)
 {
-	struct proc_acl *tmp;
+	struct proc_acl *tmp = NULL;
 
 	tmp = lookup_acl_subject_by_name(role, subject->filename);
-	if (tmp)
-		return tmp;
-	tmp = lookup_acl_subject(role, subject);
-	if (tmp)
-		return tmp;
+	if (tmp == NULL)
+		tmp = lookup_acl_subject(role, subject);
+	else {
+		/* found a match by filename, handle 'Z' flag here */
+		if (subject->mode & GR_SUBJ_REPLACE) {
+			// FIXME: we leak allocations here
+			memcpy(tmp, subject, sizeof(struct proc_acl));
+			tmp->mode = subject->mode &~ GR_SUBJ_REPLACE;
+			tmp->hash = create_hash_table(GR_HASH_OBJECT);
+			current_subject = tmp;
+		}
+	}
 
-	return NULL;
+	return tmp;
 }
 
 int
@@ -512,12 +521,7 @@ display_all_dupes(struct proc_acl *subject, struct file_acl *filp2)
 	struct file_acl ftmp;
 
 	for_each_file_object(tmp, subject) {
-	    if (!stat64(tmp->filename, &fstat)) {
-		ftmp.inode = fstat.st_ino;
-		if (is_24_kernel)
-			ftmp.dev = MKDEV_24(MAJOR_24(fstat.st_dev), MINOR_24(fstat.st_dev));
-		else
-			ftmp.dev = MKDEV_26(MAJOR_26(fstat.st_dev), MINOR_26(fstat.st_dev));
+	    if (get_canonical_inodev(tmp->filename, &ftmp.inode, &ftmp.dev, NULL)) {
 		if (ftmp.inode == filp2->inode && ftmp.dev == filp2->dev)
 			fprintf(stderr, "%s (due to symlinking/hardlinking)\n", tmp->filename);
 	    } else if (!strcmp(tmp->filename, filp2->filename)) {
@@ -552,8 +556,8 @@ parse_homedir(const char *filename)
 	}
 
 	newlen = strlen(pwd->pw_dir) + strlen(filename) - 5 + 1;
-		
-	newfilename = (char *)gr_alloc( newlen);
+
+	newfilename = (char *)gr_alloc(newlen);
 
 	if (!newfilename) {
 		fprintf(stderr, "Out of memory.\n");
@@ -653,7 +657,7 @@ add_proc_object_acl(struct proc_acl *subject, const char *filename,
 			return 1;
 		}
 	} else if ((p2 = is_proc_object_dupe(subject, p))) {
-		if (p2->mode == p->mode)
+		if (p2->mode == mode)
 			return 1;
 		fprintf(stderr, "Duplicate object found for \"%s\""
 			" in role %s, subject %s, on line %lu of %s.\n"
@@ -711,15 +715,15 @@ add_proc_subject_acl(struct role_acl *role, const char *filename, u_int32_t mode
 	if (!strncmp(filename, "$HOME", 5))
 		filename = parse_homedir(filename);
 
+	p = (struct proc_acl *) gr_alloc(sizeof (struct proc_acl));
+
 	// FIXME: for subjects we currently follow symlinks
-	if (stat(filename, &fstat)) {
+	if (!get_canonical_inodev(filename, &p->inode, &p->dev, NULL)) {
 		dfile = add_deleted_file(filename);
-		fstat.st_ino = dfile->ino;
-		fstat.st_dev = 0;
+		p->inode = dfile->ino;
+		p->dev = 0;
 		mode |= GR_DELETED;
 	}
-
-	p = (struct proc_acl *) gr_alloc(sizeof (struct proc_acl));
 
 	if (!strcmp(filename, "/") && !(flag & GR_FFAKE))
 		role->root_label = p;
@@ -727,13 +731,9 @@ add_proc_subject_acl(struct role_acl *role, const char *filename, u_int32_t mode
 	p->filename = filename;
 	p->mode = mode;
 
-	if (is_24_kernel)
-		p->dev = MKDEV_24(MAJOR_24(fstat.st_dev), MINOR_24(fstat.st_dev));
-	else
-		p->dev = MKDEV_26(MAJOR_26(fstat.st_dev), MINOR_26(fstat.st_dev));
-	p->inode = fstat.st_ino;
-
 	if (!(flag & GR_FFAKE) && (p2 = is_proc_subject_dupe(role, p))) {
+		if (mode & GR_SUBJ_REPLACE)
+			return 1;
 		fprintf(stderr, "Duplicate subject found for \"%s\""
 			" in role %s, on line %lu of %s.\n"
 			"\"%s\" references the same object as \"%s\""
@@ -871,6 +871,9 @@ proc_subject_mode_conv(const char *mode)
 		case 'O':
 			retmode |= GR_IGNORE;
 			break;
+		case 'Z':
+			retmode |= GR_SUBJ_REPLACE;
+			break;
 		case 'o':
 			retmode |= GR_OVERRIDE;
 			break;
@@ -964,6 +967,9 @@ proc_object_mode_conv(const char *mode)
 			break;
 		case 'l':
 			retmode |= GR_LINK;
+			break;
+		case 'Z':
+			retmode |= GR_OBJ_REPLACE;
 			break;
 		case 'F':
 			retmode |= GR_AUDIT_FIND;

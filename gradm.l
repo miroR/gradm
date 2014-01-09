@@ -122,7 +122,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
 					}
-<SUBJECT_STATE>[TKCAOtolhpkvdbriasx]+	{
+<SUBJECT_STATE>[TKCAOtolhpkvdbriasxZ]+	{
 					  gradmlval.num = proc_subject_mode_conv(yytext);
 					  return SUBJ_MODE;
 					}
@@ -395,7 +395,7 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 						gradmerror("invalid pathname error");
 					  return OBJ_NAME;
 					}
-<INITIAL,VAR_OBJ_STATE>[rwxahitmlLFRWXAIMcCdDspof]+	{
+<INITIAL,VAR_OBJ_STATE>[rwxahitmlLFRWXAIMcCdDspofZ]+	{
 					  gradmlval.num = proc_object_mode_conv(yytext);
 					  return OBJ_MODE;
 					}
