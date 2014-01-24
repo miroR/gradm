@@ -1,8 +1,9 @@
 ##############################################################################
-# gradm (c) 2002-2013 - Brad Spengler, Open Source Security Inc.             #
+# gradm (c) 2002-2014 - Brad Spengler, Open Source Security Inc.             #
 # http://www.grsecurity.net                                                  #
 #----------------------------------------------------------------------------#
 # gradm is licensed under the GNU GPL v2 or higher http://www.gnu.org        #
+# see COPYRIGHT and LICENSE files for more information
 ##############################################################################
 
 GRADM_BIN=gradm
