@@ -32,9 +32,25 @@ int bikeshedding_detected(void)
 char *get_bikeshedded_path(const char *path)
 {
 	unsigned int len = strlen(path);
+	struct stat64 st;
 	char *buf = gr_alloc(len + strlen("/usr") + 1);
+
+	if (strncmp(path, "/bin/", 5) && strncmp(path, "/sbin/", 6)) {
+		strcpy(buf, path);
+		return buf;
+	}
+
 	strcpy(buf, "/usr");
-	strcat(buf, path);
+
+	/* lennart breaking things for the fun of it */
+	if (!lstat64("/usr/sbin", &st) && S_ISLNK(st.st_mode) &&
+	    !lstat64("/usr/bin", &st) && !S_ISLNK(st.st_mode) &&
+	    !strncmp("/sbin/", path, 6)) {
+		strcat(buf, "/bin/");
+		strcat(buf, path + 6);
+	} else
+		strcat(buf, path);
+
 	return buf;
 }
 
