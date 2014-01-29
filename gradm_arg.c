@@ -1,11 +1,41 @@
+/*
+ * Copyright (C) 2002-2014 Bradley Spengler, Open Source Security, Inc.
+ *        http://www.grsecurity.net spender@grsecurity.net
+ *
+ * This file is part of gradm.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
 #include "gradm.h"
 
 static void
 show_version(void)
 {
-	printf("gradm v%s\n"
-	       "Licensed under the GNU General Public License (GPL) version 2 only\n"
-	       "Copyright 2002-2014 - Brad Spengler, Open Source Security, Inc.\n", GR_VERSION);
+	printf("gradm v%s - grsecurity RBAC administration and policy analysis utility\n"
+	       "Copyright 2002-2014 - Brad Spengler, Open Source Security, Inc.\n"
+	       "Email: spender@grsecurity.net\n\n"
+	       "This program is free software: you can redistribute it and/or modify\n"
+	       "it under the terms of the GNU General Public License version 2 as published\n"
+	       "by the Free Software Foundation.\n\n"
+	       "This program is distributed in the hope that it will be useful,\n"
+               "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+	       "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+	       "GNU General Public License for more details.\n\n"
+	       "You should have received a copy of the GNU General Public License\n"
+	       "along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n"
+		, GR_VERSION);
 	exit(EXIT_SUCCESS);
 }
 
@@ -13,7 +43,7 @@ static void
 show_help(void)
 {
 	printf("gradm %s\n"
-	       "grsecurity administration program\n\n"
+	       "grsecurity RBAC administration and policy analysis utility\n\n"
 	       "Usage: gradm [option] ... \n\n"
 	       "Examples:\n"
 	       "	gradm -P\n"
@@ -51,7 +81,7 @@ show_help(void)
 	       "			Authenticates to a special role through PAM\n"
 	       "	-V, --verbose   Display verbose policy statistics when enabling system\n"
 	       "	-h, --help	Display this help\n"
-	       "	-v, --version	Display version information\n",
+	       "	-v, --version	Display version and GPLv2 license information\n",
 	       GR_VERSION);
 
 	exit(EXIT_SUCCESS);
