@@ -400,6 +400,7 @@ subject /usr/sbin/sshd dpo
 	/etc/grsec	h
 	/home
 	/home/*/.ssh/authorized_keys r
+	/home/*/.ssh/authorized_keys2 r
 	/lib		rx
 	/lib32		rx
 	/libx32		rx
@@ -407,6 +408,7 @@ subject /usr/sbin/sshd dpo
 	/root
 	/proc		r
 	/proc/*/oom_adj rw
+	/proc/*/oom_score_adj rw
 	/proc/kcore	h
 	/proc/sys	h
 	/proc/sys/kernel/ngroups_max r
@@ -435,6 +437,7 @@ subject /usr/sbin/sshd dpo
 	+CAP_SYS_RESOURCE
 	+CAP_SYS_TTY_CONFIG
 	+CAP_AUDIT_WRITE
+	+CAP_KILL
 	# to access user keys
 	+CAP_DAC_OVERRIDE
 
