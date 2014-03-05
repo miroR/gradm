@@ -142,6 +142,7 @@ add_gradm_acl(struct role_acl *role)
 	ADD_OBJ("/", "h");
 	ADD_OBJ("/etc/ld.so.cache", "r");
 	ADD_OBJ("/etc/ld.so.preload", "r");
+	ADD_OBJ("/etc/ld.so.nohwcap", "r");
 	ADD_OBJ("/etc/protocols", "r");
 	ADD_OBJ("/dev/urandom", "r");
 	ADD_OBJ("/lib", "rx");
@@ -195,6 +196,7 @@ add_gradm_pam_acl(struct role_acl *role)
 	ADD_OBJ("/etc/default/passwd", "r");
 	ADD_OBJ("/etc/ld.so.cache", "r");
 	ADD_OBJ("/etc/ld.so.preload", "r");
+	ADD_OBJ("/etc/ld.so.nohwcap", "r");
 	ADD_OBJ("/etc/localtime", "r");
 	ADD_OBJ("/etc/login.defs", "r");
 	ADD_OBJ("/etc/protocols", "r");
