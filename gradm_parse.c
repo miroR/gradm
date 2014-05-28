@@ -329,7 +329,10 @@ is_proc_subject_dupe(struct role_acl *role, struct proc_acl *subject)
 		/* found a match by filename, handle 'Z' flag here */
 		if (subject->mode & GR_SUBJ_REPLACE) {
 			// FIXME: we leak allocations here
+			/* save off the old ->prev and restore it */
+			struct proc_acl *prev = tmp->prev;
 			memcpy(tmp, subject, sizeof(struct proc_acl));
+			tmp->prev = prev;
 			tmp->mode = subject->mode &~ GR_SUBJ_REPLACE;
 			tmp->hash = create_hash_table(GR_HASH_OBJECT);
 			current_subject = tmp;
