@@ -527,6 +527,9 @@ void add_include(char *includename)
 			first = tmp;
 	}
 
+	if (first == NULL)
+		return;
+
 	main_stack->stack[main_stack->sp]->dirents = first->next;	
 	path = first->name;
 
