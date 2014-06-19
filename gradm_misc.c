@@ -122,6 +122,7 @@ transmit_to_kernel(struct gr_arg_wrapper *buf)
 			fprintf(stderr, "Your request was ignored, "
 				"please check the kernel logs for more "
 				"info.\n");
+			break;
 		case EPERM:
 			if (buf->arg->mode != GRADM_UNSPROLE)
 				fprintf(stderr, "Invalid password.\n");
