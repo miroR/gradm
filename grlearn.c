@@ -336,7 +336,7 @@ int main(int argc, char *argv[])
 	if (pid > 0) {
 		exit(EXIT_SUCCESS);
 	} else if (!pid) {
-		char b;
+		char b = 0;
 		int pipefd;
 
 		write_pid_log(getpid());
@@ -349,7 +349,7 @@ int main(int argc, char *argv[])
 		close(1);
 		close(2);
 	} else {
-		char b;
+		char b = 0;
 		int pipefd;
 		pipefd = open(GR_LEARN_PIPE_PATH, O_WRONLY);
 		if (pipefd >= 0) {
