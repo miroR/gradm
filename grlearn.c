@@ -377,7 +377,7 @@ int main(int argc, char *argv[])
 						writep += len;
 					} else {
 						ignore_ret = write(fd2, writebuf, writep - writebuf);
-						memset(writebuf, 0, sizeof(4 * MAX_ENTRY_SIZE));
+						memset(writebuf, 0, 4 * MAX_ENTRY_SIZE);
 						writep = writebuf;
 					}
 				}
