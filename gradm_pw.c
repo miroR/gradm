@@ -105,7 +105,7 @@ get_user_passwd(struct gr_pw_entry *entry, int mode)
 			tcsetattr(STDIN_FILENO, TCSANOW, &term);
 		}
 
-		if ((read(STDIN_FILENO, entry->passwd, GR_PW_LEN)) < 0) {
+		if ((read(STDIN_FILENO, entry->passwd, GR_PW_LEN - 1)) < 0) {
 			fprintf(stderr,
 				"\nError reading password from user.\n");
 			term.c_lflag |= ECHO;
@@ -119,7 +119,7 @@ get_user_passwd(struct gr_pw_entry *entry, int mode)
 		term.c_lflag |= ECHO;
 		tcsetattr(STDIN_FILENO, TCSANOW, &term);
 
-		entry->passwd[strlen((char *)entry->passwd) - 1] = '\0';
+		entry->passwd[GR_PW_LEN - 1] = '\0';
 
 		if ((strlen((char *)entry->passwd) < 6) && mode == 1) {
 			fprintf(stderr,
