@@ -74,6 +74,8 @@ find_gradm_path(char *gradm_realpath)
 	if (readlink(gradm_procpath, gradm_realpath, PATH_MAX - 1) < 0)
 		failure("readlink");
 
+	gradm_realpath[PATH_MAX - 1] = '\0';
+
 	return;
 }
 
