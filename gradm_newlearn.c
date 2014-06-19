@@ -1218,8 +1218,11 @@ void insert_file(struct gr_learn_file_node **base, const char *filename, u_int32
 	if (!(*base)) {
 		if (subj) {
 			do_insert_file(base, "/", GR_PROCFIND, subj);
-			if (subj == 2) /* learning in non-full mode, don't display / subject */
+			if (subj == 2) {
+				/* learning in non-full mode, don't display / subject */
+				assert(*base != NULL);
 				(*base)->dont_display = 1;
+			}
 		} else
 			do_insert_file(base, "/", 0, subj);
 	}
