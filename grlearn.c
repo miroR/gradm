@@ -364,7 +364,7 @@ int main(int argc, char *argv[])
 	fds.events = POLLIN;
 
 	while (poll(&fds, 1, -1) > 0) {
-		retval = read(fd, buf, LEARN_BUFFER_SIZE);
+		retval = read(fd, buf, LEARN_BUFFER_SIZE - 1);
 		if (retval > 0) {
 			p = buf;
 			while (p < (buf + retval)) {
