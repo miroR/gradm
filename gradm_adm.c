@@ -209,6 +209,7 @@ add_gradm_pam_acl(struct role_acl *role)
 	ADD_OBJ("/etc/security", "r");
 	ADD_OBJ("/usr/share/zoneinfo", "r");
 	ADD_OBJ("/etc/nsswitch.conf", "r");
+	ADD_OBJ("/etc/ldap.conf", "r");
 	ADD_OBJ("/dev/urandom", "r");
 	ADD_OBJ("/proc", "");
 	ADD_OBJ("/proc/filesystems", "r");
@@ -219,6 +220,7 @@ add_gradm_pam_acl(struct role_acl *role)
 	ADD_OBJ("/dev/pts", "rw");
 	ADD_OBJ("/var/run", "");
 	ADD_OBJ("/run", "");
+	ADD_OBJ("/run/nscd/socket", "rw");
 	ADD_OBJ("/var/run/utmp", "rw");
 	ADD_OBJ("/var/run/utmpx", "rw");
 	ADD_OBJ("/var/log/faillog", "rw");
