@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 
 	if (retval != 1)
 		exit(EXIT_FAILURE);
-	
+
 	retval = pam_start(PAM_SERVICENAME, argv[1], &conv, &pamh);
 
 	if (retval == PAM_SUCCESS)

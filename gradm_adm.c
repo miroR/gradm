@@ -23,6 +23,19 @@
 #define ADD_OBJ(x, y) \
 		add_proc_object_acl(current_subject, (x), proc_object_mode_conv(y), GR_FEXIST)
 
+static struct protoent *gr_getprotobyname(const char *name)
+{
+	struct protoent *proto;
+
+	proto = getprotobyname(name);
+	if (proto == NULL) {
+		fprintf(stderr, "Error while parsing /etc/protocols.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	return proto;
+}
+
 int
 is_valid_elf_binary(const char *filename)
 {
@@ -127,15 +140,13 @@ add_gradm_acl(struct role_acl *role)
 		exit(EXIT_FAILURE);
 	}
 
-	proto = getprotobyname("udp");
-	if (proto == NULL) {
-		fprintf(stderr, "Error while parsing /etc/protocols.\n");
-		exit(EXIT_FAILURE);
-	}
+	/* for NFS */
+	proto = gr_getprotobyname("udp");
 	memset(&ip, 0, sizeof (ip));
 	ip.low = 2049;
 	ip.high = 2049;
 	ip.type = (1U << SOCK_DGRAM);
+	ip.proto[IPPROTO_IP / 32] |= (1U << (IPPROTO_IP % 32));
 	ip.proto[proto->p_proto / 32] |= (1U << (proto->p_proto % 32));
 	add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
 	memset(&ip, 0, sizeof (ip));
@@ -180,17 +191,46 @@ add_gradm_pam_acl(struct role_acl *role)
 
 	ADD_OBJ(GRDEV_PATH, "w");
 
-	proto = getprotobyname("udp");
-	if (proto == NULL) {
-		fprintf(stderr, "Error while parsing /etc/protocols.\n");
-		exit(EXIT_FAILURE);
-	}
+	/* for NFS */
+	proto = gr_getprotobyname("udp");
 	memset(&ip, 0, sizeof (ip));
 	ip.low = 2049;
 	ip.high = 2049;
 	ip.type = (1U << SOCK_DGRAM);
+	ip.proto[IPPROTO_IP / 32] |= (1U << (IPPROTO_IP % 32));
 	ip.proto[proto->p_proto / 32] |= (1U << (proto->p_proto % 32));
 	add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
+
+	/* for TCP/UDP LDAP */
+	proto = gr_getprotobyname("tcp");
+	memset(&ip, 0, sizeof (ip));
+	ip.low = 389;
+	ip.high = 389;
+	ip.type = (1U << SOCK_STREAM);
+	ip.proto[IPPROTO_IP / 32] |= (1U << (IPPROTO_IP % 32));
+	ip.proto[proto->p_proto / 32] |= (1U << (proto->p_proto % 32));
+	add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
+
+	proto = gr_getprotobyname("udp");
+	memset(&ip, 0, sizeof (ip));
+	ip.low = 389;
+	ip.high = 389;
+	ip.type = (1U << SOCK_DGRAM);
+	ip.proto[IPPROTO_IP / 32] |= (1U << (IPPROTO_IP % 32));
+	ip.proto[proto->p_proto / 32] |= (1U << (proto->p_proto % 32));
+	add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
+
+	/* for TCP SSL LDAP */
+	proto = gr_getprotobyname("tcp");
+	memset(&ip, 0, sizeof (ip));
+	ip.low = 636;
+	ip.high = 636;
+	ip.type = (1U << SOCK_STREAM);
+	ip.proto[IPPROTO_IP / 32] |= (1U << (IPPROTO_IP % 32));
+	ip.proto[proto->p_proto / 32] |= (1U << (proto->p_proto % 32));
+	add_ip_acl(current_subject, GR_IP_CONNECT, &ip);
+
+	/* no binding allowed */
 	memset(&ip, 0, sizeof (ip));
 	add_ip_acl(current_subject, GR_IP_BIND, &ip);
 
@@ -210,6 +250,7 @@ add_gradm_pam_acl(struct role_acl *role)
 	ADD_OBJ("/usr/share/zoneinfo", "r");
 	ADD_OBJ("/etc/nsswitch.conf", "r");
 	ADD_OBJ("/etc/ldap.conf", "r");
+	ADD_OBJ("/etc/ldap/ldap.conf", "r");
 	ADD_OBJ("/dev/urandom", "r");
 	ADD_OBJ("/proc", "");
 	ADD_OBJ("/proc/filesystems", "r");
@@ -220,6 +261,7 @@ add_gradm_pam_acl(struct role_acl *role)
 	ADD_OBJ("/dev/pts", "rw");
 	ADD_OBJ("/var/run", "");
 	ADD_OBJ("/run", "");
+	ADD_OBJ("/run/resolvconf/resolv.conf", "r");
 	ADD_OBJ("/run/nscd/socket", "rw");
 	ADD_OBJ("/var/run/utmp", "rw");
 	ADD_OBJ("/var/run/utmpx", "rw");
