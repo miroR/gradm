@@ -223,7 +223,7 @@ void add_net_var_object(struct var_object **object, struct ip_acl *ip, u_int8_t 
 	var.net_obj.mode = mode;
 	var.net_obj.host = host ? gr_strdup(host) : NULL;
 
-	add_var_object(object, &var);	
+	add_var_object(object, &var);
 }
 
 void add_cap_var_object(struct var_object **object, const char *name, const char *audit)
@@ -244,7 +244,6 @@ struct var_object * sym_retrieve(char *symname)
 	for (i = 0; i < symtab_size; i++)
 		if (!strcmp(symname, symtab[i].symname))
 			return symtab[i].object;
-		
 
 	return NULL;
 }
