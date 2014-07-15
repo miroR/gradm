@@ -159,7 +159,7 @@ struct var_object * differentiate_objects(struct var_object *var1, struct var_ob
 					case VAR_FILE_OBJECT:
 						if (!strcmp(path, tmpvar2->file_obj.filename)) {
 							found_dupe = 1;
-							add_file_var_object(&retvar, tmpvar1->file_obj.filename, tmpvar1->file_obj.mode &= ~tmpvar2->file_obj.mode);
+							add_file_var_object(&retvar, tmpvar1->file_obj.filename, tmpvar1->file_obj.mode & ~tmpvar2->file_obj.mode);
 							goto done;
 						}
 						break;
