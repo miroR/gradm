@@ -109,6 +109,17 @@
 		(list) = (head);		\
 	} while (0);
 
+#define for_each_variable(x, y) \
+	for (x = (y); x; x = (x)->next)
+
+#define get_list_head(x)			\
+	({					\
+		typeof (x) _x = (x);		\
+		while (_x->prev)		\
+			_x = _x->prev;		\
+		_x;				\
+	})
+
 #define MAJOR_26(dev)     ((unsigned int) ((dev)>>20))
 #define MINOR_26(dev)     ((unsigned int) ((dev) & ((1U << 20) - 1)))
 #define MKDEV_26(ma,mi)   ((mi & 0xff) | (ma << 8) | ((mi & ~0xff) << 12))

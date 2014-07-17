@@ -31,10 +31,9 @@ static unsigned int symtab_size = 0;
 void interpret_variable(struct var_object *var)
 {
 	struct var_object *tmp;
-	for (tmp = var; tmp->prev; tmp = tmp->prev)
-		;
+	struct var_object *varhead = get_list_head(var);
 
-	for (; tmp; tmp = tmp->next) {
+	for_each_variable(tmp, varhead) {
 		switch (tmp->type) {
 		case VAR_FILE_OBJECT:
 			add_proc_object_acl(current_subject, tmp->file_obj.filename, tmp->file_obj.mode, GR_FEXIST);
@@ -59,11 +58,13 @@ void interpret_variable(struct var_object *var)
 struct var_object * intersect_objects(struct var_object *var1, struct var_object *var2)
 {
 	struct var_object *tmpvar1, *tmpvar2, *retvar = NULL;
+	struct var_object *var1head = get_list_head(var1);
+	struct var_object *var2head = get_list_head(var2);
 
-	for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
+	for_each_variable(tmpvar1, var1head) {
 		switch (tmpvar1->type) {
 		case VAR_FILE_OBJECT:
-			for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
+			for_each_variable(tmpvar2, var2head) {
 				switch (tmpvar2->type) {
 				case VAR_FILE_OBJECT:
 					if (!strcmp(tmpvar1->file_obj.filename, tmpvar2->file_obj.filename)) {
@@ -87,13 +88,15 @@ struct var_object * intersect_objects(struct var_object *var1, struct var_object
 struct var_object * union_objects(struct var_object *var1, struct var_object *var2)
 {
 	struct var_object *tmpvar1, *tmpvar2, *retvar = NULL;
+	struct var_object *var1head = get_list_head(var1);
+	struct var_object *var2head = get_list_head(var2);
 	int found_dupe = 0;
 
-	for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
+	for_each_variable(tmpvar1, var1head) {
 		switch (tmpvar1->type) {
 		case VAR_FILE_OBJECT:
 			found_dupe = 0;
-			for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
+			for_each_variable(tmpvar2, var2head) {
 				switch (tmpvar2->type) {
 				case VAR_FILE_OBJECT:
 					if (!strcmp(tmpvar1->file_obj.filename, tmpvar2->file_obj.filename)) {
@@ -114,11 +117,11 @@ struct var_object * union_objects(struct var_object *var1, struct var_object *va
 		}
 	}
 
-	for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
+	for_each_variable(tmpvar2, var2head) {
 		switch (tmpvar2->type) {
 		case VAR_FILE_OBJECT:
 			found_dupe = 0;
-			for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
+			for_each_variable(tmpvar1, var1head) {
 				switch (tmpvar1->type) {
 				case VAR_FILE_OBJECT:
 					if (!strcmp(tmpvar1->file_obj.filename, tmpvar2->file_obj.filename)) {
@@ -145,16 +148,18 @@ struct var_object * union_objects(struct var_object *var1, struct var_object *va
 struct var_object * differentiate_objects(struct var_object *var1, struct var_object *var2)
 {
 	struct var_object *tmpvar1, *tmpvar2, *retvar = NULL;
+	struct var_object *var1head = get_list_head(var1);
+	struct var_object *var2head = get_list_head(var2);
 	int found_dupe = 0;
 	char *path;
 
-	for (tmpvar1 = var1; tmpvar1; tmpvar1 = tmpvar1->prev) {
+	for_each_variable(tmpvar1, var1head) {
 		switch (tmpvar1->type) {
 		case VAR_FILE_OBJECT:
 			path = gr_strdup(tmpvar1->file_obj.filename);
 			found_dupe = 0;
 			do {
-				for (tmpvar2 = var2; tmpvar2; tmpvar2 = tmpvar2->prev) {
+				for_each_variable(tmpvar2, var2head) {
 					switch (tmpvar2->type) {
 					case VAR_FILE_OBJECT:
 						if (!strcmp(path, tmpvar2->file_obj.filename)) {
