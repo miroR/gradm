@@ -267,6 +267,7 @@ add_gradm_pam_acl(struct role_acl *role)
 	ADD_OBJ("/var/run/utmpx", "rw");
 	ADD_OBJ("/var/log/faillog", "rw");
 	ADD_OBJ("/dev/log", "rw");
+	ADD_OBJ("/run/systemd/journal/dev-log", "rw");
 	ADD_OBJ("/dev/null", "rw");
 	ADD_OBJ("/lib", "rx");
 	ADD_OBJ("/usr/lib", "rx");
