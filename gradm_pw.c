@@ -120,6 +120,8 @@ get_user_passwd(struct gr_pw_entry *entry, int mode)
 		tcsetattr(STDIN_FILENO, TCSANOW, &term);
 
 		entry->passwd[GR_PW_LEN - 1] = '\0';
+		/* strip newline */
+		entry->passwd[strlen((char *)entry->passwd) - 1] = '\0';
 
 		if ((strlen((char *)entry->passwd) < 6) && mode == 1) {
 			fprintf(stderr,
