@@ -104,7 +104,7 @@ int full_reduce_allowed_ips(struct gr_learn_group_node *group,
 		reduce_ip_tree(group->allowed_ips);
 
 	return 0;
-}	
+}
 
 void fulllearn_pass2(FILE *stream)
 {
@@ -181,7 +181,7 @@ int full_reduce_ip_node(struct gr_learn_file_node *subject,
 	reduce_ports_tree(tmp);
 
 	return 0;
-}	
+}
 
 void free_subject_ids(unsigned int ***list, int thresh)
 {
@@ -226,9 +226,9 @@ int full_reduce_id_node(struct gr_learn_file_node *subject,
 		free_subject_ids(&(subject->group_trans_list), 0);
 	else
 		free_subject_ids(&(subject->group_trans_list), 3);
-	
+
 	return 0;
-}	
+}
 
 int full_reduce_ips(struct gr_learn_group_node *group,
 			 struct gr_learn_user_node *user,
@@ -262,7 +262,7 @@ void free_ip_ports(struct gr_learn_ip_node *node)
 		tmp = tmp3;
 		for_each_removable_list_entry_end(tmp);
 	}
-	
+
 	node->leaves = NULL;
 
 	tmp2 = node->ports;
@@ -386,7 +386,7 @@ void free_role_group_full(struct gr_learn_group_node *group)
 
 	free_subject_objects(group->subject_list);
 	free_ip_ports(group->allowed_ips);
-	
+
 	return;
 }
 
@@ -413,7 +413,7 @@ void enforce_hidden_file(struct gr_learn_file_node *subject, const char *filenam
 {
 	struct gr_learn_file_node *objects = subject->object_list;
 	struct gr_learn_file_node *retobj;
-	
+
 	retobj = match_file_node(objects, filename);
 	if (retobj->mode & GR_FIND && !strcmp(retobj->filename, filename))
 		retobj->mode = 0;
@@ -561,14 +561,14 @@ void generate_full_learned_acls(FILE *learnlog, FILE *stream)
 		}
 	}
 
-	
+
 
 	output_learn_header(stream);
 
 	fulllearn_pass1(learnlog);
 	fseek(learnlog, 0, SEEK_SET);
 	fulllearn_pass2(learnlog);
-	
+
 	fulllearn_pass3in = learnlog;
 
 	for_each_removable_list_entry(group, the_role_list) {
