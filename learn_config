@@ -172,7 +172,8 @@ high-protected-path /dev/log
 high-protected-path /sys
 high-protected-path /etc/ppp
 high-protected-path /etc/samba/smbpasswd
-#to protect kernel images
+
+# to protect kernel images
 high-protected-path /boot
 high-protected-path /lib/modules
 high-protected-path /lib64/modules
@@ -183,6 +184,10 @@ inherit-learn /etc/cron.hourly
 inherit-learn /etc/cron.daily
 inherit-learn /etc/cron.weekly
 inherit-learn /etc/cron.monthly
+
+# the below lines are for catching the occasional use of init.d scripts at runtime
+# comment them out if you are starting learning before services are started by init
+# (a highly non-recommended choice)
 inherit-learn /etc/init.d
 inherit-learn /etc/rc.d/init.d
 
