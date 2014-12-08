@@ -247,7 +247,7 @@ check_learning(struct role_acl *role)
 
 	if (!gr_learn && role->roletype & GR_ROLE_LEARN) {
 		fprintf(stderr,
-			"Warning: You have enabled learning on the role "
+			"Error: You have enabled learning on the role "
 			"%s.  You have not used -L on the command "
 			"line however.  If you wish to use learning "
 			"on this role, use the -L argument to gradm.  "
@@ -259,7 +259,7 @@ check_learning(struct role_acl *role)
 	for_each_subject(tmp, role) {
 	    if (!gr_learn && (tmp->mode & (GR_LEARN | GR_INHERITLEARN))) {
 			fprintf(stderr,
-				"Warning: You have enabled some form of "
+				"Error: You have enabled some form of "
 				"learning on the subject for %s in role "
 				"%s.  You have not used -L on the command "
 				"line however.  If you wish to use learning "
