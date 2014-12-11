@@ -114,7 +114,9 @@ IP [0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}
 					}
 <SUBJECT_STATE>([/]|$[(])[^ :\t\n]*	{
 					  gradmlval.string = strip_trailing_slash(process_string_replace(yytext));
-					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") || strstr(gradmlval.string, "/../"))
+					  if (strstr(gradmlval.string, "//") || strstr(gradmlval.string, "/./") ||
+					      strstr(gradmlval.string, "/../") || strchr(gradmlval.string, '*') ||
+					      strchr(gradmlval.string, '?'), strchr(gradmlval.string, '['))
 						gradmerror("invalid pathname error");
 					  return SUBJ_NAME;
 					}
