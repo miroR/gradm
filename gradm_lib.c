@@ -401,7 +401,7 @@ void create_mount_hash(void)
 	fclose(f);
 }
 
-int get_canonical_inodev(const char *name, ino_t *ino, u_int32_t *dev, int *is_symlink)
+int get_canonical_inodev(const char *name, u_int64_t *ino, u_int32_t *dev, int *is_symlink)
 {
 	struct stat64 st;
 	char *dirname;

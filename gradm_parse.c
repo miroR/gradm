@@ -284,7 +284,7 @@ add_deleted_file(const char *filename)
 {
 	struct deleted_file *dfile;
 	struct deleted_file *retfile;
-	static ino_t ino = 0x10000000;
+	static u_int64_t ino = 0x10000000;
 
 	ino++;
 
@@ -601,7 +601,7 @@ add_proc_object_acl(struct proc_acl *subject, const char *filename,
 	struct file_acl *p2;
 	struct deleted_file *dfile;
 	const char *str;
-	ino_t inode;
+	u_int64_t inode;
 	u_int32_t dev;
 	int is_symlink;
 

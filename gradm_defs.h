@@ -14,8 +14,8 @@
 #define GR_LEARN_PIPE_PATH	GRSEC_DIR "/.grlearn.pipe"
 #define GR_LEARN_PID_PATH	GRSEC_DIR "/.grlearn.pid"
 
-#define GR_VERSION		"3.0"
-#define GRADM_VERSION		0x3000
+#define GR_VERSION		"3.1"
+#define GRADM_VERSION		0x3100
 
 
 #define LEARN_LOG_BUFFER_SIZE	(16 * 1024 * 1024)
@@ -295,7 +295,7 @@ struct ip_acl {
 
 struct file_acl {
 	const char *filename;
-	ino_t inode;
+	u_int64_t inode;
 	u_int32_t dev;
 	u_int32_t mode;
 
@@ -368,7 +368,7 @@ struct role_acl {
 
 struct proc_acl {
 	const char *filename;
-	ino_t inode;
+	u_int64_t inode;
 	u_int32_t dev;
 	u_int32_t mode;
 	gr_cap_t cap_mask;
@@ -491,7 +491,7 @@ struct gr_pw_entry {
 	unsigned char sum[GR_SHA_SUM_SIZE];
 	unsigned char salt[GR_SALT_SIZE];
 	u_int32_t segv_dev;
-	ino_t segv_inode;
+	u_int64_t segv_inode;
 	uid_t segv_uid;
 	u_int16_t mode;
 };
@@ -502,7 +502,7 @@ struct gr_pw_entry {
 
 struct deleted_file {
 	const char *filename;
-	ino_t ino;
+	u_int64_t ino;
 	struct deleted_file *next;
 };
 
@@ -588,7 +588,7 @@ struct gr_arg {
 	unsigned char sp_role[GR_SPROLE_LEN];
 	struct sprole_pw *sprole_pws;
 	u_int32_t segv_dev;
-	ino_t segv_inode;
+	u_int64_t segv_inode;
 	uid_t segv_uid;
 	u_int16_t num_sprole_pws;
 	u_int16_t mode;

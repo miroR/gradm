@@ -205,7 +205,7 @@ char *get_anchor(const char *filename);
 int anchorcmp(const char *path1, const char *path2);
 
 char *strip_trailing_slash(char *filename);
-int get_canonical_inodev(const char *name, ino_t *ino, u_int32_t *dev, int *is_symlink);
+int get_canonical_inodev(const char *name, u_int64_t *ino, u_int32_t *dev, int *is_symlink);
 
 void init_res_table(void);
 int bikeshedding_detected(void);
