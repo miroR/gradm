@@ -24,7 +24,7 @@ static void
 show_version(void)
 {
 	printf("gradm v%s - grsecurity RBAC administration and policy analysis utility\n"
-	       "Copyright 2002-2014 - Brad Spengler, Open Source Security, Inc.\n"
+	       "Copyright 2002-2015 - Brad Spengler, Open Source Security, Inc.\n"
 	       "Email: spender@grsecurity.net\n\n"
 	       "This program is free software: you can redistribute it and/or modify\n"
 	       "it under the terms of the GNU General Public License version 2 as published\n"
