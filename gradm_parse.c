@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2014 Bradley Spengler, Open Source Security, Inc.
+ * Copyright (C) 2002-2015 Bradley Spengler, Open Source Security, Inc.
  *        http://www.grsecurity.net spender@grsecurity.net
  *
  * This file is part of gradm.
