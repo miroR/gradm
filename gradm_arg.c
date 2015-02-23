@@ -91,9 +91,9 @@ show_help(void)
 static void
 conv_name_to_num(const char *filename, u_int32_t *dev, u_int64_t * inode)
 {
-	struct stat fstat;
+	struct stat64 fstat;
 
-	if (stat(filename, &fstat) != 0) {
+	if (stat64(filename, &fstat) != 0) {
 		fprintf(stderr, "Unable to stat %s: %s\n", filename,
 			strerror(errno));
 		exit(EXIT_FAILURE);
