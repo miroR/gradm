@@ -58,6 +58,7 @@ struct capability_set capability_list[] = {
 	{"CAP_SYSLOG", 34},
 	{"CAP_WAKE_ALARM", 35},
 	{"CAP_BLOCK_SUSPEND", 36},
+	{"CAP_AUDIT_READ", 37},
 	{"CAP_ALL", ~0}
 };
 

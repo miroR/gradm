@@ -40,8 +40,8 @@
 #define PATH_MAX 		4096
 #define MAX_LINE_LEN 		5000
 
-// CAP_BLOCK_SUSPEND
-#define CAP_MAX			36
+// CAP_AUDIT_READ
+#define CAP_MAX			37
 
 #define MAX_INCLUDE_DEPTH	20
 #define MAX_NEST_DEPTH		8
