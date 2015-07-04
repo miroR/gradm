@@ -111,8 +111,17 @@
 #ifndef AF_CAIF
 #define AF_CAIF 37
 #endif
+#ifndef AF_ALG
+#define AF_ALG 38
+#endif
+#ifndef AF_NFC
+#define AF_NFC 39
+#endif
+#ifndef AF_VSOCK
+#define AF_VSOCK 40
+#endif
 #undef AF_MAX
-#define AF_MAX 38
+#define AF_MAX 41
 
 #define GR_NLIMITS	32
 #define GR_CRASH_RES	31
