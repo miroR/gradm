@@ -403,13 +403,13 @@ void free_entire_user_node_list(struct gr_learn_user_node **userlist)
 {
 	struct gr_learn_user_node *freeuser, *tmpuser;
 
-	for_each_list_entry(tmpuser, *userlist) {
+	for_each_removable_list_entry(tmpuser, *userlist) {
 		freeuser = tmpuser;
 		tmpuser = tmpuser->next;
 		free(freeuser->rolename);
 		gr_free(freeuser);
 	}
-		
+
 	*userlist = NULL;
 
 	return;
@@ -538,7 +538,7 @@ void reduce_roles(struct gr_learn_group_node **grouplist)
 			continue;
 		free_entire_user_node_list(&group->users);
 	}
-	
+
 	/* make sure only one role is created for each user */
 	for_each_list_entry(group, *grouplist) {
 		for_each_list_entry(tmpuser, group->users) {
