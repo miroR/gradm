@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2014 Bradley Spengler, Open Source Security, Inc.
+ * Copyright (C) 2002-2016 Bradley Spengler, Open Source Security, Inc.
  *        http://www.grsecurity.net spender@grsecurity.net
  *
  * This file is part of gradm.
@@ -91,7 +91,8 @@ add_proc_nested_acl(struct role_acl *role, const char *mainsubjname,
 			if (otmp->mode & GR_EXEC)
 				otmp->nested = current_subject;
 	}
-	current_subject->parent_subject = stmp;
+	if (!(current_subject->mode & GR_OVERRIDE) && strcmp(current_subject->filename, "/"))
+		current_subject->parent_subject = stmp;
 
 	if (!stat(nestednames[i - 1], &fstat) && S_ISREG(fstat.st_mode))
 		add_proc_object_acl(current_subject, nestednames[i - 1], proc_object_mode_conv("rx"), GR_FLEARN);

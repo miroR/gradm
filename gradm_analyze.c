@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2014 Bradley Spengler, Open Source Security, Inc.
+ * Copyright (C) 2002-2016 Bradley Spengler, Open Source Security, Inc.
  *        http://www.grsecurity.net spender@grsecurity.net
  *
  * This file is part of gradm.
@@ -289,6 +289,29 @@ check_default_objects(struct role_acl *role)
 				"role %s subject %s\nThe RBAC system will "
 				"not load until you correct this "
 				"error.\n", role->rolename, tmp->filename);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	return;
+}
+
+static void
+check_nested_default_objects(void)
+{
+	struct proc_acl *tmp;
+	struct file_acl *tmpf;
+
+	for_each_nested_subject(tmp) {
+		/* skip all inherited subjects */
+		if (tmp->parent_subject != NULL)
+			continue;
+		tmpf = lookup_acl_object_by_name(tmp, "/");
+		if (tmpf == NULL) {
+			fprintf(stderr, "Default object not found for "
+				"nested subject %s\nThe RBAC system will "
+				"not load until you correct this "
+				"error.\n", tmp->filename);
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -680,6 +703,8 @@ analyze_acls(void)
 	errs_found += insert_globbed_objects();
 
 	errs_found += check_role_transitions();
+
+	errs_found += check_nested_default_objects();
 
 	for_each_role(role, current_role)
 		if (role->roletype & GR_ROLE_DEFAULT)
