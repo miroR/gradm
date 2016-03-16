@@ -296,11 +296,12 @@ check_default_objects(struct role_acl *role)
 	return;
 }
 
-static void
+static unsigned int
 check_nested_default_objects(void)
 {
 	struct proc_acl *tmp;
 	struct file_acl *tmpf;
+	unsigned int errs_found = 0;
 
 	for_each_nested_subject(tmp) {
 		/* skip all inherited subjects */
@@ -309,14 +310,12 @@ check_nested_default_objects(void)
 		tmpf = lookup_acl_object_by_name(tmp, "/");
 		if (tmpf == NULL) {
 			fprintf(stderr, "Default object not found for "
-				"nested subject %s\nThe RBAC system will "
-				"not load until you correct this "
-				"error.\n", tmp->filename);
-			exit(EXIT_FAILURE);
+				"nested subject %s\n", tmp->filename);
+			errs_found++;
 		}
 	}
 
-	return;
+	return errs_found;
 }
 
 static void
